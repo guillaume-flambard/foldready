@@ -3,107 +3,155 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fold-Ready Index — how iOS apps will look on the iPhone Fold</title>
-<meta name="description" content="Independent Fold-Ready Score for well-known open-source iOS apps: how they will render on the 7.8 inch inner display of the iPhone Fold, and how many hours of porting work they need.">
+<title>FoldReady — your iOS app, ready for the iPhone Fold</title>
+<meta name="description" content="A Fold-Ready Score for your iOS app, and the porting work to be featured on the iPhone Fold day one. Static + pixel audit of your source tree, then fixed-price adaptation to the 7.8 inch inner display.">
 <style>
-  :root { --ink:#0F172A; --panel:#1E293B; --line:#334155; --txt:#E2E8F0; --dim:#94A3B8; --blue:#0EA5E9; --green:#22C55E; --lime:#84CC16; --yellow:#FACC15; --orange:#F97316; --red:#EF4444; }
+  :root { --ink:#0F172A; --panel:#1E293B; --line:#334155; --txt:#E2E8F0; --dim:#94A3B8; --blue:#0EA5E9; --sky:#7DD3FC; --green:#22C55E; --lime:#84CC16; --yellow:#FACC15; --orange:#F97316; --red:#EF4444; }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--ink); color:var(--txt); font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
-  .wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
-  header { display:flex; align-items:center; gap:16px; padding:28px 0 8px; }
-  header img { width:56px; height:56px; border-radius:12px; }
-  header h1 { margin:0; font-size:26px; letter-spacing:-0.02em; }
-  header .tag { color:var(--dim); margin:2px 0 0; font-size:14px; }
-  .cta { margin-left:auto; display:inline-block; background:var(--blue); color:#052E16; font-weight:700; text-decoration:none; padding:12px 20px; border-radius:12px; }
-  .intro { color:var(--dim); margin:20px 0 8px; max-width:64ch; }
-  .meta { color:var(--dim); font-size:13px; margin-bottom:24px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:20px; padding-bottom:64px; }
-  .card { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:12px; }
-  .card .top { display:flex; align-items:center; gap:14px; }
-  .card .score { font-size:40px; font-weight:800; line-height:1; min-width:74px; }
-  .card .g { padding:4px 12px; border-radius:8px; font-weight:800; color:#052E16; font-size:14px; }
-  .card h2 { margin:0; font-size:17px; }
-  .card .repo { color:var(--dim); font-size:12px; margin-top:2px; }
-  .card .stats { display:flex; gap:18px; color:var(--dim); font-size:13px; }
-  .card .stats b { color:var(--txt); font-weight:600; }
-  .checks { display:flex; flex-wrap:wrap; gap:6px; }
-  .chip { font-size:11px; padding:3px 8px; border-radius:99px; background:#0B1220; border:1px solid var(--line); color:var(--dim); }
-  .chip b { color:var(--txt); }
-  .card a { text-decoration:none; font-weight:600; font-size:13px; color:var(--blue); margin-top:auto; }
-  footer { border-top:1px solid var(--line); padding:28px 0 48px; color:var(--dim); font-size:13px; }
-  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--dim); margin-bottom:20px; }
+  body { margin:0; background:var(--ink); color:var(--txt); font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 24px; }
+  nav { display:flex; align-items:center; gap:18px; padding:22px 0; }
+  nav img { width:44px; height:44px; border-radius:10px; }
+  nav .brand { font-weight:800; font-size:19px; letter-spacing:-0.02em; }
+  nav a.link { color:var(--dim); text-decoration:none; font-size:14px; }
+  nav a.link:hover { color:var(--txt); }
+  .btn { display:inline-block; background:var(--blue); color:#052E16; font-weight:800; text-decoration:none; padding:13px 22px; border-radius:12px; font-size:15px; }
+  .btn.ghost { background:transparent; color:var(--txt); border:1px solid var(--line); }
+  .push { margin-left:auto; }
+  .hero { padding:64px 0 40px; }
+  .hero h1 { font-size:52px; line-height:1.05; letter-spacing:-0.03em; margin:0 0 18px; max-width:14ch; }
+  .hero h1 .blue { color:var(--blue); }
+  .hero .sub { color:var(--dim); font-size:19px; max-width:56ch; margin:0 0 28px; }
+  .hero .actions { display:flex; gap:12px; align-items:center; }
+  .proof { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:36px 0 0; }
+  .proof .p { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .proof .p .s { font-size:26px; font-weight:800; line-height:1; }
+  .proof .p .n { color:var(--dim); font-size:12px; margin-top:4px; }
+  section { padding:56px 0; }
+  h2 { font-size:30px; letter-spacing:-0.02em; margin:0 0 10px; }
+  .lead { color:var(--dim); max-width:62ch; margin:0 0 28px; }
+  .cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px; }
+  .card h3 { margin:0 0 8px; font-size:18px; }
+  .card p { color:var(--dim); font-size:14px; margin:0; }
+  .card .num { color:var(--blue); font-weight:800; font-size:13px; letter-spacing:.08em; }
+  .pricing { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+  .price { font-size:34px; font-weight:800; letter-spacing:-0.02em; margin:10px 0 4px; }
+  .price small { font-size:14px; color:var(--dim); font-weight:500; }
+  .tick { list-style:none; padding:0; margin:16px 0 0; font-size:14px; color:var(--dim); }
+  .tick li { padding:4px 0 4px 24px; position:relative; }
+  .tick li:before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:800; }
+  .highlight { border-color:var(--blue); }
+  .quote { border-left:3px solid var(--blue); padding:6px 0 6px 20px; color:var(--dim); font-style:italic; margin:0 0 14px; }
+  footer { border-top:1px solid var(--line); padding:36px 0 56px; color:var(--dim); font-size:14px; }
+  footer a { color:var(--blue); text-decoration:none; }
+  @media (max-width:720px){ .hero h1 { font-size:38px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <img src="reports/_brand/logo-64.png" alt="FoldReady mark">
-    <div>
-      <h1>Fold-Ready Index</h1>
-      <p class="tag">How iOS apps will look on the iPhone Fold</p>
+  <nav>
+    <img src="reports/_brand/logo-64.png" alt="FoldReady">
+    <span class="brand">foldready</span>
+    <a class="link push" href="ranking.html">Fold-Ready Index</a>
+    <a class="link" href="#pricing">Pricing</a>
+    <a class="btn" href="#pricing">Get scored</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Your iOS app, <span class="blue">ready</span> for the iPhone Fold.</h1>
+    <p class="sub">The iPhone Fold ships this fall with a 7.8" inner display. Apps that adopt the foldable layout get featured, press, and new users. Apps that don't get letterboxed. We score your app, then make it one of the good ones.</p>
+    <div class="actions">
+      <a class="btn" href="#pricing">Get your Fold-Ready Score</a>
+      <a class="btn ghost" href="ranking.html">See the Index</a>
     </div>
-    <a class="cta" href="#get">Get your app scored</a>
-  </header>
-
-  <p class="intro">The iPhone Fold's 7.8" inner display lands this fall. Parallel View keeps every app running; these scores measure how good it will look. The index audits well-known open-source iOS apps, so you can see the difference a few hours of porting makes.</p>
-  <div class="legend">
-    <span><b style="color:var(--green)">A</b> ready, featured-grade</span>
-    <span><b style="color:var(--lime)">B</b> good, some polish needed</span>
-    <span><b style="color:var(--yellow)">C</b> functional but not at home</span>
-    <span><b style="color:var(--orange)">D</b> visibly squeezed</span>
-    <span><b style="color:var(--red)">F</b> needs a real port</span>
+    <div class="proof" id="proof"></div>
   </div>
-  <p class="meta" id="meta"></p>
 
-  <div class="grid" id="grid"></div>
+  <section>
+    <h2>What your app looks like on day one</h2>
+    <p class="lead">Parallel View keeps every app running. Running is the floor. On a 7.8" canvas, a portrait app reads as a narrow column floating in black: no split-screen, no sidebar, no second glance.</p>
+    <div class="cols">
+      <div class="card"><div class="num">THE FLOOR</div><h3>It runs, squeezed</h3><p>Parallel View reflows your app automatically. It will not crash. It will also not look like it belongs on the device.</p></div>
+      <div class="card"><div class="num">THE GAP</div><h3>No split-screen, no sidebar</h3><p>The Fold runs two apps side by side and shows iPad-style sidebars. Apps without <code>NavigationSplitView</code> or the sidebar opt-in miss the two biggest launch features.</p></div>
+      <div class="card"><div class="num">THE WINDOW</div><h3>Featured at launch</h3><p>Apple curates the launch apps from the ones that adopt the foldable APIs in beta. Same thing happened with iPad, iPhone 6 Plus, and iPhone X.</p></div>
+    </div>
+  </section>
 
-  <footer id="get">
-    <h3 style="color:var(--txt)">Get your app scored</h3>
-    <p>The Fold-Ready Score is a static + pixel audit of your iOS source tree: 7 checks against the iOS 27 foldable requirements, a captured-layout pass, and an hours estimate for the port. Self-serve audits and fixed-price porting for teams that want to be featured on day one.</p>
-    <p style="margin-top:8px">hello@foldready.com</p>
+  <section id="how">
+    <h2>How we get you there</h2>
+    <p class="lead">One audit, one plan, one port. Every step produces something you can show.</p>
+    <div class="cols">
+      <div class="card"><div class="num">01 · SCORE</div><h3>Fold-Ready Score</h3><p>We scan your source tree against the iOS 27 foldable requirements and capture it on the widest simulator. You get a 0-100 score, every blocking finding, and an hours estimate.</p></div>
+      <div class="card"><div class="num">02 · PORT</div><h3>Fixed-price porting</h3><p>Adaptive layout, split-view navigation, fold-state handling, state preservation. We ship the code, you keep it. Fixed scope, fixed price.</p></div>
+      <div class="card"><div class="num">03 · FEATURE</div><h3>Launch-ready package</h3><p>Real-device validation, App Store featuring nomination, before/after screenshots for your release notes and your investors.</p></div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <p class="lead">Start with the audit. It pays for itself the day the decision meeting has numbers.</p>
+    <div class="cols pricing">
+      <div class="card">
+        <div class="num">SELF-SERVE</div>
+        <div class="price">$499 <small>/ report</small></div>
+        <ul class="tick">
+          <li>Fold-Ready Score (0-100)</li>
+          <li>Every blocking finding, file and line</li>
+          <li>Porting estimate in hours</li>
+          <li>Turnaround 48h</li>
+        </ul>
+      </div>
+      <div class="card highlight">
+        <div class="num">FIXED PRICE</div>
+        <div class="price">$15k+ <small>/ app</small></div>
+        <ul class="tick">
+          <li>Full foldable port, adaptive layout + sidebar</li>
+          <li>Split-screen and fold-state handling</li>
+          <li>Simulator + real-device validation</li>
+          <li>Before/after screenshots for release notes</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="num">RETAINER</div>
+        <div class="price">$6k <small>/ month</small></div>
+        <ul class="tick">
+          <li>Continuous Fold-Ready upkeep</li>
+          <li>New betas covered within a week</li>
+          <li>Launch-day fast lane</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why now</h2>
+    <p class="lead">The featured-app shortlist is being assembled now, from apps that already support foldable in beta. Every week closer to launch is a week harder to be on it.</p>
+    <p class="quote">"It happened with iPad in 2010, iPhone 6 Plus in 2014, iPhone X in 2017. Apps that adopt the new form factor at launch get editorial featuring and a visibility bump at the exact moment a new device brings a wave of new users."</p>
+    <p class="lead" style="margin:0">Not sure you need this? If your app is a mostly-SwiftUI app with no hardcoded frames, you might already be 80% there. The audit tells you in 48 hours.</p>
+  </section>
+
+  <footer>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <img src="reports/_brand/logo-64.png" alt="FoldReady" style="width:40px;height:40px;border-radius:10px">
+      <div><b style="color:var(--txt)">foldready</b><br>Score · Port · Feature</div>
+    </div>
+    <p style="margin:6px 0">Get your app scored: <a href="mailto:hello@foldready.com">hello@foldready.com</a></p>
+    <p style="margin:6px 0"><a href="ranking.html">Fold-Ready Index</a> · independent scores for well-known open-source iOS apps</p>
   </footer>
 </div>
 
 <script src="data.js"></script>
 <script>
-  const apps = window.FOLDREADY_APPS || [];
+  const apps = (window.FOLDREADY_APPS || []).slice(0, 6);
   const gradeColor = { A:'var(--green)', B:'var(--lime)', C:'var(--yellow)', D:'var(--orange)', F:'var(--red)' };
-  const checkLabels = {
-    'adaptive-layout':'Adaptive', 'full-screen':'ParallelView', 'navigation':'Sidebar',
-    'scene':'Scene', 'fold-state':'FoldState', 'state':'State', 'framework':'SwiftUI', 'captured-layout':'Captured'
-  };
-  const grid = document.getElementById('grid');
+  const proof = document.getElementById('proof');
   apps.forEach(a => {
-    const best = Object.entries(a.checks).sort((x,y)=>y[1]-x[1])[0];
-    const worst = Object.entries(a.checks).sort((x,y)=>x[1]-y[1])[0];
-    const chips = Object.entries(a.checks)
-      .filter(([k,v]) => v < 70)
-      .sort((x,y)=>x[1]-y[1])
-      .slice(0,4)
-      .map(([k,v]) => `<span class="chip">${checkLabels[k]||k} <b>${Math.round(v)}%</b></span>`).join('');
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="top">
-        <div class="score" style="color:${gradeColor[a.grade]}">${a.score}</div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <h2>${a.name}</h2><span class="g" style="background:${gradeColor[a.grade]}">${a.grade}</span>
-          </div>
-          <div class="repo">${a.swiftFiles} Swift files · ${a.findings} blocking findings</div>
-        </div>
-      </div>
-      <div class="stats">
-        <span>Risk <b>${a.risk}</b></span>
-        <span>Port <b>${a.hours}h</b></span>
-        <span>Best <b>${checkLabels[best[0]]||best[0]} ${Math.round(best[1])}%</b></span>
-        <span>Worst <b>${checkLabels[worst[0]]||worst[0]} ${Math.round(worst[1])}%</b></span>
-      </div>
-      ${chips ? `<div class="checks">${chips}</div>` : '<div class="checks"><span class="chip" style="color:var(--green)">no weak checks</span></div>'}
-      <a href="${a.report}" target="_blank">Full Fold-Ready report →</a>`;
-    grid.appendChild(card);
+    const el = document.createElement('div');
+    el.className = 'p';
+    el.innerHTML = `<div class="s" style="color:${gradeColor[a.grade]}">${a.score}</div><div class="n">${a.name} · ${a.grade}</div>`;
+    proof.appendChild(el);
   });
-  document.getElementById('meta').textContent = apps.length + ' apps audited · updated with the FoldReady CLI';
 </script>
 </body>
 </html>
