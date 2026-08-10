@@ -7,7 +7,7 @@
 set -euo pipefail
 
 BIN="$(cd "$(dirname "$0")/.." && pwd)/.build/debug/foldready"
-WEB="$(cd "$(dirname "$0")/.." && pwd)/web"
+WEB="$(cd "$(dirname "$0")/.." && pwd)/web-legacy"
 REPORTS="$WEB/reports"
 BRAND="$REPORTS/_brand"
 

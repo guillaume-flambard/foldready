@@ -5,8 +5,8 @@ import sys
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent
-DATA = BASE / "web" / "data.js"
-REPORTS = BASE / "web" / "reports"
+DATA = BASE / "web-legacy" / "data.js"
+REPORTS = BASE / "web-legacy" / "reports"
 
 apps = []
 for rdir in sorted(REPORTS.iterdir()):
