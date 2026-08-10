@@ -257,31 +257,49 @@ enum AuditEngine {
 
     private static func foldState(swiftFiles: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
         var findings: [Finding] = []
-        var explicit = 0, adaptive = 0
-        var any = false
+        var effectiveGeometry = 0
+        var sizeClasses = 0
+        var geometryReader = 0
+        var internalStrings = 0
+        var idiomOrientation = 0
 
         for file in swiftFiles {
-            if file.content.contains("foldState") || file.content.contains("angleDegrees")
-                || file.content.contains("mechanicalAngleDegrees") { explicit += 1; any = true }
-            if file.content.contains("didUpdateEffectiveGeometry") || file.content.contains("GeometryReader") {
-                adaptive += 1
+            let lines = file.content.components(separatedBy: .newlines)
+            if file.content.contains("didUpdateEffectiveGeometry") { effectiveGeometry += 1 }
+            if file.content.contains("horizontalSizeClass") || file.content.contains("verticalSizeClass") { sizeClasses += 1 }
+            if file.content.contains("GeometryReader") { geometryReader += 1 }
+            for (idx, line) in lines.enumerated() {
+                if line.contains("foldState") || line.contains("angleDegrees") || line.contains("mechanicalAngleDegrees") {
+                    internalStrings += 1
+                    findings.append(Finding(check: "fold-state", severity: .info,
+                        message: "foldState/angleDegrees are internal framework strings, not public API. Rely on size classes and effective geometry instead.",
+                        file: file.path, line: idx + 1))
+                }
+                if line.contains("userInterfaceIdiom") || line.contains("interfaceOrientation") {
+                    idiomOrientation += 1
+                    findings.append(Finding(check: "fold-state", severity: .minor,
+                        message: "userInterfaceIdiom/interfaceOrientation are not meaningful for layout in resizable environments; use size classes.",
+                        file: file.path, line: idx + 1))
+                }
             }
         }
 
-        if !any && adaptive == 0 {
+        if effectiveGeometry == 0 && sizeClasses == 0 && geometryReader == 0 {
             findings.append(Finding(check: "fold-state", severity: .minor,
-                message: "No fold-state or adaptive geometry handling. The app will still run via Parallel View, but has no opinion about the folded/unfolded states.",
+                message: "No adaptive geometry handling (didUpdateEffectiveGeometry, size classes, GeometryReader). The app runs via Parallel View, but has no opinion about wider canvases.",
                 file: nil, line: nil))
         }
 
         let score: Double
-        if explicit > 0 { score = 1.0 }
-        else if adaptive > 0 { score = 0.7 }
+        if effectiveGeometry > 0 || sizeClasses > 0 { score = 1.0 }
+        else if geometryReader > 0 { score = 0.7 }
         else { score = 0.2 }
+        // small penalty for layout decided by idiom/orientation
+        let penalized = max(0.0, score - Double(idiomOrientation) * 0.05)
 
-        let detail = "\(explicit) fold-state reads, \(adaptive) adaptive geometry"
-        let outcome = CheckOutcome(key: "fold-state", title: "Fold state handling",
-            weight: 0.15, score: score, detail: detail, findings: findings)
+        let detail = "\(effectiveGeometry) effectiveGeometry, \(sizeClasses) size classes, \(geometryReader) GeometryReader, \(internalStrings) internal strings"
+        let outcome = CheckOutcome(key: "fold-state", title: "Adaptive geometry (fold-aware)",
+            weight: 0.15, score: penalized, detail: detail, findings: findings)
         return (outcome, findings)
     }
 

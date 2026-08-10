@@ -114,7 +114,7 @@ const ICECUBES: ReportDetail = {
     { title: "Parallel View verification", body: "Capture inner-display layouts at 7.8in on a device and confirm the opt-in holds for every tab.", hours: 8, pct: 0.08 },
     { title: "State preservation", body: "Add @SceneStorage and scenePhase restoration across the 42 view models so the fold keeps every scroll position.", hours: 24, pct: 0.25 },
     { title: "Adaptive layout pass", body: "Resolve the 34 hardcoded frames and 6 UIScreen.main.bounds reads to the scene coordinate space.", hours: 38, pct: 0.4 },
-    { title: "Fold-state handling", body: "Add @Environment(\\.foldState) reads for book, tent and flat postures across the 5 adaptive sites.", hours: 42, pct: 0.44 },
+    { title: "Adaptive geometry pass", body: "Add size-class reads and respond to didUpdateEffectiveGeometry across the 5 adaptive sites so the layout reflows, not letterboxes, on wide canvases.", hours: 42, pct: 0.44 },
     { title: "Sidebar & adaptive navigation", body: "Replace the 31 stacked tabs with NavigationSplitView and a sidebar opt-in — the single largest lift, and the one that earns the featured look on the inner display.", hours: 96, pct: 1 },
   ],
 };

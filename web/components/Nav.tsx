@@ -17,7 +17,7 @@ function ThemeToggle() {
 
 const LINKS = [
   { href: "/ranking", label: "Index" },
-  { href: "/components", label: "Design system" },
+  { href: "/", label: "How it works", anchor: "#how" },
   { href: "/", label: "Pricing", anchor: "#pricing" },
 ];
 
@@ -31,7 +31,7 @@ export function Nav() {
       </Link>
       <div className="links">
         {LINKS.map((l) => {
-          const href = l.anchor && l.href === "/" ? "/#pricing" : l.href;
+          const href = l.anchor ? `/${l.anchor}` : l.href;
           const current = pathname === l.href;
           return (
             <Link key={l.label} href={href} aria-current={current ? "page" : undefined}>

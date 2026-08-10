@@ -61,6 +61,32 @@ adopted split-view sidebars and adaptive layout, not the ones that merely surviv
 
 Grade bands: A >= 75, B >= 60, C >= 45, D >= 30, F < 30. Risk: low / medium / high.
 
+## Porting engine
+
+Beyond the audit, `foldready` generates and applies porting patches. The engine runs
+7 transforms, each gated by a confidence tier, and closes the loop: audit → port →
+re-score.
+
+```sh
+./.build/debug/foldready port <repo> [--tiers srm] [--apply] [--out <dir>]
+./.build/debug/foldready verify <repo>            # re-audit after a port
+```
+
+| Tier | Transforms |
+|---|---|
+| safe | Remove `UIRequiresFullScreen` (Info.plist) · UIKit tab bar → sidebar opt-in |
+| review | Migrate to `UIScene` lifecycle (manifest + SceneDelegate) · replace `UIScreen.main.bounds` · wrap root `NavigationStack` in `NavigationSplitView` |
+| manual | `@SceneStorage` state preservation · de-hardcode fixed frames (guidance + snippets) |
+
+Dry run by default: writes a `porting-report.md` with unified diffs per transform.
+`--apply` writes edits to the working tree. The verification loop is the point: a
+ported fixture goes 20/100 → 51/100 with the safe + review tiers applied.
+
+The transforms target the **public** iOS 27 contract (scene lifecycle mandate,
+Parallel View opt-in, adaptive layout, `NavigationSplitView` + `.adaptiveSidebar`).
+The internal `foldState`/`angleDegrees` strings are NOT public API and are treated as
+info-only, never as a port target.
+
 ## Web app (Next.js)
 
 The marketing + product site implements the design system v2 (Space Grotesk /

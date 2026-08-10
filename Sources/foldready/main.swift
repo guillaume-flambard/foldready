@@ -16,6 +16,10 @@ struct CliOptions {
     var open: Bool = false
     var visual: Bool = false
     var screenshotsDir: String?
+    var port: Bool = false
+    var verify: Bool = false
+    var apply: Bool = false
+    var tiers: [TransformTier] = [.safe, .review, .manual]
 }
 
 func usage() -> Never {
@@ -25,6 +29,8 @@ func usage() -> Never {
     USAGE
       foldready <path> [options]          Audit an iOS source tree
       foldready visual <dir> [--open]     Analyze screenshots only (captured layout)
+      foldready port <path> [options]     Generate porting patches (or apply with --apply)
+      foldready verify <path> [options]   Re-audit after a port (score delta)
 
     OPTIONS
       --name <name>           App name used in the report (default: folder name)
@@ -32,10 +38,25 @@ func usage() -> Never {
       --with-screenshots <dir> Add a "Captured layout" check from PNG screenshots in <dir>
       --json                  Also write result.json (machine readable)
       --open                  Open the HTML report in the default browser
+      --apply                 (port) write patches to the working tree
+      --tiers <t|r|m>         (port) transform tiers: safe/review/manual, or sr/m (default srm)
       --version               Print version
       -h, --help              Show this help
     """)
     exit(0)
+}
+
+func parseTiers(_ raw: String) -> [TransformTier] {
+    var tiers: [TransformTier] = []
+    for c in raw.lowercased() {
+        switch c {
+        case "s": if !tiers.contains(.safe) { tiers.append(.safe) }
+        case "r": if !tiers.contains(.review) { tiers.append(.review) }
+        case "m": if !tiers.contains(.manual) { tiers.append(.manual) }
+        default: break
+        }
+    }
+    return tiers
 }
 
 func parseArgs(_ args: [String]) -> CliOptions {
@@ -50,6 +71,15 @@ func parseArgs(_ args: [String]) -> CliOptions {
             exit(0)
         case "visual":
             opts.visual = true
+        case "port":
+            opts.port = true
+        case "verify":
+            opts.verify = true
+        case "--apply":
+            opts.apply = true
+        case "--tiers":
+            i += 1
+            if i < args.count { opts.tiers = parseTiers(args[i]) }
         case "--name":
             i += 1
             if i < args.count { opts.appName = args[i] }
@@ -100,6 +130,42 @@ func main() {
     }
 
     let appName = opts.appName ?? (root as NSString).lastPathComponent
+
+    if opts.port {
+        let options = PortOptions(tiers: opts.tiers, apply: opts.apply, outDir: opts.outDir)
+        let result = PortEngine.run(root: root, appName: appName, options: options)
+        print(color("FoldReady port", "36") + " - \(appName)")
+        let mode = options.apply ? "applied" : "dry run"
+        print("  mode: \(color(mode, options.apply ? "32" : "33"))  tiers: \(options.tiers.map(\.rawValue).joined(separator: ","))")
+        if options.apply { print("  \(color("\(result.appliedCount) edits written", "32")) to the working tree") }
+        for patch in result.plan.patches {
+            let n = patch.edits.count + patch.newFiles.count
+            let label = patch.tier == .safe ? "SAFE" : (patch.tier == .review ? "REVIEW" : "MANUAL")
+            print("  \(color("[\(label)]", patch.tier == .safe ? "32" : "33"))  \(patch.title)  (\(n) file\(n == 1 ? "" : "s"))")
+            for note in patch.notes.prefix(2) { print("      - \(note)") }
+        }
+        if result.plan.patches.isEmpty { print("  nothing to port — the app is already fold-ready on these checks.") }
+        if let report = result.reportPath {
+            print("  report: \(report)")
+            if opts.open {
+                let p = Process()
+                p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+                p.arguments = [report]
+                try? p.run()
+            }
+        }
+        exit(0)
+    }
+
+    if opts.verify {
+        let screenshots = opts.screenshotsDir.map { listPNGs(in: $0) } ?? []
+        let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
+        print(color("FoldReady verify", "36") + " - \(appName)")
+        print("  score after port: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)")
+        print("  compare with the pre-port score from your audit report.")
+        print("  full audit: foldready \(root) --name \"\(appName)\"")
+        exit(0)
+    }
 
     if opts.visual {
         let shots = listPNGs(in: root)
