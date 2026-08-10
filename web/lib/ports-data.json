@@ -1,0 +1,278 @@
+{
+  "dime": {
+    "app": "Dime",
+    "hasPatch": false,
+    "transforms": [
+      {
+        "id": "scene-lifecycle",
+        "title": "UIScene lifecycle",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "screen-bounds",
+        "title": "Replace UIScreen.main.bounds",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "adaptive-navigation",
+        "title": "NavigationStack \u2192 NavigationSplitView",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "state-preservation",
+        "title": "State preservation across fold transitions",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "dehardcode-frames",
+        "title": "De-hardcode fixed frames",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      }
+    ]
+  },
+  "icecubesapp": {
+    "app": "IceCubesApp",
+    "hasPatch": true,
+    "transforms": [
+      {
+        "id": "scene-lifecycle",
+        "title": "UIScene lifecycle",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "screen-bounds",
+        "title": "Replace UIScreen.main.bounds",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "adaptive-navigation",
+        "title": "NavigationStack \u2192 NavigationSplitView",
+        "tier": "review",
+        "files": 24,
+        "edits": 24,
+        "newFiles": 0
+      },
+      {
+        "id": "state-preservation",
+        "title": "State preservation across fold transitions",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "dehardcode-frames",
+        "title": "De-hardcode fixed frames",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      }
+    ]
+  },
+  "isowords": {
+    "app": "isowords",
+    "hasPatch": true,
+    "transforms": [
+      {
+        "id": "scene-lifecycle",
+        "title": "UIScene lifecycle",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "screen-bounds",
+        "title": "Replace UIScreen.main.bounds",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "adaptive-navigation",
+        "title": "NavigationStack \u2192 NavigationSplitView",
+        "tier": "review",
+        "files": 2,
+        "edits": 2,
+        "newFiles": 0
+      },
+      {
+        "id": "state-preservation",
+        "title": "State preservation across fold transitions",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "dehardcode-frames",
+        "title": "De-hardcode fixed frames",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      }
+    ]
+  },
+  "mochidiffusion": {
+    "app": "MochiDiffusion",
+    "hasPatch": false,
+    "transforms": [
+      {
+        "id": "scene-lifecycle",
+        "title": "UIScene lifecycle",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "screen-bounds",
+        "title": "Replace UIScreen.main.bounds",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "adaptive-navigation",
+        "title": "NavigationStack \u2192 NavigationSplitView",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "state-preservation",
+        "title": "State preservation across fold transitions",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "dehardcode-frames",
+        "title": "De-hardcode fixed frames",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      }
+    ]
+  },
+  "movieswiftui": {
+    "app": "MovieSwiftUI",
+    "hasPatch": false,
+    "transforms": [
+      {
+        "id": "scene-lifecycle",
+        "title": "UIScene lifecycle",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "screen-bounds",
+        "title": "Replace UIScreen.main.bounds",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "adaptive-navigation",
+        "title": "NavigationStack \u2192 NavigationSplitView",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "state-preservation",
+        "title": "State preservation across fold transitions",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "dehardcode-frames",
+        "title": "De-hardcode fixed frames",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      }
+    ]
+  },
+  "openfoodfacts": {
+    "app": "openfoodfacts-ios",
+    "hasPatch": true,
+    "transforms": [
+      {
+        "id": "scene-lifecycle",
+        "title": "Migrate to UIScene lifecycle",
+        "tier": "review",
+        "files": 2,
+        "edits": 1,
+        "newFiles": 1
+      },
+      {
+        "id": "screen-bounds",
+        "title": "Replace UIScreen.main.bounds",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "adaptive-navigation",
+        "title": "NavigationStack \u2192 NavigationSplitView",
+        "tier": "review",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "state-preservation",
+        "title": "State preservation across fold transitions",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      },
+      {
+        "id": "dehardcode-frames",
+        "title": "De-hardcode fixed frames",
+        "tier": "manual",
+        "files": 0,
+        "edits": 0,
+        "newFiles": 0
+      }
+    ]
+  }
+}

@@ -82,6 +82,12 @@ a:hover { color: var(--sky); }
 .gchip { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 9px; border-radius: 8px; font: 700 14px/1 var(--font-mono); color: var(--on-chip); }
 .gchip.a { background: var(--gA); } .gchip.b { background: var(--gB); } .gchip.c { background: var(--gC); } .gchip.d { background: var(--gD); } .gchip.f { background: var(--gF); }
 
+/* TIER BADGES (port plan) */
+.tier { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: 999px; font: 700 10px/1 var(--font-mono); letter-spacing: .08em; white-space: nowrap; }
+.tier.safe { color: var(--green); border: 1px solid rgba(34,197,94,.4); background: rgba(34,197,94,.08); }
+.tier.review { color: var(--gD); border: 1px solid rgba(249,115,22,.4); background: rgba(249,115,22,.08); }
+.tier.manual { color: var(--blue); border: 1px solid rgba(14,165,233,.4); background: rgba(14,165,233,.08); }
+
 /* KICKER + SECTIONS */
 .kicker { display: inline-flex; align-items: center; gap: 8px; font: 500 11px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--blue); padding: 6px 12px; border: 1px solid rgba(14,165,233,.4); border-radius: 999px; }
 section.block { padding: 52px 0; border-bottom: 1px solid var(--line); }

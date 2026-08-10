@@ -1,0 +1,87 @@
+# FoldReady — porting report: MovieSwiftUI
+
+**Dry run — review the patches, then re-run with `--apply`.**
+
+## UIScene lifecycle · REVIEW (check the diff)
+
+- Scene lifecycle already present.
+
+## Replace UIScreen.main.bounds · REVIEW (check the diff)
+
+- MovieSwift/MovieSwiftTV/AppDelegate.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.
+- MovieSwift/MovieSwift/views/components/discover/DraggableCover.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.
+- UIScreen.main is deprecated in iOS 27; reads must come from the window scene / effective geometry.
+
+## NavigationStack → NavigationSplitView · REVIEW (check the diff)
+
+- No top-level NavigationStack without an existing NavigationSplitView found.
+
+## State preservation across fold transitions · MANUAL (suggested)
+
+- MovieSwift/MovieSwiftTV/AppDelegate.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwiftTV/views/MoviesView.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/shared/images/ListImage.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/shared/images/ImagesCarouselView.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/shared/contextMenu/MovieContextMenu.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/home/HomeView.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/home/outline/OutlineMenu.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/fan club/FanClubHome.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/discover/DiscoverView.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/peopleDetail/rows/PeopleDetailImagesRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/peopleDetail/rows/PeopleDetailMovieRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/peopleDetail/PeopleDetail.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/genres/GenresList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesHome/models/MoviesMenuListPageListener.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesHome/models/MoviesSelectedMenuStore.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesHome/list/MoviesHomeList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesHome/MoviesHome.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesHome/grid/MoviesHomeGrid.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesHome/grid/rows/MoviesHomeGridMoviesRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/custom list/rows/CustomListCoverRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/custom list/rows/CustomListRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/custom list/rows/CustomListHeaderRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/custom list/CustomListDetail.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/custom list/CustomListForm.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/myLists/MyLists.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/MovieDetail.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieCoverRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieBackdropsRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieCrosslinePeopleRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MoviePostersRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieCrosslineRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieKeywords.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieButtonsRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/movieDetail/reviews/MovieReviews.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/MovieKeywordList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/rows/MovieRow.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/MoviesGenreList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/MoviesCrewList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/base/MoviesSearch.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/base/MoviesList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/MovieSwift/views/components/moviesList/base/MoviesPageListener.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/flux/models/MovieUserMeta.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/flux/models/CustomList.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/flux/state/AppState.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/flux/state/MoviesState.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/flux/actions/MoviesActions.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/flux/reducers/MoviesReducer.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/extensions/Collection.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Shared/extensions/ActionSheet.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- MovieSwift/Packages/UI/Sources/UI/fields/SearchField.swift: add @SceneStorage for selection/scroll so the fold transition keeps user state.
+- Pattern: @SceneStorage("selection") var selection: String? — survives the scene geometry change.
+
+## De-hardcode fixed frames · MANUAL (suggested)
+
+- MovieSwift/MovieSwift/views/shared/images/PeopleImage.swift: 4 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/shared/images/ImagesCarouselView.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/discover/DiscoverCoverImage.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/discover/DiscoverView.swift: 5 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/peopleDetail/PeopleDetail.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/moviesHome/MoviesHome.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/custom list/rows/CustomListRow.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/custom list/CustomListDetail.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/myLists/MyLists.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/MovieSwift/views/components/movieDetail/rows/MovieCrosslineRow.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/Packages/UI/Sources/UI/badges/RoundedBadge.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+- MovieSwift/Packages/UI/Sources/UI/badges/PopularityBadge.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.
+

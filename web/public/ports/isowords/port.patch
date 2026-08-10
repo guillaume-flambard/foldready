@@ -1,0 +1,16 @@
+--- a/Sources/AppFeature/AppView.swift
++++ b/Sources/AppFeature/AppView.swift
+@@ -313,1 +313,1 @@
++        NavigationSplitView { NavigationStack {
+-        NavigationStack {
+@@ -335,1 +335,1 @@
++      } } detail: { Color.clear }
+-      }
+--- a/Sources/GameCore/Views/GameView.swift
++++ b/Sources/GameCore/Views/GameView.swift
+@@ -145,1 +145,1 @@
++        NavigationSplitView { NavigationStack {
+-        NavigationStack {
+@@ -148,1 +148,1 @@
++      } } detail: { Color.clear }
+-      }

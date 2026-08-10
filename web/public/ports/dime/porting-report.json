@@ -1,0 +1,119 @@
+{
+  "app" : "Dime",
+  "applied" : false,
+  "patches" : [
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "scene-lifecycle",
+      "newFiles" : 0,
+      "notes" : [
+        "Scene lifecycle already present."
+      ],
+      "tier" : "review",
+      "title" : "UIScene lifecycle"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "screen-bounds",
+      "newFiles" : 0,
+      "notes" : [
+        "app\/dime\/Utilities\/KeyboardHeightHelper.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Utilities\/AlertToast.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/TransactionView.swift: 3 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/WelcomeSheetView.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/ImportDataView.swift: 2 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/TemplateTransactionView.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/LogView.swift: 4 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/BudgetView.swift: 6 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/InsightsView.swift: 16 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "app\/dime\/Views\/NewBudgetView.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "UIScreen.main is deprecated in iOS 27; reads must come from the window scene \/ effective geometry."
+      ],
+      "tier" : "review",
+      "title" : "Replace UIScreen.main.bounds"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "adaptive-navigation",
+      "newFiles" : 0,
+      "notes" : [
+        "No top-level NavigationStack without an existing NavigationSplitView found."
+      ],
+      "tier" : "review",
+      "title" : "NavigationStack → NavigationSplitView"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "state-preservation",
+      "newFiles" : 0,
+      "notes" : [
+        "app\/dime\/Utilities\/OffsetHelper.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Utilities\/TestDragToAdd.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Components\/Transactions\/SuggestedTransactions.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Components\/Transactions\/TransactionCategoryPicker.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/Settings\/SettingsView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsUpcomingView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsCurrencyView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsWeekStartView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsFeatureLabView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/CategoryView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/TransactionView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/UpdateSheet.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/ImportDataView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/TemplateTransactionView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/LogView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/BudgetView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/InsightsView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "app\/dime\/Views\/NewBudgetView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Pattern: @SceneStorage(\"selection\") var selection: String? — survives the scene geometry change."
+      ],
+      "tier" : "manual",
+      "title" : "State preservation across fold transitions"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "dehardcode-frames",
+      "newFiles" : 0,
+      "notes" : [
+        "app\/dime\/Utilities\/AlertToast.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Utilities\/TestDragToAdd.swift: 3 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Components\/Buttons\/InsightsSummaryBlock.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Components\/Buttons\/DetailedBudgetViewTopBarButtons.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Components\/Toolbar\/ToolbarButton.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Components\/Transactions\/NumberPad.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Shortcuts\/Actions\/NewTransactionIntent.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/Settings\/SettingsView.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsUpcomingView.swift: 4 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsAppIconView.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsNotificationView.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsCloudView.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsFeatureLabView.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/SingleTransactionPhotoView.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/CategoryView.swift: 21 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/TransactionView.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/WelcomeSheetView.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/LineGraph.swift: 5 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/TestView.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/ImportDataView.swift: 7 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/TemplateTransactionView.swift: 3 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/LogView.swift: 5 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/BudgetView.swift: 4 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/InsightsView.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/CustomTabBar.swift: 3 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/dime\/Views\/NewBudgetView.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/ExpenditureWidget\/MainBudgetWidget.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/ExpenditureWidget\/RecentTransactionsWidget.swift: 3 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/ExpenditureWidget\/BudgetWidget.swift: 2 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/ExpenditureWidget\/InsightsWidget.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes.",
+        "app\/ExpenditureWidget\/TemplateTransactionWidget.swift: 1 hardcoded frame(s) — prefer .containerRelativeFrame, GeometryReader, or intrinsic sizes."
+      ],
+      "tier" : "manual",
+      "title" : "De-hardcode fixed frames"
+    }
+  ]
+}

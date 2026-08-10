@@ -4,6 +4,7 @@ import { APPS, CHECK_LABELS, CHECK_WEIGHTS, GRADE_COLOR, appBySlug, reportDetail
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { SeverityChip, SegBar } from "@/components/ScoreCard";
 import { PageMotion } from "@/components/Motion";
+import { PortPlan } from "@/components/PortPlan";
 
 export function generateStaticParams() {
   return APPS.map((a) => ({ slug: a.slug }));
@@ -171,6 +172,8 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
           </div>
         ))}
       </section>
+
+      <PortPlan slug={app.slug} />
 
       <section className="block" style={{ borderBottom: 0 }}>
         <div className="band">

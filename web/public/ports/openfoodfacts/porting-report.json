@@ -1,0 +1,95 @@
+{
+  "app" : "openfoodfacts-ios",
+  "applied" : false,
+  "patches" : [
+    {
+      "edits" : 1,
+      "files" : 2,
+      "id" : "scene-lifecycle",
+      "newFiles" : 1,
+      "notes" : [
+        "Added UIApplicationSceneManifest to Snapshots\/Info.plist.",
+        "UIScene lifecycle is REQUIRED from the iOS 27 SDK — apps without it fail to launch (TN3187).",
+        "Set the real rootViewController in SceneDelegate (currently a placeholder)."
+      ],
+      "tier" : "review",
+      "title" : "Migrate to UIScene lifecycle"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "screen-bounds",
+      "newFiles" : 0,
+      "notes" : [
+        "Sources\/AppDelegate.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "Sources\/Views\/Products\/Search\/StateViews\/EmptyView.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
+        "UIScreen.main is deprecated in iOS 27; reads must come from the window scene \/ effective geometry."
+      ],
+      "tier" : "review",
+      "title" : "Replace UIScreen.main.bounds"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "adaptive-navigation",
+      "newFiles" : 0,
+      "notes" : [
+        "No top-level NavigationStack without an existing NavigationSplitView found."
+      ],
+      "tier" : "review",
+      "title" : "NavigationStack → NavigationSplitView"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "state-preservation",
+      "newFiles" : 0,
+      "notes" : [
+        "Snapshots\/SnapshotHelper.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Tests\/Network\/ProductServiceTests.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Tests\/ViewControllers\/Products\/Detail\/ProductDetailViewControllerTests.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Tests\/ViewControllers\/Products\/Add\/ProductAddViewControllerTests.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/PendingUploadItem.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/DataManager.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/PersistenceManager.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/Common\/InfoRow.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/Transforms\/TagTransform.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/PendingProductMergeProcessor.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Product.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Label.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/IngredientsAnalysis.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Vitamin.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Additive.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Nucleotide.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Allergen.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/OtherNutritionalSubstance.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Country.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Nutriment.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Category.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/API\/Taxonomies\/Mineral.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/Realm\/RealmPendingUploadItem.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Models\/Realm\/RealmUserPreferences.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/ViewControllers\/Products\/Search\/ScannerViewController.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/ViewControllers\/Products\/Detail\/ProductDetailViewController.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/ViewControllers\/Products\/Add\/ProductAddViewController.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Views\/Products\/Detail\/Common\/IngredientsAnalysisView.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Views\/Products\/Detail\/Summary\/IngredientsAnalysisTableViewCell.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Sources\/Helpers\/SharingManager.swift: add @SceneStorage for selection\/scroll so the fold transition keeps user state.",
+        "Pattern: @SceneStorage(\"selection\") var selection: String? — survives the scene geometry change."
+      ],
+      "tier" : "manual",
+      "title" : "State preservation across fold transitions"
+    },
+    {
+      "edits" : 0,
+      "files" : 0,
+      "id" : "dehardcode-frames",
+      "newFiles" : 0,
+      "notes" : [
+        "No hardcoded frames detected."
+      ],
+      "tier" : "manual",
+      "title" : "De-hardcode fixed frames"
+    }
+  ]
+}

@@ -147,6 +147,30 @@ func main() {
         if result.plan.patches.isEmpty { print("  nothing to port — the app is already fold-ready on these checks.") }
         if let report = result.reportPath {
             print("  report: \(report)")
+            let dir = (report as NSString).deletingLastPathComponent
+            let patch = result.plan.patches.map(\.diff).joined()
+            if !patch.isEmpty {
+                let patchPath = (dir as NSString).appendingPathComponent("port.patch")
+                try? patch.write(toFile: patchPath, atomically: true, encoding: .utf8)
+            }
+            if opts.json {
+                let jsonPath = (dir as NSString).appendingPathComponent("porting-report.json")
+                let patches = result.plan.patches.map { p -> [String: Any] in
+                    [
+                        "id": p.transformId,
+                        "title": p.title,
+                        "tier": p.tier.rawValue,
+                        "files": p.edits.count + p.newFiles.count,
+                        "edits": p.edits.count,
+                        "newFiles": p.newFiles.count,
+                        "notes": p.notes,
+                    ]
+                }
+                let obj: [String: Any] = ["app": appName, "applied": options.apply, "patches": patches]
+                if let data = try? JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted, .sortedKeys]) {
+                    try? data.write(to: URL(fileURLWithPath: jsonPath))
+                }
+            }
             if opts.open {
                 let p = Process()
                 p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
