@@ -118,6 +118,10 @@ Static export: `output: "export"`, deployable to GitHub Pages / Vercel / any hos
 App data lives in `web/lib/data.ts`; the CLI audit JSON can seed it via
 `Scripts/aggregate-index.py` (currently writes the legacy `web-legacy/data.js`).
 
+**Live**: https://foldready.memolabs.dev (primary, Coolify/nginx serving `web/out`)
+and https://guillaume-flambard.github.io/foldready/ (GitHub Pages). The repo root
+Dockerfile builds the web static export for Coolify.
+
 Legacy static v1 site (report HTML per app) is preserved in `web-legacy/`, rebuilt
 by `Scripts/build-index.sh`:
 
