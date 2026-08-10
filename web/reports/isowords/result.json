@@ -1,0 +1,372 @@
+{
+  "app" : "isowords",
+  "checks" : [
+    {
+      "detail" : "16 hardcoded frames, 6 UIScreen.main.bounds reads across 388 files",
+      "key" : "adaptive-layout",
+      "score" : 95,
+      "title" : "Adaptive layout",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "Parallel View not blocked",
+      "key" : "full-screen",
+      "score" : 100,
+      "title" : "Parallel View opt-in",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 NavigationSplitView, 0 sidebar opt-ins, 24 stacks",
+      "key" : "navigation",
+      "score" : 40,
+      "title" : "Adaptive navigation \/ sidebar",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "SwiftUI @main App scene",
+      "key" : "scene",
+      "score" : 100,
+      "title" : "UIScene lifecycle",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 fold-state reads, 10 adaptive geometry",
+      "key" : "fold-state",
+      "score" : 70,
+      "title" : "Fold state handling",
+      "weight" : 0.14999999999999999
+    },
+    {
+      "detail" : "0 @SceneStorage, 0 restoration, 26 view models",
+      "key" : "state",
+      "score" : 70,
+      "title" : "State preservation",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "99 SwiftUI files, 12 UIKit files",
+      "key" : "framework",
+      "score" : 89,
+      "title" : "SwiftUI vs UIKit",
+      "weight" : 0.14999999999999999
+    }
+  ],
+  "estimatedPortingHours" : 185.5,
+  "findings" : [
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameOverFeature\/GameOverView.swift",
+      "line" : 805,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/CubeSceneView.swift",
+      "line" : 253,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/CubeSceneView.swift",
+      "line" : 254,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/CubeSceneView.swift",
+      "line" : 258,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/CubeSceneView.swift",
+      "line" : 259,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/Styleguide\/AdaptiveSize.swift",
+      "line" : 33,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "App\/Previews\/HomeFeaturePreview\/HomeFeaturePreviewApp.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "App\/Previews\/SettingsPreview\/SettingsPreviewApp.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/StatsFeature\/StatsFeature.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/DailyChallengeFeature\/DailyChallengeView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/MultiplayerFeature\/PastGamesView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/MultiplayerFeature\/MultiplayerView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/AppFeature\/AppView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/GameCore\/Views\/GameView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/GameCore\/Views\/WordSubmitButton.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/HomeFeature\/Home.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/HomeFeature\/DailyChallengeHeaderView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/HomeFeature\/NagBanner.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/ActiveGamesFeature\/ActiveGameCard.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/Styleguide\/Buttons.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/Styleguide\/GameButton.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/LeaderboardFeature\/Leaderboard.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/SettingsFeature\/SettingsView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/SettingsFeature\/SoundsSettingsView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/SettingsFeature\/AccessibilitySettingsView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/SettingsFeature\/PurchasesSettingsView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/SettingsFeature\/AppearanceSettingsView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/VocabFeature\/Vocab.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/SoloFeature\/SoloView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "Sources\/UpgradeInterstitialFeature\/UpgradeInterstitialView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameOverFeature\/GameOverView.swift",
+      "line" : 721,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameOverFeature\/GameOverView.swift",
+      "line" : 761,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameOverFeature\/Confetti.swift",
+      "line" : 241,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameOverFeature\/Confetti.swift",
+      "line" : 248,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/OnboardingFeature\/OnboardingStepView.swift",
+      "line" : 192,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/OnboardingFeature\/OnboardingStepView.swift",
+      "line" : 214,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameCore\/Views\/PlayersAndScoresView.swift",
+      "line" : 104,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/GameCore\/Views\/PlayersAndScoresView.swift",
+      "line" : 109,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/NubView.swift",
+      "line" : 67,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/NubView.swift",
+      "line" : 80,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/NubView.swift",
+      "line" : 84,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/NubView.swift",
+      "line" : 88,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/CubeCore\/NubView.swift",
+      "line" : 97,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/ActiveGamesFeature\/ActiveGameCard.swift",
+      "line" : 103,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/SettingsFeature\/SettingsView.swift",
+      "line" : 223,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/SettingsFeature\/AppearanceSettingsView.swift",
+      "line" : 37,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "state",
+      "message" : "No explicit scroll\/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
+      "severity" : "minor"
+    }
+  ],
+  "generatedAt" : "2026-08-10T10:25:20Z",
+  "grade" : "A",
+  "risk" : "low",
+  "root" : "\/var\/folders\/p3\/1nb2tr357hs_8vc786h_thnw0000gn\/T\/opencode\/fr-index\/isowords",
+  "score" : 78,
+  "stats" : {
+    "infoPlists" : 12,
+    "swiftFiles" : 388,
+    "swiftuiFiles" : 99,
+    "uikitFiles" : 12,
+    "xibOrStoryboard" : 1
+  }
+}

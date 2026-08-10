@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady - IceCubesApp</title>
+<style>
+  :root { --ink:#0F172A; --panel:#1E293B; --line:#334155; --txt:#E2E8F0; --dim:#94A3B8; --blue:#0EA5E9; --green:#22C55E; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ink); color:var(--txt); font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+  header { display:flex; align-items:center; gap:20px; border-bottom:1px solid var(--line); padding-bottom:24px; }
+  header img { width:64px; height:64px; border-radius:14px; }
+  h1 { margin:0; font-size:26px; letter-spacing:-0.02em; }
+  .sub { color:var(--dim); margin-top:4px; font-size:14px; }
+  .scorebox { margin-left:auto; text-align:center; }
+  .score { font-size:44px; font-weight:800; line-height:1; }
+  .grade { display:inline-block; margin-top:6px; padding:2px 10px; border-radius:8px; font-weight:800; color:#052E16; background:#22C55E; }
+  h2 { margin:36px 0 12px; font-size:18px; }
+  .bars { display:grid; gap:10px; }
+  .bar { display:grid; grid-template-columns:220px 1fr 64px; align-items:center; gap:12px; }
+  .bar .name { color:var(--txt); font-size:14px; }
+  .bar .track { background:var(--panel); border:1px solid var(--line); border-radius:99px; height:14px; overflow:hidden; }
+  .bar .fill { height:100%; border-radius:99px; background:var(--blue); }
+  .bar .val { text-align:right; font-variant-numeric:tabular-nums; color:var(--dim); font-size:13px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--dim); font-weight:600; }
+  .sev { font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:.05em; }
+  .critical { color:#EF4444; } .major { color:#F97316; } .minor { color:#FACC15; } .info { color:#94A3B8; }
+  code { background:#0B1220; padding:1px 5px; border-radius:6px; font-size:12px; }
+  .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .card .k { color:var(--dim); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+  .card .v { font-size:22px; font-weight:700; margin-top:4px; }
+  .ok { color:var(--green); }
+  footer { margin-top:48px; color:var(--dim); font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzBGMTcyQSIvPjxyZWN0IHg9IjEwNCIgeT0iOTYiIHdpZHRoPSIzMDQiIGhlaWdodD0iMzIwIiByeD0iNDAiIGZpbGw9IiMxRTI5M0IiLz48cmVjdCB4PSIxMjAiIHk9IjExMiIgd2lkdGg9IjI3MiIgaGVpZ2h0PSIyODgiIHJ4PSIyOCIgZmlsbD0iIzMzNDE1NSIvPjxyZWN0IHg9IjEyMCIgeT0iMTEyIiB3aWR0aD0iMTM2IiBoZWlnaHQ9IjI4OCIgcng9IjI4IiBmaWxsPSIjMEYxNzJBIi8+PHJlY3QgeD0iMTI4IiB5PSIxMjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjcyIiByeD0iMjAiIGZpbGw9IiM0NzU1NjkiLz48cmVjdCB4PSIyNjQiIHk9IjExMiIgd2lkdGg9IjEyOCIgaGVpZ2h0PSIyODgiIHJ4PSIyOCIgZmlsbD0iIzMzNDE1NSIvPjxyZWN0IHg9IjI3MiIgeT0iMTIwIiB3aWR0aD0iMTEyIiBoZWlnaHQ9IjI3MiIgcng9IjIwIiBmaWxsPSIjMEVBNUU5Ii8+PHJlY3QgeD0iMjQ4IiB5PSI5NiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjMyMCIgZmlsbD0iIzBGMTcyQSIvPjxjaXJjbGUgY3g9IjM5MiIgY3k9IjQwMCIgcj0iNDAiIGZpbGw9IiMyMkM1NUUiLz48cGF0aCBkPSJNMzc2IDQwMCBMMzg4IDQxMiBMNDEwIDM4OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDUyRTE2IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" alt="FoldReady mark">
+    <div>
+      <h1>IceCubesApp</h1>
+      <div class="sub">Fold-Ready audit · 2026-08-10T10:25:19Z · /var/folders/p3/1nb2tr357hs_8vc786h_thnw0000gn/T/opencode/IceCubesApp</div>
+    </div>
+    <div class="scorebox">
+      <div class="score">78</div>
+      <div class="grade">A</div>
+    </div>
+  </header>
+
+  <h2>Summary</h2>
+  <div class="cards">
+    <div class="card"><div class="k">Risk</div><div class="v">low</div></div>
+    <div class="card"><div class="k">Est. porting effort</div><div class="v">214.0 h</div></div>
+    <div class="card"><div class="k">Swift files</div><div class="v">424</div></div>
+  </div>
+
+  <h2>Score breakdown</h2>
+  <div class="bars">
+    <div class="bar">
+  <div class="name">Adaptive layout</div>
+  <div class="track"><div class="fill" style="width:93%"></div></div>
+  <div class="val">93%</div>
+</div>
+<div class="bar">
+  <div class="name">Parallel View opt-in</div>
+  <div class="track"><div class="fill" style="width:100%"></div></div>
+  <div class="val">100%</div>
+</div>
+<div class="bar">
+  <div class="name">Adaptive navigation / sidebar</div>
+  <div class="track"><div class="fill" style="width:40%"></div></div>
+  <div class="val">40%</div>
+</div>
+<div class="bar">
+  <div class="name">UIScene lifecycle</div>
+  <div class="track"><div class="fill" style="width:100%"></div></div>
+  <div class="val">100%</div>
+</div>
+<div class="bar">
+  <div class="name">Fold state handling</div>
+  <div class="track"><div class="fill" style="width:70%"></div></div>
+  <div class="val">70%</div>
+</div>
+<div class="bar">
+  <div class="name">State preservation</div>
+  <div class="track"><div class="fill" style="width:70%"></div></div>
+  <div class="val">70%</div>
+</div>
+<div class="bar">
+  <div class="name">SwiftUI vs UIKit</div>
+  <div class="track"><div class="fill" style="width:91%"></div></div>
+  <div class="val">91%</div>
+</div>
+  </div>
+
+  <h2>Findings</h2>
+  <table><thead><tr><th>Severity</th><th>Check</th><th>Finding</th><th>File</th></tr></thead><tbody><tr><td class="sev major">major</td><td>adaptive-layout</td><td>UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift:11</code></td></tr>
+<tr><td class="sev major">major</td><td>adaptive-layout</td><td>UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift:12</code></td></tr>
+<tr><td class="sev major">major</td><td>adaptive-layout</td><td>UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift:44</code></td></tr>
+<tr><td class="sev major">major</td><td>adaptive-layout</td><td>UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift:45</code></td></tr>
+<tr><td class="sev major">major</td><td>adaptive-layout</td><td>UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift:66</code></td></tr>
+<tr><td class="sev major">major</td><td>adaptive-layout</td><td>UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift:70</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/SettingsTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/AddAccountsView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/NavigationSheet.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/NotificationTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/MessagesTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/NavigationTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/ExploreTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/Timeline/TimelineTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Tabs/ProfileTab.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>IceCubesApp/App/Report/ReportView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/MediaUI/Sources/MediaUI/MediaUIView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/MediaUI/Sources/MediaUI/MediaUIAttachmentVideoView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Lists/Sources/Lists/Edit/ListEditView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Lists/Sources/Lists/Create/ListCreateView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Account/Sources/Account/Filters/FiltersListView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Account/Sources/Account/Edit/EditRelationshipNoteView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Account/Sources/Account/Edit/EditAccountView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Timeline/Sources/Timeline/View/TimelineContentFilterView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/Notifications/Sources/Notifications/List/NotificationsPolicyView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/History/StatusEditHistoryView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Drafts/DraftsListView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/MediaEditView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/MainView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift</code></td></tr>
+<tr><td class="sev major">major</td><td>navigation</td><td>NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/AboutView.swift:35</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/AboutView.swift:39</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/AboutView.swift:43</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/AboutView.swift:47</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/SupportAppView.swift:162</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/SupportAppView.swift:166</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesApp/App/Tabs/Settings/SettingsTab.swift:301</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/Views/ThemePreviewView.swift:62</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/Views/ThemePreviewView.swift:71</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/Views/TagChartView.swift:26</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/Views/AccountPopoverView.swift:33</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/DesignSystem/Sources/DesignSystem/Views/AccountPopoverView.swift:118</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/AppAccount/Sources/AppAccount/AppAccountView.swift:91</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift:123</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/Conversations/Sources/Conversations/List/ConversationsListRow.swift:45</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/Account/Sources/Account/Detail/Components/AccountStatsView.swift:61</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/Account/Sources/Account/Detail/Components/AccountAvatarView.swift:46</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/Notifications/Sources/Notifications/Requests/NotificationsRequestsListView.swift:132</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/Notifications/Sources/Notifications/Requests/NotificationsRequestsListView.swift:137</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/Notifications/Sources/Notifications/Row/NotificationRowIconView.swift:22</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Row/Subviews/StatusRowCardView.swift:180</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift:28</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift:36</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:104</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:122</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:172</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:187</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:201</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:221</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:229</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>Packages/StatusKit/Sources/StatusKit/Editor/Components/AccessoryView.swift:281</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesAppWidgetsExtension/Shared/PostsWidgetView.swift:75</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesAppWidgetsExtension/Shared/PostsWidgetView.swift:80</code></td></tr>
+<tr><td class="sev minor">minor</td><td>adaptive-layout</td><td>Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td><code>IceCubesAppWidgetsExtension/AccountWidget/AccountWidgetView.swift:19</code></td></tr>
+<tr><td class="sev minor">minor</td><td>state</td><td>No explicit scroll/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.</td><td><code>—</code></td></tr></tbody></table>
+
+  <footer>Generated by FoldReady. Parallel View keeps every app running on the iPhone Fold; this score measures how good it looks, not whether it crashes.</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,344 @@
+{
+  "app" : "MovieSwiftUI",
+  "checks" : [
+    {
+      "detail" : "23 hardcoded frames, 2 UIScreen.main.bounds reads across 105 files",
+      "key" : "adaptive-layout",
+      "score" : 85,
+      "title" : "Adaptive layout",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "Parallel View not blocked",
+      "key" : "full-screen",
+      "score" : 100,
+      "title" : "Parallel View opt-in",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 NavigationSplitView, 0 sidebar opt-ins, 15 stacks",
+      "key" : "navigation",
+      "score" : 40,
+      "title" : "Adaptive navigation \/ sidebar",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "scene lifecycle missing",
+      "key" : "scene",
+      "score" : 20,
+      "title" : "UIScene lifecycle",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 fold-state reads, 6 adaptive geometry",
+      "key" : "fold-state",
+      "score" : 70,
+      "title" : "Fold state handling",
+      "weight" : 0.14999999999999999
+    },
+    {
+      "detail" : "0 @SceneStorage, 0 restoration, 1 view models",
+      "key" : "state",
+      "score" : 70,
+      "title" : "State preservation",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "91 SwiftUI files, 3 UIKit files",
+      "key" : "framework",
+      "score" : 97,
+      "title" : "SwiftUI vs UIKit",
+      "weight" : 0.14999999999999999
+    }
+  ],
+  "estimatedPortingHours" : 76,
+  "findings" : [
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwiftTV\/AppDelegate.swift",
+      "line" : 21,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DraggableCover.swift",
+      "line" : 146,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwiftTV\/views\/MoviesView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/settings\/SettingsForm.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/home\/outline\/OutlineMenu.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/fan club\/FanClubHome.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverFilterForm.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/peopleDetail\/PeopleDetail.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/moviesHome\/list\/MoviesHomeList.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/moviesHome\/MoviesHome.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/custom list\/CustomListDetail.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/custom list\/CustomListForm.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/bottomMenu\/BottomMenu.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/myLists\/MyLists.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/movieDetail\/MovieDetail.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/movieDetail\/rows\/MovieCrosslineRow.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "scene",
+      "message" : "No UIScene lifecycle detected. The scene lifecycle is mandatory on iOS 27; apps without it fail to adapt to fold transitions.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/shared\/images\/PeopleImage.swift",
+      "line" : 22,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/shared\/images\/PeopleImage.swift",
+      "line" : 26,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/shared\/images\/PeopleImage.swift",
+      "line" : 45,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/shared\/images\/PeopleImage.swift",
+      "line" : 49,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/shared\/images\/ImagesCarouselView.swift",
+      "line" : 45,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/shared\/images\/ImagesCarouselView.swift",
+      "line" : 62,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverCoverImage.swift",
+      "line" : 43,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverView.swift",
+      "line" : 122,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverView.swift",
+      "line" : 130,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverView.swift",
+      "line" : 139,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverView.swift",
+      "line" : 155,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/discover\/DiscoverView.swift",
+      "line" : 167,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/peopleDetail\/PeopleDetail.swift",
+      "line" : 67,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/moviesHome\/MoviesHome.swift",
+      "line" : 35,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/moviesHome\/MoviesHome.swift",
+      "line" : 45,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/custom list\/rows\/CustomListRow.swift",
+      "line" : 47,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/custom list\/rows\/CustomListRow.swift",
+      "line" : 58,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/custom list\/CustomListDetail.swift",
+      "line" : 63,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/custom list\/CustomListDetail.swift",
+      "line" : 71,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/myLists\/MyLists.swift",
+      "line" : 115,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/MovieSwift\/views\/components\/movieDetail\/rows\/MovieCrosslineRow.swift",
+      "line" : 66,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/Packages\/UI\/Sources\/UI\/badges\/RoundedBadge.swift",
+      "line" : 30,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "MovieSwift\/Packages\/UI\/Sources\/UI\/badges\/PopularityBadge.swift",
+      "line" : 62,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "state",
+      "message" : "No explicit scroll\/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
+      "severity" : "minor"
+    }
+  ],
+  "generatedAt" : "2026-08-10T10:25:19Z",
+  "grade" : "B",
+  "risk" : "low",
+  "root" : "\/var\/folders\/p3\/1nb2tr357hs_8vc786h_thnw0000gn\/T\/opencode\/fr-index\/MovieSwiftUI",
+  "score" : 69,
+  "stats" : {
+    "infoPlists" : 3,
+    "swiftFiles" : 105,
+    "swiftuiFiles" : 91,
+    "uikitFiles" : 3,
+    "xibOrStoryboard" : 2
+  }
+}

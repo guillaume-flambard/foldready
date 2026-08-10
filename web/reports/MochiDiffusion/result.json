@@ -1,0 +1,130 @@
+{
+  "app" : "MochiDiffusion",
+  "checks" : [
+    {
+      "detail" : "8 hardcoded frames, 0 UIScreen.main.bounds reads across 58 files",
+      "key" : "adaptive-layout",
+      "score" : 93,
+      "title" : "Adaptive layout",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "Parallel View not blocked",
+      "key" : "full-screen",
+      "score" : 100,
+      "title" : "Parallel View opt-in",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "1 NavigationSplitView, 0 sidebar opt-ins, 0 stacks",
+      "key" : "navigation",
+      "score" : 100,
+      "title" : "Adaptive navigation \/ sidebar",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "SwiftUI @main App scene",
+      "key" : "scene",
+      "score" : 100,
+      "title" : "UIScene lifecycle",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 fold-state reads, 2 adaptive geometry",
+      "key" : "fold-state",
+      "score" : 70,
+      "title" : "Fold state handling",
+      "weight" : 0.14999999999999999
+    },
+    {
+      "detail" : "0 @SceneStorage, 0 restoration, 8 view models",
+      "key" : "state",
+      "score" : 70,
+      "title" : "State preservation",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "37 SwiftUI files, 0 UIKit files",
+      "key" : "framework",
+      "score" : 100,
+      "title" : "SwiftUI vs UIKit",
+      "weight" : 0.14999999999999999
+    }
+  ],
+  "estimatedPortingHours" : 27.5,
+  "findings" : [
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/GalleryToolbarView.swift",
+      "line" : 31,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/GalleryToolbarView.swift",
+      "line" : 40,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/GalleryToolbarView.swift",
+      "line" : 49,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/GalleryToolbarView.swift",
+      "line" : 55,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/GalleryItemView.swift",
+      "line" : 98,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/GalleryItemView.swift",
+      "line" : 101,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/SidebarControls\/ControlNetView.swift",
+      "line" : 31,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Mochi Diffusion\/Views\/SidebarControls\/StartingImageView.swift",
+      "line" : 37,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "state",
+      "message" : "No explicit scroll\/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
+      "severity" : "minor"
+    }
+  ],
+  "generatedAt" : "2026-08-10T10:25:19Z",
+  "grade" : "A",
+  "risk" : "low",
+  "root" : "\/var\/folders\/p3\/1nb2tr357hs_8vc786h_thnw0000gn\/T\/opencode\/fr-index\/MochiDiffusion",
+  "score" : 91,
+  "stats" : {
+    "infoPlists" : 1,
+    "swiftFiles" : 58,
+    "swiftuiFiles" : 37,
+    "uikitFiles" : 0,
+    "xibOrStoryboard" : 0
+  }
+}

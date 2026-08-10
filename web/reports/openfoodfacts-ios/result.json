@@ -1,0 +1,98 @@
+{
+  "app" : "openfoodfacts-ios",
+  "checks" : [
+    {
+      "detail" : "0 hardcoded frames, 2 UIScreen.main.bounds reads across 218 files",
+      "key" : "adaptive-layout",
+      "score" : 98,
+      "title" : "Adaptive layout",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "Parallel View not blocked",
+      "key" : "full-screen",
+      "score" : 100,
+      "title" : "Parallel View opt-in",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 NavigationSplitView, 0 sidebar opt-ins, 0 stacks",
+      "key" : "navigation",
+      "score" : 50,
+      "title" : "Adaptive navigation \/ sidebar",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "scene lifecycle missing",
+      "key" : "scene",
+      "score" : 20,
+      "title" : "UIScene lifecycle",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 fold-state reads, 0 adaptive geometry",
+      "key" : "fold-state",
+      "score" : 20,
+      "title" : "Fold state handling",
+      "weight" : 0.14999999999999999
+    },
+    {
+      "detail" : "0 @SceneStorage, 0 restoration, 0 view models",
+      "key" : "state",
+      "score" : 30,
+      "title" : "State preservation",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 SwiftUI files, 107 UIKit files",
+      "key" : "framework",
+      "score" : 0,
+      "title" : "SwiftUI vs UIKit",
+      "weight" : 0.14999999999999999
+    }
+  ],
+  "estimatedPortingHours" : 86,
+  "findings" : [
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/AppDelegate.swift",
+      "line" : 41,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "Sources\/Views\/Products\/Search\/StateViews\/EmptyView.swift",
+      "line" : 22,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "scene",
+      "message" : "No UIScene lifecycle detected. The scene lifecycle is mandatory on iOS 27; apps without it fail to adapt to fold transitions.",
+      "severity" : "major"
+    },
+    {
+      "check" : "fold-state",
+      "message" : "No fold-state or adaptive geometry handling. The app will still run via Parallel View, but has no opinion about the folded\/unfolded states.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "state",
+      "message" : "No explicit scroll\/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
+      "severity" : "minor"
+    }
+  ],
+  "generatedAt" : "2026-08-10T10:25:21Z",
+  "grade" : "C",
+  "risk" : "medium",
+  "root" : "\/var\/folders\/p3\/1nb2tr357hs_8vc786h_thnw0000gn\/T\/opencode\/fr-index\/openfoodfacts-ios",
+  "score" : 48,
+  "stats" : {
+    "infoPlists" : 4,
+    "swiftFiles" : 218,
+    "swiftuiFiles" : 0,
+    "uikitFiles" : 107,
+    "xibOrStoryboard" : 41
+  }
+}

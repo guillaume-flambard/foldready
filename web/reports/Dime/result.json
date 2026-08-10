@@ -1,0 +1,940 @@
+{
+  "app" : "Dime",
+  "checks" : [
+    {
+      "detail" : "86 hardcoded frames, 36 UIScreen.main.bounds reads across 94 files",
+      "key" : "adaptive-layout",
+      "score" : 0,
+      "title" : "Adaptive layout",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "Parallel View not blocked",
+      "key" : "full-screen",
+      "score" : 100,
+      "title" : "Parallel View opt-in",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 NavigationSplitView, 0 sidebar opt-ins, 2 stacks",
+      "key" : "navigation",
+      "score" : 40,
+      "title" : "Adaptive navigation \/ sidebar",
+      "weight" : 0.20000000000000001
+    },
+    {
+      "detail" : "SwiftUI @main App scene",
+      "key" : "scene",
+      "score" : 100,
+      "title" : "UIScene lifecycle",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "0 fold-state reads, 18 adaptive geometry",
+      "key" : "fold-state",
+      "score" : 70,
+      "title" : "Fold state handling",
+      "weight" : 0.14999999999999999
+    },
+    {
+      "detail" : "0 @SceneStorage, 0 restoration, 4 view models",
+      "key" : "state",
+      "score" : 70,
+      "title" : "State preservation",
+      "weight" : 0.10000000000000001
+    },
+    {
+      "detail" : "77 SwiftUI files, 9 UIKit files",
+      "key" : "framework",
+      "score" : 90,
+      "title" : "SwiftUI vs UIKit",
+      "weight" : 0.14999999999999999
+    }
+  ],
+  "estimatedPortingHours" : 79.5,
+  "findings" : [
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Utilities\/KeyboardHeightHelper.swift",
+      "line" : 80,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Utilities\/AlertToast.swift",
+      "line" : 502,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TransactionView.swift",
+      "line" : 129,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TransactionView.swift",
+      "line" : 131,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TransactionView.swift",
+      "line" : 1439,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/WelcomeSheetView.swift",
+      "line" : 55,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 326,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 1086,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TemplateTransactionView.swift",
+      "line" : 114,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 1207,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 1211,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 1372,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 1768,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 381,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 519,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 523,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 652,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 656,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 761,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 727,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 982,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 984,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 990,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1073,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1083,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1403,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1405,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1411,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1494,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1504,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1782,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1784,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1790,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1873,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 1883,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/NewBudgetView.swift",
+      "line" : 818,
+      "message" : "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "app\/dime\/Views\/Settings\/SettingsView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "navigation",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "message" : "NavigationStack without NavigationSplitView: the list\/detail panes will not gain a sidebar on the inner display.",
+      "severity" : "major"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Utilities\/AlertToast.swift",
+      "line" : 353,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Utilities\/TestDragToAdd.swift",
+      "line" : 104,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Utilities\/TestDragToAdd.swift",
+      "line" : 217,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Utilities\/TestDragToAdd.swift",
+      "line" : 222,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Components\/Buttons\/InsightsSummaryBlock.swift",
+      "line" : 27,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Components\/Buttons\/DetailedBudgetViewTopBarButtons.swift",
+      "line" : 24,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Components\/Toolbar\/ToolbarButton.swift",
+      "line" : 10,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Components\/Transactions\/NumberPad.swift",
+      "line" : 48,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Shortcuts\/Actions\/NewTransactionIntent.swift",
+      "line" : 227,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/SettingsView.swift",
+      "line" : 522,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/SettingsView.swift",
+      "line" : 528,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsUpcomingView.swift",
+      "line" : 45,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsUpcomingView.swift",
+      "line" : 51,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsUpcomingView.swift",
+      "line" : 80,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsUpcomingView.swift",
+      "line" : 86,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsAppIconView.swift",
+      "line" : 63,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsNotificationView.swift",
+      "line" : 50,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsNotificationView.swift",
+      "line" : 56,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsCloudView.swift",
+      "line" : 43,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsCloudView.swift",
+      "line" : 49,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsFeatureLabView.swift",
+      "line" : 125,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/Settings\/Settings Subviews\/SettingsFeatureLabView.swift",
+      "line" : 131,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/SingleTransactionPhotoView.swift",
+      "line" : 90,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 223,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 239,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 256,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 274,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 285,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 310,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 325,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 342,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 361,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 377,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 453,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 534,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 917,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 928,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 944,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 1009,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 1336,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 1347,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 1363,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 1409,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CategoryView.swift",
+      "line" : 1944,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TransactionView.swift",
+      "line" : 1703,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/WelcomeSheetView.swift",
+      "line" : 42,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LineGraph.swift",
+      "line" : 141,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LineGraph.swift",
+      "line" : 146,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LineGraph.swift",
+      "line" : 152,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LineGraph.swift",
+      "line" : 160,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LineGraph.swift",
+      "line" : 165,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TestView.swift",
+      "line" : 42,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 160,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 174,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 483,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 515,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 601,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 604,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/ImportDataView.swift",
+      "line" : 978,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TemplateTransactionView.swift",
+      "line" : 390,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TemplateTransactionView.swift",
+      "line" : 929,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/TemplateTransactionView.swift",
+      "line" : 1018,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 75,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 334,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 589,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 1813,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/LogView.swift",
+      "line" : 1837,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 23,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 407,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 687,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/BudgetView.swift",
+      "line" : 862,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/InsightsView.swift",
+      "line" : 42,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CustomTabBar.swift",
+      "line" : 44,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CustomTabBar.swift",
+      "line" : 49,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/CustomTabBar.swift",
+      "line" : 129,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/NewBudgetView.swift",
+      "line" : 988,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/dime\/Views\/NewBudgetView.swift",
+      "line" : 1002,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/MainBudgetWidget.swift",
+      "line" : 333,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/MainBudgetWidget.swift",
+      "line" : 428,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/RecentTransactionsWidget.swift",
+      "line" : 309,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/RecentTransactionsWidget.swift",
+      "line" : 405,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/RecentTransactionsWidget.swift",
+      "line" : 506,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/BudgetWidget.swift",
+      "line" : 217,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/BudgetWidget.swift",
+      "line" : 309,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/InsightsWidget.swift",
+      "line" : 816,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "adaptive-layout",
+      "file" : "app\/ExpenditureWidget\/TemplateTransactionWidget.swift",
+      "line" : 112,
+      "message" : "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
+      "severity" : "minor"
+    },
+    {
+      "check" : "state",
+      "message" : "No explicit scroll\/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
+      "severity" : "minor"
+    }
+  ],
+  "generatedAt" : "2026-08-10T10:25:21Z",
+  "grade" : "C",
+  "risk" : "medium",
+  "root" : "\/var\/folders\/p3\/1nb2tr357hs_8vc786h_thnw0000gn\/T\/opencode\/fr-index\/Dime",
+  "score" : 59,
+  "stats" : {
+    "infoPlists" : 5,
+    "swiftFiles" : 94,
+    "swiftuiFiles" : 77,
+    "uikitFiles" : 9,
+    "xibOrStoryboard" : 1
+  }
+}
