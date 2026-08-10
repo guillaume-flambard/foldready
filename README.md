@@ -61,6 +61,19 @@ adopted split-view sidebars and adaptive layout, not the ones that merely surviv
 
 Grade bands: A >= 75, B >= 60, C >= 45, D >= 30, F < 30. Risk: low / medium / high.
 
+## Fold-Ready Index
+
+The public ranking of well-known open-source iOS apps by Fold-Ready Score lives in
+`web/`. Rebuild it after any change:
+
+```sh
+./Scripts/build-index.sh <repo1> <repo2> ...   # re-audits and regenerates web/
+```
+
+Current lineup: MochiDiffusion 91 (A), IceCubesApp 78 (A), isowords 78 (A),
+MovieSwiftUI 69 (B), Dime 59 (C), Open Food Facts 48 (C). Each card links to the
+full report. Serve `web/` statically (GitHub Pages or `python3 -m http.server`).
+
 ## Product
 
 The CLI is the entry product: pay-per-audit reports that open the door to fixed-price
