@@ -69,8 +69,13 @@ re-score.
 
 ```sh
 ./.build/debug/foldready port <repo> [--tiers srm] [--apply] [--out <dir>]
-./.build/debug/foldready verify <repo>            # re-audit after a port
+./.build/debug/foldready verify <repo> [--build]   # re-audit after a port
 ```
+
+`verify --build` closes the visual loop: it builds the app for the widest available
+simulator (in-process pipeline mirroring `Scripts/capture.sh`), captures a screenshot,
+and adds the "Captured layout" pixel check to the re-score. Without a buildable
+`.xcodeproj` it degrades to the static re-score.
 
 | Tier | Transforms |
 |---|---|

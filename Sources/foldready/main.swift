@@ -19,6 +19,7 @@ struct CliOptions {
     var port: Bool = false
     var verify: Bool = false
     var apply: Bool = false
+    var build: Bool = false
     var tiers: [TransformTier] = [.safe, .review, .manual]
 }
 
@@ -40,6 +41,7 @@ func usage() -> Never {
       --open                  Open the HTML report in the default browser
       --apply                 (port) write patches to the working tree
       --tiers <t|r|m>         (port) transform tiers: safe/review/manual, or sr/m (default srm)
+      --build                 (verify) build + capture the app on the widest simulator, add the visual check
       --version               Print version
       -h, --help              Show this help
     """)
@@ -77,6 +79,8 @@ func parseArgs(_ args: [String]) -> CliOptions {
             opts.verify = true
         case "--apply":
             opts.apply = true
+        case "--build":
+            opts.build = true
         case "--tiers":
             i += 1
             if i < args.count { opts.tiers = parseTiers(args[i]) }
@@ -181,11 +185,25 @@ func main() {
         exit(0)
     }
 
+    var screenshots = opts.screenshotsDir.map { listPNGs(in: $0) } ?? []
+    if opts.build && screenshots.isEmpty {
+        let shotsDir = (root as NSString).appendingPathComponent("foldready-screenshots")
+        print("  building + capturing on the widest simulator…")
+        if let dir = CapturePipeline.capture(root: root, appName: appName, shotsDir: shotsDir) {
+            screenshots = listPNGs(in: dir)
+            print("  captured \(screenshots.count) screenshot(s) → \(shotsDir)")
+        } else {
+            print("  build/capture failed (no project, or build error) — static score only.")
+        }
+    }
+
     if opts.verify {
-        let screenshots = opts.screenshotsDir.map { listPNGs(in: $0) } ?? []
         let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
         print(color("FoldReady verify", "36") + " - \(appName)")
         print("  score after port: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)")
+        for o in result.outcomes where o.key == "captured-layout" {
+            print("  captured layout: \(color(String(format: "%.0f%%", o.score * 100), o.score >= 0.6 ? "32" : "33"))  (\(o.detail))")
+        }
         print("  compare with the pre-port score from your audit report.")
         print("  full audit: foldready \(root) --name \"\(appName)\"")
         exit(0)
@@ -212,7 +230,6 @@ func main() {
         exit(0)
     }
 
-    let screenshots = opts.screenshotsDir.map { listPNGs(in: $0) } ?? []
     let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
 
     let outDir = opts.outDir ?? (root as NSString).appendingPathComponent("foldready-report")
