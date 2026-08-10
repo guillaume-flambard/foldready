@@ -2,3 +2,6 @@
 .DS_Store
 *.png
 !brand/png/
+
+# private strategy, never committed
+sales/

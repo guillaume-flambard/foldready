@@ -1,7 +1,11 @@
 # FoldReady
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 Fold-Ready audit CLI: score how an iOS app will look on the iPhone Fold (Sept 2026),
-then ship the report that sells the porting contract.
+then ship the report that sells the porting contract. **Open source and independent** —
+the readiness check should not be a black box.
 
 `foldready <path>` scans an iOS source tree, runs 7 static checks against the iOS 27
 foldable requirements, and emits a 0-100 Fold-Ready Score with an HTML report and an
@@ -11,13 +15,13 @@ effort estimate in hours.
 
 | Weight | Check | What it looks for |
 |---|---|---|
-| 20% | Adaptive layout | Hardcoded `.frame(width:height:)`, `UIScreen.main.bounds` |
-| 10% | Parallel View opt-in | `UIRequiresFullScreen=true` blocks the auto-adaptation layer |
-| 20% | Adaptive navigation / sidebar | `NavigationSplitView`, `.adaptiveSidebar()`, `tabBarController.sidebar` |
-| 10% | UIScene lifecycle | Scene lifecycle is mandatory on iOS 27 |
-| 15% | Fold state handling | `foldState`, `angleDegrees`, `didUpdateEffectiveGeometry`, `GeometryReader` |
-| 10% | State preservation | `@SceneStorage`, restoration, view models that survive a fold |
-| 15% | SwiftUI vs UIKit | SwiftUI adapts to geometry; UIKit needs the sidebar opt-in |
+| 25% | Adaptive navigation / sidebar | `NavigationSplitView`, `.adaptiveSidebar()`, `tabBarController.sidebar` |
+| 22% | Adaptive layout | Hardcoded `.frame(width:height:)`, `UIScreen.main.bounds`, deprecated `UIScreen.main` |
+| 15% | UIScene lifecycle | Scene lifecycle is mandatory on iOS 27 (TN3187) |
+| 12% | Adaptive geometry | size classes, `didUpdateEffectiveGeometry`, `GeometryReader` |
+| 10% | SwiftUI vs UIKit | SwiftUI adapts to geometry; UIKit needs the sidebar opt-in |
+| 8% | Parallel View opt-in | `UIRequiresFullScreen=true` blocks the auto-adaptation layer |
+| 8% | State preservation | `@SceneStorage`, restoration, view models that survive a resize |
 
 Scores are proportional to the codebase (occurrences relative to file count), so a large
 app with a handful of hardcoded frames is not unfairly failed.
@@ -133,6 +137,13 @@ radius/spacing/motion names (`--r-container`, `--sp-*`, `--t-fast`…) are decla
 `web/app/globals.css`. Reconcile any drift against `design/ds-package/` before
 changing a color. The design prompt used to generate the system is in
 `design/DESIGN-SYSTEM-PROMPT.md`.
+
+## Contributing
+
+Open source, PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the rules —
+the short version: new checks, transforms, and edge-case tests are the most useful;
+stay anchored on the **public** iOS 27 contract; never break code silently; keep
+`./Scripts/check.sh` green.
 
 ## Product
 
