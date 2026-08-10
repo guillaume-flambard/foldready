@@ -6,7 +6,7 @@ export function Footer() {
       <div className="foot-top">
         <Mark size={32} />
         <span className="wordmark">foldready</span>
-        <span className="mono" style={{ marginLeft: "auto" }}>hello@foldready.com</span>
+        <span className="mono" style={{ marginLeft: "auto" }}>hello@memolabs.dev</span>
       </div>
     </footer>
   );

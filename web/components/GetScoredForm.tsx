@@ -17,7 +17,7 @@ export function GetScoredForm() {
     const body = encodeURIComponent(
       `App: ${appName.trim()}\nRepo / source: ${repo.trim()}\nEmail: ${email.trim()}\n\nI want the Fold-Ready audit (score, findings with file:line, hours estimate).`
     );
-    window.location.href = `mailto:hello@foldready.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:hello@memolabs.dev?subject=${subject}&body=${body}`;
     setSent(true);
   }
 
