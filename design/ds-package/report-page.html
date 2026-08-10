@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fold-Ready Report · IceCubesApp</title>
+<meta name="description" content="Fold-Ready audit of IceCubesApp for the iPhone Fold: score 78, grade A, 214h port estimate, 37 findings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --font-display:'Space Grotesk','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ink:#0F172A; --ink2:#0B1220; --panel:#1E293B; --panel2:#24344D;
+    --slate1:#334155; --slate2:#475569;
+    --blue:#0EA5E9; --sky:#7DD3FC;
+    --green:#22C55E; --checkink:#052E16;
+    --txt:#E2E8F0; --dim:#94A3B8; --line:rgba(226,232,240,.14);
+    --gA:#22C55E; --gB:#84CC16; --gC:#FACC15; --gD:#F97316; --gF:#EF4444;
+    --sevBlocker:#F87171; --sevMajor:#FDBA74; --on-accent:#0F172A; --on-chip:#0F172A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink);color:var(--txt);font:15px/1.55 var(--font-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  a:hover{color:var(--sky)}
+  :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  ::selection{background:rgba(14,165,233,.3)}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .mark{width:40px;height:40px;flex:none;border-radius:10px;display:block;box-shadow:inset 0 0 0 1px rgba(226,232,240,.16)}
+
+  .nav{display:flex;align-items:center;gap:26px;height:72px;border-bottom:1px solid var(--line)}
+  .nav .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--txt)}
+  .nav .wordmark{font:700 21px/1 var(--font-display);letter-spacing:-.02em}
+  .nav .links{display:flex;gap:24px;margin-left:8px}
+  .nav .links a{color:var(--dim);text-decoration:none;font-size:14px;font-weight:500}
+  .nav .links a:hover{color:var(--txt)}
+  .nav .right{margin-left:auto;display:flex;align-items:center;gap:16px}
+  @media(max-width:720px){.nav .links{display:none}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1 var(--font-body);padding:11px 18px;border-radius:11px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background .15s ease-out,color .15s ease-out,border-color .15s ease-out}
+  .btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .btn-pri{background:var(--blue);color:var(--on-accent)}
+  .btn-pri:hover{background:var(--sky)}
+  .btn-sec{background:transparent;color:var(--txt);border-color:var(--line)}
+  .btn-sec:hover{background:var(--panel2);border-color:var(--slate2)}
+  .btn-ghost{background:transparent;color:var(--blue);border-color:transparent;padding-left:8px;padding-right:8px}
+  .btn-ghost:hover{color:var(--sky)}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.45;cursor:default;pointer-events:none}
+  .btn .ic{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font:500 12px/1 var(--font-body);letter-spacing:.02em;border:1px solid var(--line);color:var(--txt)}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .chip.sev-b{color:var(--sevBlocker);border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+  .chip.sev-m{color:var(--sevMajor);border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.08)}
+  .chip.sev-n{color:var(--dim)}
+  .gchip{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:8px;font:700 13px/1 var(--font-mono);color:var(--on-chip);background:var(--gA)}
+
+  .crumbs{display:flex;gap:8px;align-items:center;font:500 12px/1 var(--font-mono);color:var(--dim);letter-spacing:.04em;padding:20px 0 0}
+  .crumbs a{color:var(--dim);text-decoration:none}
+  .crumbs a:hover{color:var(--txt)}
+  .crumbs .sep{color:var(--slate2)}
+
+  .report-head{padding:28px 0 36px;border-bottom:1px solid var(--line)}
+  .report-head .top{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+  .report-head h1{font:700 clamp(30px,3.6vw,42px)/1.05 var(--font-display);letter-spacing:-.03em}
+  .report-head .repo{font:500 14px/1.4 var(--font-mono);color:var(--dim);margin-top:6px}
+  .report-head .acts{margin-left:auto;display:flex;gap:12px}
+  .report-head .gen{font:500 12px/1.4 var(--font-mono);color:var(--dim);margin-top:14px;width:100%}
+
+  .hero-grid{display:grid;grid-template-columns:280px 1fr;gap:40px;padding:40px 0;border-bottom:1px solid var(--line);align-items:center}
+  @media(max-width:820px){.hero-grid{grid-template-columns:1fr}}
+
+  .gauge{position:relative;width:260px;height:142px}
+  .gauge svg{position:absolute;inset:0}
+  .gauge .track{fill:none;stroke:var(--slate1);stroke-width:11;stroke-linecap:round;opacity:.45}
+  .gauge .arc{fill:none;stroke:var(--g);stroke-width:11;stroke-linecap:round;stroke-dasharray:313;stroke-dashoffset:313;transition:stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)}
+  .gauge .body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding-top:8px}
+  .gauge .val{font:700 52px/1 var(--font-mono);color:var(--g);letter-spacing:-.02em}
+  .gauge .cap{position:absolute;left:0;right:0;bottom:2px;text-align:center;font:600 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .stamp{display:inline-flex;align-items:center;gap:9px;border:1.5px solid var(--g);border-radius:9px;padding:5px 12px;color:var(--g);font:700 13px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;transform:rotate(-2deg)}
+  .stamp .ck{width:15px;height:15px;border-radius:50%;background:var(--green);display:grid;place-items:center}
+
+  .hero-side{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+  .stat .l{font:600 11px/1.2 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .stat .v{font:700 30px/1 var(--font-mono);letter-spacing:-.02em;color:var(--txt)}
+  .stat .u{font:600 12px/1 var(--font-mono);color:var(--dim);margin-left:6px}
+  @media(max-width:820px){.hero-side{grid-template-columns:repeat(3,1fr)}}
+
+  section.block{padding:52px 0;border-bottom:1px solid var(--line)}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:26px}
+  .sec-head h2{font:700 26px/1.15 var(--font-display);letter-spacing:-.02em}
+  .sec-head .id{font:500 12px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em}
+  .sec-head .note{font:500 12px/1.5 var(--font-mono);color:var(--dim);text-align:right}
+
+  .chkrow{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)}
+  .chkrow:last-child{border-bottom:0}
+  @media(max-width:760px){.chkrow{grid-template-columns:1fr}}
+  .chkrow .nm{display:flex;align-items:center;gap:12px}
+  .chkrow h3{font:600 15px/1.3 var(--font-body);color:var(--txt)}
+  .chkrow .dt{font:500 12px/1.5 var(--font-mono);color:var(--dim);margin-top:4px}
+  .chkrow .m{display:flex;align-items:center;gap:16px;justify-content:flex-end}
+  .chkrow .wt{font:500 11px/1 var(--font-mono);color:var(--dim);min-width:52px}
+  .chkrow .score{font:700 16px/1 var(--font-mono);min-width:40px;text-align:right}
+  @media(max-width:760px){.chkrow .dt{grid-column:1}.chkrow .m{justify-content:flex-start}}
+
+  .cbar{display:flex;align-items:center;gap:14px}
+  .cbar .segs{display:flex;gap:4px}
+  .cbar .seg{width:8px;height:22px;border-radius:2px;background:var(--slate1);opacity:.4;transition:background .15s ease-out,opacity .15s ease-out}
+  .cbar .seg.on{background:var(--c);opacity:1}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:14px}
+  .tbl th{text-align:left;font:600 11px/1.3 var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--dim);padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl tr:hover td{background:rgba(148,163,184,.07)}
+  .tbl .file{font:500 12px/1.5 var(--font-mono);color:var(--dim);white-space:nowrap}
+  .tbl .chk{font:600 12px/1.4 var(--font-body);color:var(--dim);white-space:nowrap}
+  .tbl .msg{color:var(--txt)}
+  @media(max-width:760px){
+    .tbl thead{display:none}
+    .tbl,.tbl tbody,.tbl tr,.tbl td{display:block}
+    .tbl tr{padding:14px 4px;border-bottom:1px solid var(--line)}
+    .tbl td{border:0;padding:4px 0}
+  }
+
+  .road{display:grid;grid-template-columns:52px 1fr 120px 90px;gap:18px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line)}
+  .road:last-child{border-bottom:0}
+  @media(max-width:760px){.road{grid-template-columns:40px 1fr;gap:8px}.road .hr,.road .cum{grid-column:2}}
+  .road .no{font:700 14px/1 var(--font-mono);color:var(--txt)}
+  .road h3{font:600 15px/1.3 var(--font-body);color:var(--txt)}
+  .road p{font-size:13px;color:var(--dim);margin-top:3px;max-width:56ch}
+  .road .hr{font:700 16px/1 var(--font-mono);color:var(--txt);text-align:right}
+  .road .cum{font:500 11px/1.3 var(--font-mono);color:var(--dim);text-align:right}
+  .road .hr .u{color:var(--dim);font-size:12px}
+  .roadbar{height:4px;border-radius:2px;background:var(--slate1);margin-top:10px;overflow:hidden;grid-column:2/4}
+  .roadbar i{display:block;height:100%;background:var(--slate2);border-radius:2px}
+  @media(max-width:760px){.roadbar{grid-column:2}}
+
+  .fstats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+  .fs{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;font:500 12px/1 var(--font-body);color:var(--dim);letter-spacing:.02em}
+  .fs i{width:7px;height:7px;border-radius:50%}
+  .fs b{font-weight:700;margin-left:2px}
+
+  .band{display:flex;align-items:center;gap:32px;flex-wrap:wrap;width:100%}
+  .band h2{font:700 26px/1.15 var(--font-display);letter-spacing:-.02em}
+  .band p{color:var(--dim);font-size:14px;max-width:56ch;margin-top:6px}
+  .band-acts{margin-left:auto;display:flex;gap:8px;align-items:center}
+  @media(max-width:760px){.band-acts{margin-left:0}}
+
+  footer.foot{border-top:1px solid var(--line);padding:32px 0 56px;color:var(--dim);font-size:13px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  footer.foot .mono{margin-left:auto}
+  /* entrance + scroll-reveal motion (JS adds .fr to <html>) */
+  .fr .gauge{animation:frUp .2s ease-out both}
+  .fr .hero-right{animation:frUp .2s ease-out .07s both}
+  @keyframes frUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .fr [data-reveal]{opacity:0;transform:translateY(8px)}
+  .fr [data-reveal].in{opacity:1;transform:none;transition:opacity .22s ease-out,transform .22s ease-out}
+  @media (prefers-reduced-motion: reduce){
+    .fr .gauge,.fr .hero-right{animation:none}
+    .fr [data-reveal]{opacity:1;transform:none;transition:none}
+  }
+  @media print{.fr [data-reveal]{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <a class="brand" href="index.html" aria-label="FoldReady home">
+    <svg class="mark" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="wordmark">foldready</span>
+  </a>
+  <div class="links">
+    <a href="index-ranking.html">Index</a>
+    <a href="report-page.html" aria-current="page" style="color:var(--txt)">Reports</a>
+    <a href="landing-page.html">Pricing</a>
+  </div>
+  <div class="right">
+    <a class="btn btn-sec" href="#">Run audit</a>
+        <a class="btn btn-pri" href="landing-page.html#pricing">Score my app<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16"/><path d="M13 6l6 6-6 6"/></svg></a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <nav class="crumbs" data-od-id="breadcrumb">
+    <a href="index-ranking.html">Fold-Ready Index</a>
+    <span class="sep">/</span>
+    <span>IceCubesApp</span>
+  </nav>
+
+  <header class="report-head" data-od-id="report-header">
+    <div class="top">
+      <div>
+        <h1>IceCubesApp</h1>
+        <p class="repo">Dimillian/IceCubesApp</p>
+      </div>
+      <div class="acts">
+        <button class="btn btn-sec" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="M7 9l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share</button>
+        <button class="btn btn-pri" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/></svg>Re-run audit</button>
+      </div>
+    </div>
+    <p class="gen">Generated 2026-08-10T10:25 UTC · CLI v0.4 · static + captured-layout pass · 424 Swift files</p>
+  </header>
+
+  <section class="hero-grid" data-od-id="hero">
+    <div class="gauge" style="--g:var(--gA)">
+      <svg viewBox="0 0 260 142" aria-hidden="true"><path class="track" d="M30,128 A100,100 0 0 1 230,128"/><path class="arc" data-p=".78" d="M30,128 A100,100 0 0 1 230,128"/></svg>
+      <div class="body">
+        <span class="val">78</span>
+      </div>
+      <span class="cap">Fold-Ready score</span>
+    </div>
+    <div class="hero-right">
+      <span class="stamp"><span class="ck"><svg width="9" height="9" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5 L10.2 16.5 L18 8" fill="none" stroke="#052E16" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A · Ready</span>
+      <p style="color:var(--dim);font-size:14px;max-width:58ch;margin-top:18px">A passing grade for the 7.8in inner display. One structural gap pulls the score down: navigation runs on stacked tabs, so the inner display won't gain a sidebar. Worth fixing before launch — see the roadmap.</p>
+      <div class="hero-side" style="margin-top:22px">
+        <div class="stat"><span class="l">Risk</span><span class="v" style="color:var(--green)">low</span></div>
+        <div class="stat"><span class="l">Est. port</span><span class="v">214<span class="u">h</span></span></div>
+        <div class="stat"><span class="l">Findings</span><span class="v">37</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-od-id="breakdown" data-reveal>
+    <div class="sec-head">
+      <h2>Check breakdown</h2>
+      <span class="id">7 checks · weighted</span>
+    </div>
+    <div id="checks">
+      <div class="chkrow" data-od-id="check-adaptive">
+        <div class="nm"><h3>Adaptive layout</h3><div style="flex:1"></div><span class="chip sev-m"><span class="dot"></span>w 0.20</span></div>
+        <div class="m"><span class="cbar" data-score="93" style="--c:var(--gA)"><span class="segs"></span></span><span class="score" style="color:var(--gA)">93</span></div>
+        <p class="dt" style="grid-column:1/3">34 hardcoded frames · 6 UIScreen.main.bounds reads across 424 files</p>
+      </div>
+      <div class="chkrow" data-od-id="check-parallelview">
+        <div class="nm"><h3>Parallel View opt-in</h3><div style="flex:1"></div><span class="chip ready">Pass</span></div>
+        <div class="m"><span class="cbar" data-score="100" style="--c:var(--gA)"><span class="segs"></span></span><span class="score" style="color:var(--gA)">100</span></div>
+        <p class="dt" style="grid-column:1/3">Parallel View not blocked · w 0.10</p>
+      </div>
+      <div class="chkrow" data-od-id="check-navigation">
+        <div class="nm"><h3>Adaptive navigation / sidebar</h3><div style="flex:1"></div><span class="chip sev-m"><span class="dot"></span>w 0.20</span></div>
+        <div class="m"><span class="cbar" data-score="40" style="--c:var(--gD)"><span class="segs"></span></span><span class="score" style="color:var(--gD)">40</span></div>
+        <p class="dt" style="grid-column:1/3">0 NavigationSplitView · 0 sidebar opt-ins · 31 stacks</p>
+      </div>
+      <div class="chkrow" data-od-id="check-scene">
+        <div class="nm"><h3>UIScene lifecycle</h3><div style="flex:1"></div><span class="chip ready">Pass</span></div>
+        <div class="m"><span class="cbar" data-score="100" style="--c:var(--gA)"><span class="segs"></span></span><span class="score" style="color:var(--gA)">100</span></div>
+        <p class="dt" style="grid-column:1/3">SwiftUI @main App scene · w 0.10</p>
+      </div>
+      <div class="chkrow" data-od-id="check-foldstate">
+        <div class="nm"><h3>Fold state handling</h3><div style="flex:1"></div><span class="chip sev-n">w 0.15</span></div>
+        <div class="m"><span class="cbar" data-score="70" style="--c:var(--gC)"><span class="segs"></span></span><span class="score" style="color:var(--gC)">70</span></div>
+        <p class="dt" style="grid-column:1/3">0 fold-state reads · 5 adaptive geometry</p>
+      </div>
+      <div class="chkrow" data-od-id="check-state">
+        <div class="nm"><h3>State preservation</h3><div style="flex:1"></div><span class="chip sev-n">w 0.10</span></div>
+        <div class="m"><span class="cbar" data-score="70" style="--c:var(--gC)"><span class="segs"></span></span><span class="score" style="color:var(--gC)">70</span></div>
+        <p class="dt" style="grid-column:1/3">0 @SceneStorage · 0 restoration · 42 view models</p>
+      </div>
+      <div class="chkrow" data-od-id="check-framework">
+        <div class="nm"><h3>SwiftUI vs UIKit</h3><div style="flex:1"></div><span class="chip sev-m"><span class="dot"></span>w 0.15</span></div>
+        <div class="m"><span class="cbar" data-score="91" style="--c:var(--gA)"><span class="segs"></span></span><span class="score" style="color:var(--gA)">91</span></div>
+        <p class="dt" style="grid-column:1/3">265 SwiftUI files · 26 UIKit files</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-od-id="findings" data-reveal>
+    <div class="sec-head">
+      <h2>Findings</h2>
+      <span class="id">sample · 12 of 72 rows</span>
+    </div>
+    <div class="fstats" data-od-id="findings-summary">
+      <span class="fs"><i style="background:var(--sevMajor)"></i>Blocking<b class="mono" style="color:var(--sevMajor)">37</b></span>
+      <span class="fs"><i style="background:var(--dim)"></i>Minor<b class="mono">35</b></span>
+      <span class="fs"><i style="background:var(--gD)"></i>Leading check<b class="mono">navigation · 31</b></span>
+    </div>
+    <table class="tbl">
+      <thead><tr><th style="width:96px">Severity</th><th style="width:170px">Check</th><th>Finding</th><th style="width:230px">Location</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Navigation</td><td class="msg">NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td class="file">TimelineTab.swift</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Navigation</td><td class="msg">NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td class="file">MessagesTab.swift</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Navigation</td><td class="msg">NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td class="file">ProfileTab.swift</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Navigation</td><td class="msg">NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td class="file">ExploreTab.swift</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Navigation</td><td class="msg">NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td class="file">SettingsTab.swift</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Navigation</td><td class="msg">NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.</td><td class="file">MediaUIView.swift</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Adaptive layout</td><td class="msg">UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td class="file">SceneDelegate.swift:11</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Adaptive layout</td><td class="msg">UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td class="file">SceneDelegate.swift:12</td></tr>
+        <tr><td><span class="chip sev-m"><span class="dot"></span>Major</span></td><td class="chk">Adaptive layout</td><td class="msg">UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</td><td class="file">SceneDelegate.swift:44</td></tr>
+        <tr><td><span class="chip sev-n"><span class="dot"></span>Minor</span></td><td class="chk">Adaptive layout</td><td class="msg">Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td class="file">AboutView.swift:35</td></tr>
+        <tr><td><span class="chip sev-n"><span class="dot"></span>Minor</span></td><td class="chk">Adaptive layout</td><td class="msg">Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.</td><td class="file">TagChartView.swift:26</td></tr>
+        <tr><td><span class="chip sev-n"><span class="dot"></span>Minor</span></td><td class="chk">State</td><td class="msg">No explicit scroll/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.</td><td class="file">app-wide</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="block" data-od-id="roadmap" style="border-bottom:0" data-reveal>
+    <div class="sec-head">
+      <h2>Remediation roadmap</h2>
+      <span class="note">ordered by effort · total 214h</span>
+    </div>
+    <div class="road" data-od-id="road-1">
+      <span class="no">01</span>
+      <div><h3>SwiftUI / UIKit boundary</h3><p>Box the 26 UIKit files behind representable wrappers so the foldable renderer treats them as one surface.</p><div class="roadbar"><i style="width:6%"></i></div></div>
+      <span class="hr">6<span class="u">h</span></span><span class="cum">cum 6h</span>
+    </div>
+    <div class="road" data-od-id="road-2">
+      <span class="no">02</span>
+      <div><h3>Parallel View verification</h3><p>Capture inner-display layouts at 7.8in on a device and confirm the opt-in holds for every tab.</p><div class="roadbar"><i style="width:8%"></i></div></div>
+      <span class="hr">8<span class="u">h</span></span><span class="cum">cum 14h</span>
+    </div>
+    <div class="road" data-od-id="road-3">
+      <span class="no">03</span>
+      <div><h3>State preservation</h3><p>Add @SceneStorage and scenePhase restoration across the 42 view models so the fold keeps every scroll position.</p><div class="roadbar"><i style="width:25%"></i></div></div>
+      <span class="hr">24<span class="u">h</span></span><span class="cum">cum 38h</span>
+    </div>
+    <div class="road" data-od-id="road-4">
+      <span class="no">04</span>
+      <div><h3>Adaptive layout pass</h3><p>Resolve the 34 hardcoded frames and 6 UIScreen.main.bounds reads to the scene coordinate space.</p><div class="roadbar"><i style="width:40%"></i></div></div>
+      <span class="hr">38<span class="u">h</span></span><span class="cum">cum 76h</span>
+    </div>
+    <div class="road" data-od-id="road-5">
+      <span class="no">05</span>
+      <div><h3>Fold-state handling</h3><p>Add @Environment(\.foldState) reads for book, tent and flat postures across the 5 adaptive sites.</p><div class="roadbar"><i style="width:44%"></i></div></div>
+      <span class="hr">42<span class="u">h</span></span><span class="cum">cum 118h</span>
+    </div>
+    <div class="road" data-od-id="road-6">
+      <span class="no">06</span>
+      <div><h3>Sidebar &amp; adaptive navigation</h3><p>Replace the 31 stacked tabs with NavigationSplitView and a sidebar opt-in — the single largest lift, and the one that earns the featured look on the inner display.</p><div class="roadbar"><i style="width:100%"></i></div></div>
+      <span class="hr">96<span class="u">h</span></span><span class="cum">cum 214h</span>
+    </div>
+  </section>
+
+  <section class="block" data-od-id="next-step" style="border-bottom:0" data-reveal>
+    <div class="band">
+      <div>
+        <h2>Fixed these? Re-run the audit.</h2>
+        <p>The CLI re-scans your source tree and re-scores in minutes — the roadmap above is the exact checklist.</p>
+      </div>
+      <div class="band-acts">
+        <a class="btn btn-ghost" href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/></svg>Re-run audit</a>
+        <a class="btn btn-sec" href="landing-page.html#pricing">Get it ported<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16"/><path d="M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="foot wrap" data-od-id="footer">
+  <svg class="mark" style="width:32px;height:32px" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span>FoldReady · audit generated by the FoldReady CLI</span>
+  <span class="mono">hello@foldready.com</span>
+</footer>
+
+<script>
+  (function(){
+    var doc=document.documentElement;
+    doc.classList.add('fr');
+    var reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function fillSegs(bar){
+      var host=bar.querySelector('.segs');
+      while(host.firstChild)host.removeChild(host.firstChild);
+      for(var i=0;i<10;i++){
+        var s=document.createElement('span');s.className='seg';host.appendChild(s);
+      }
+      var n=Math.max(0,Math.min(10,Math.round(parseFloat(bar.getAttribute('data-score'))/10)));
+      bar.querySelectorAll('.seg').forEach(function(seg,i){seg.classList.toggle('on',i<n);});
+    }
+    document.querySelectorAll('.cbar[data-score]').forEach(fillSegs);
+
+    var arcs=document.querySelectorAll('.gauge .arc');
+    function land(){arcs.forEach(function(a){a.style.strokeDashoffset=String(313*(1-parseFloat(a.getAttribute('data-p'))));});}
+    if(reduced){land();}else{requestAnimationFrame(function(){requestAnimationFrame(land);});}
+
+    var val=document.querySelector('.gauge .val');
+    if(val){
+      var to=parseFloat(val.textContent)||0;
+      if(reduced){val.textContent=String(to);}
+      else{
+        val.textContent='0';
+        var t0=null;
+        function tick(ts){
+          if(t0===null)t0=ts;
+          var p=Math.min(1,(ts-t0)/1100);
+          val.textContent=String(Math.round(to*(1-Math.pow(1-p,4))));
+          if(p<1)requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+    }
+
+    var reveals=document.querySelectorAll('[data-reveal]');
+    if(!('IntersectionObserver' in window)||reduced){
+      reveals.forEach(function(el){el.classList.add('in');});
+      return;
+    }
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+      });
+    },{threshold:.1,rootMargin:'0px 0px -6% 0px'});
+    reveals.forEach(function(el){io.observe(el);});
+  })();
+</script>
+</body>
+</html>

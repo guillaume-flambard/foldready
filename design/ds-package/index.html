@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady · design system & screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --font-display:'Space Grotesk','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ink:#0F172A; --panel:#1E293B; --panel2:#24344D; --slate1:#334155; --slate2:#475569;
+    --blue:#0EA5E9; --sky:#7DD3FC; --green:#22C55E;
+    --txt:#E2E8F0; --dim:#94A3B8; --line:rgba(226,232,240,.14);
+    --gA:#22C55E; --gB:#84CC16; --gC:#FACC15;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink);color:var(--txt);font:15px/1.55 var(--font-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .mark{width:44px;height:44px;flex:none;border-radius:10px;display:block;box-shadow:inset 0 0 0 1px rgba(226,232,240,.16)}
+
+  .nav{display:flex;align-items:center;gap:12px;height:72px;border-bottom:1px solid var(--line)}
+  .nav .wordmark{font:700 21px/1 var(--font-display);letter-spacing:-.02em}
+  .nav .tag{margin-left:auto;font:500 12px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+
+  .hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .hero h1{font:700 clamp(38px,4.6vw,58px)/1.03 var(--font-display);letter-spacing:-.03em;margin:20px 0 14px;max-width:20ch}
+  .hero p{max-width:60ch;color:var(--dim);font-size:16px}
+
+  .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:44px 0 72px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:12px;transition:border-color .15s ease-out,transform .15s ease-out}
+  .item:hover{border-color:var(--slate2)}
+  .item .num{font:700 12px/1 var(--font-mono);color:var(--blue);letter-spacing:.1em}
+  .item h2{font:700 20px/1.2 var(--font-display);letter-spacing:-.01em;color:var(--txt)}
+  .item p{font-size:13px;color:var(--dim);flex:1}
+  .item .go{font:600 13px/1 var(--font-body);color:var(--blue)}
+  footer.foot{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--dim);font-size:13px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  footer.foot .mono{margin-left:auto}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <svg class="mark" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span class="wordmark">foldready</span>
+  <span class="tag">Design system v2 · Sept 2026</span>
+</nav>
+
+<header class="hero wrap" data-od-id="hero">
+  <span class="kicker">Deliverables</span>
+  <h1>FoldReady design system &amp; screens</h1>
+  <p>A token file, a 12-component catalog on dark and light, and three high-fidelity screens built from real audits, reconciled with the existing Hinge Check mark.</p>
+</header>
+
+<main class="wrap">
+  <div class="items" data-od-id="items">
+    <a class="item" href="components.html" data-od-id="item-components">
+      <span class="num">DESIGN SYSTEM</span>
+      <h2>Component catalog</h2>
+      <p>All 12 components on dark and light with a working theme toggle, plus token reference: palette, type ramp, spacing, radius, motion, grade bands.</p>
+      <span class="go">Open components.html</span>
+    </a>
+    <a class="item" href="report-page.html" data-od-id="item-report">
+      <span class="num">SCREEN 01 · REPORT</span>
+      <h2>Fold-Ready report</h2>
+      <p>Audited app at 78 / A: hero gauge, grade stamp, 7-check breakdown, findings with file:line, and a remediation roadmap ordered by effort.</p>
+      <span class="go">Open report-page.html</span>
+    </a>
+    <a class="item" href="index-ranking.html" data-od-id="item-index">
+      <span class="num">SCREEN 02 · INDEX</span>
+      <h2>Fold-Ready Index</h2>
+      <p>The ranking of 6 real open-source iOS apps with sortable scores and grade filters, driven by the FoldReady CLI's audit output.</p>
+      <span class="go">Open index-ranking.html</span>
+    </a>
+    <a class="item" href="landing-page.html" data-od-id="item-landing">
+      <span class="num">SCREEN 03 · LANDING</span>
+      <h2>Landing page</h2>
+      <p>Hero with a giant score, proof strip of app scores, three-column offering, pricing cards, and the objection block.</p>
+      <span class="go">Open landing-page.html</span>
+    </a>
+    <a class="item" href="DESIGN.md" data-od-id="item-designmd">
+      <span class="num">TOKENS</span>
+      <h2>DESIGN.md</h2>
+      <p>The token file: colors dark + light, type scale, spacing, radius, motion, grade bands, personality statement, voice, and the logo usage rule.</p>
+      <span class="go">Open DESIGN.md</span>
+    </a>
+  </div>
+
+  <h2 style="font:700 22px/1.15 var(--font-display);letter-spacing:-.02em;margin-top:8px">Design-system package</h2>
+  <div class="items" data-od-id="package">
+    <a class="item" href="preview/index.html" data-od-id="item-preview">
+      <span class="num">GALLERY</span>
+      <h2>Review previews</h2>
+      <p>Six focused cards: colors, typography, spacing &amp; radius, components, brand assets, applied surfaces, each reading the shared token file.</p>
+      <span class="go">Open preview/index.html</span>
+    </a>
+    <a class="item" href="ui_kits/app/index.html" data-od-id="item-uikit">
+      <span class="num">UI KIT</span>
+      <h2>Applied interface kit</h2>
+      <p>A working audit workspace built on colors_and_type.css: gauge, check bars, findings, empty state, persisted theme toggle.</p>
+      <span class="go">Open ui_kits/app/index.html</span>
+    </a>
+    <a class="item" href="colors_and_type.css" data-od-id="item-css">
+      <span class="num">TOKENS · CSS</span>
+      <h2>colors_and_type.css</h2>
+      <p>The paste-ready token file: dark + light themes, fonts, radius, spacing, motion. The single source every preview and the UI kit bind to.</p>
+      <span class="go">Open colors_and_type.css</span>
+    </a>
+    <a class="item" href="README.md" data-od-id="item-readme">
+      <span class="num">USAGE</span>
+      <h2>README + SKILL</h2>
+      <p>The package guide and the agent-facing skill for building FoldReady artifacts. Provenance lives in context/provenance.md.</p>
+      <span class="go">Open README.md</span>
+    </a>
+  </div>
+</main>
+
+<footer class="foot wrap" data-od-id="footer">
+  <span>FoldReady · iOS app audit + porting for the iPhone Fold</span>
+  <span class="mono">DESIGN.md → colors_and_type.css → preview → ui_kits/app → screens</span>
+</footer>
+</body>
+</html>

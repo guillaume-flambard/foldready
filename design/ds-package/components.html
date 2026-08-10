@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady · Design System v2</title>
+<meta name="description" content="Component catalog for FoldReady — all 12 components on dark and light.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --font-display:'Space Grotesk','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ink:#0F172A; --ink2:#0B1220; --panel:#1E293B; --panel2:#24344D;
+    --slate1:#334155; --slate2:#475569;
+    --blue:#0EA5E9; --sky:#7DD3FC;
+    --green:#22C55E; --checkink:#052E16;
+    --txt:#E2E8F0; --dim:#94A3B8; --line:rgba(226,232,240,.14);
+    --gA:#22C55E; --gB:#84CC16; --gC:#FACC15; --gD:#F97316; --gF:#EF4444;
+    --sevBlocker:#F87171; --sevMajor:#FDBA74;
+    --on-accent:#0F172A; --on-chip:#0F172A;
+    --bg:var(--ink);
+  }
+  :root[data-theme="light"]{
+    --ink:#FBFBFE; --ink2:#F6F7FB; --panel:#FFFFFF; --panel2:#F1F5F9;
+    --slate1:#CBD5E1; --slate2:#94A3B8;
+    --txt:#0F172A; --dim:#475569; --line:rgba(15,23,42,.12);
+    --gA:#15803D; --gB:#4D7C0F; --gC:#A16207; --gD:#C2410C; --gF:#B91C1C;
+    --sevBlocker:#DC2626; --sevMajor:#C2410C;
+    --on-chip:#FFFFFF;
+    --bg:var(--ink);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--txt);font:15px/1.55 var(--font-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;transition:background .2s ease-out,color .2s ease-out}
+  a{color:var(--blue)}
+  a:hover{color:var(--sky)}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  ::selection{background:rgba(14,165,233,.3)}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .skip{position:absolute;left:-9999px;top:0;background:var(--blue);color:var(--on-accent);padding:10px 14px;z-index:99}
+  .skip:focus{left:12px;top:12px}
+
+  .mark{width:44px;height:44px;flex:none;border-radius:10px;display:block;box-shadow:inset 0 0 0 1px rgba(226,232,240,.16)}
+
+  .nav{display:flex;align-items:center;gap:28px;height:72px;border-bottom:1px solid var(--line)}
+  .nav .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--txt)}
+  .nav .wordmark{font:700 21px/1 var(--font-display);letter-spacing:-.02em}
+  .nav .links{display:flex;gap:24px;margin-left:8px}
+  .nav .links a{color:var(--dim);text-decoration:none;font-size:14px;font-weight:500}
+  .nav .links a:hover{color:var(--txt)}
+  .nav .links a[aria-current]{color:var(--txt)}
+  .nav .right{margin-left:auto;display:flex;align-items:center;gap:16px}
+  @media(max-width:720px){.nav .links{display:none}}
+
+  .tgl{display:inline-flex;align-items:center;gap:9px;padding:6px 8px 6px 13px;border:1px solid var(--line);border-radius:999px;background:var(--panel);cursor:pointer;font:500 12px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  .tgl:hover{border-color:var(--slate2);color:var(--txt)}
+  .tgl .knob{position:relative;width:34px;height:20px;border-radius:999px;background:var(--slate1);transition:background .16s ease-out}
+  .tgl .knob::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .16s ease-out}
+  .tgl[aria-pressed="true"] .knob::after{transform:translateX(14px)}
+  .tgl[aria-pressed="true"] .knob{background:var(--blue)}
+
+  .hero{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .hero h1{font:700 clamp(40px,5vw,64px)/1.05 var(--font-display);letter-spacing:-.03em;margin:20px 0 14px;max-width:19ch}
+  .hero p.lede{max-width:62ch;color:var(--dim);font-size:17px}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:26px;color:var(--dim);font-size:13px}
+  .hero .meta b{color:var(--txt);font-weight:600}
+
+  section.block{padding:56px 0;border-bottom:1px solid var(--line)}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:28px}
+  .sec-head h2{font:700 28px/1.15 var(--font-display);letter-spacing:-.02em}
+  .sec-head .id{font:500 12px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em}
+  .spec{font:500 12px/1.5 var(--font-mono);color:var(--dim);letter-spacing:.02em}
+
+  .frame{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .comphead{display:flex;align-items:baseline;gap:16px;margin-bottom:16px}
+  .comphead .no{font:700 13px/1 var(--font-mono);color:var(--blue)}
+  .comphead h3{font:700 18px/1.2 var(--font-display);letter-spacing:-.01em}
+  .comphead .spec{margin-left:auto;text-align:right}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .row3{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+  @media(max-width:860px){.row2{grid-template-columns:1fr}}
+
+  .swgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+  .sw{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel)}
+  .sw .chipc{height:44px;border-radius:7px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)}
+  .sw .nm{font:600 12px/1.3 var(--font-body);color:var(--txt)}
+  .sw .vl{font:500 11px/1.3 var(--font-mono);color:var(--dim);margin-top:2px}
+  .mode{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:16px}
+  .mode .bar{display:flex;align-items:center;gap:8px;padding:10px 14px;font:600 11px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase}
+  .mode .pad{padding:16px}
+  .mode.dark .bar{background:#0F172A;color:#E2E8F0;border-bottom:1px solid rgba(226,232,240,.14)}
+  .mode.dark .pad{background:#0F172A}
+  .mode.light .bar{background:#FBFBFE;color:#0F172A;border-bottom:1px solid rgba(15,23,42,.12)}
+  .mode.light .pad{background:#FBFBFE}
+  .grades{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+  .ramp{border-top:1px solid var(--line);margin-top:20px}
+  .ramp .r{display:flex;align-items:baseline;gap:24px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .ramp .r .pt{font:500 12px/1 var(--font-mono);color:var(--dim);min-width:116px}
+  .ramp .r .sample{color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ramp .r .val{font:500 11px/1 var(--font-mono);color:var(--dim);margin-left:auto;white-space:nowrap}
+  .space{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .space .nm{font:500 12px/1 var(--font-mono);color:var(--dim);min-width:52px}
+  .space .ln{height:10px;border-radius:3px;background:var(--blue)}
+  .space .px{font:500 11px/1 var(--font-mono);color:var(--dim);margin-left:auto}
+  .rp{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .rpill{width:72px;height:56px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;font:500 11px/1 var(--font-mono);color:var(--dim)}
+  .mcell{flex:1;min-width:200px;border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+  .mcell .t{font:600 11px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+
+  .gauge{position:relative;width:240px;height:132px;flex:none}
+  .gauge svg{position:absolute;inset:0}
+  .gauge .track{fill:none;stroke:var(--slate1);stroke-width:10;stroke-linecap:round;opacity:.45}
+  .gauge .arc{fill:none;stroke:var(--g);stroke-width:10;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:289;transition:stroke-dashoffset 1s cubic-bezier(.16,1,.3,1)}
+  .gauge .body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding-top:6px}
+  .gauge .val{font:700 46px/1 var(--font-mono);color:var(--g);letter-spacing:-.02em}
+  .gauge .cap{position:absolute;left:0;right:0;bottom:2px;text-align:center;font:600 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+  .scard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:340px}
+  .scard .top{display:flex;align-items:flex-start;gap:14px}
+  .scard .num{font:700 44px/1 var(--font-mono);letter-spacing:-.02em;min-width:74px}
+  .scard h4{font:600 16px/1.25 var(--font-body);color:var(--txt)}
+  .scard .sub{font:500 12px/1.4 var(--font-mono);color:var(--dim);margin-top:4px}
+  .scard .stats{display:flex;gap:22px;font-size:13px;color:var(--dim);padding-top:12px;border-top:1px solid var(--line)}
+  .scard .stats b{display:block;font:700 16px/1.2 var(--font-mono);color:var(--txt)}
+  .scard .checks{display:flex;flex-wrap:wrap;gap:6px}
+  .scard .go{margin-top:auto;font:600 13px/1 var(--font-body);color:var(--blue);text-decoration:none}
+  .scard .go:hover{color:var(--sky)}
+
+  .cbar{display:flex;align-items:center;gap:14px}
+  .cbar .lbl{font:500 13px/1.2 var(--font-body);color:var(--txt);min-width:150px}
+  .cbar .segs{display:flex;gap:4px}
+  .cbar .seg{width:7px;height:20px;border-radius:2px;background:var(--slate1);opacity:.4;transition:background .15s ease-out,opacity .15s ease-out}
+  .cbar .seg.on{background:var(--c);opacity:1}
+  .cbar .val{font:700 13px/1 var(--font-mono);color:var(--txt);min-width:40px;text-align:right}
+  .cbar .wt{font:500 11px/1 var(--font-mono);color:var(--dim);min-width:56px}
+
+  .frow{display:grid;grid-template-columns:92px 136px 1fr auto;gap:16px;align-items:baseline;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+  .frow .msg{font-size:14px;color:var(--txt)}
+  .frow .chk{font:600 12px/1.4 var(--font-body);color:var(--txt)}
+  .frow .file{font:500 12px/1.4 var(--font-mono);color:var(--dim);text-align:right}
+  @media(max-width:720px){.frow{grid-template-columns:1fr;gap:8px}.frow .file{text-align:left}}
+
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:148px}
+  .stat .l{font:600 11px/1.2 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .stat .v{font:700 34px/1 var(--font-mono);letter-spacing:-.02em;color:var(--txt)}
+  .stat .u{font:600 13px/1 var(--font-mono);color:var(--dim);margin-left:6px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 15px/1 var(--font-body);padding:13px 22px;border-radius:11px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background .15s ease-out,color .15s ease-out,border-color .15s ease-out}
+  .btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .btn-pri{background:var(--blue);color:var(--on-accent)}
+  .btn-pri:hover{background:var(--sky)}
+  .btn-sec{background:transparent;color:var(--txt);border-color:var(--line)}
+  .btn-sec:hover{background:var(--panel2);border-color:var(--slate2)}
+  .btn-ghost{background:transparent;color:var(--blue);border-color:transparent;padding-left:8px;padding-right:8px}
+  .btn-ghost:hover{color:var(--sky)}
+  .btn[disabled]{opacity:.45;cursor:default}
+
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font:500 12px/1 var(--font-body);letter-spacing:.02em;border:1px solid var(--line);color:var(--txt);background:transparent}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .chip.sev-b{color:var(--sevBlocker);border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+  .chip.sev-m{color:var(--sevMajor);border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.08)}
+  .chip.sev-n{color:var(--dim);border-color:var(--line);background:transparent}
+  .chip.ready{color:var(--green);border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08)}
+  .chip.weak{color:var(--txt);border-color:var(--line);background:var(--ink2)}
+  .gchip{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 9px;border-radius:8px;font:700 14px/1 var(--font-mono);color:var(--on-chip)}
+  .gchip.a{background:var(--gA)}.gchip.b{background:var(--gB)}.gchip.c{background:var(--gC)}.gchip.d{background:var(--gD)}.gchip.f{background:var(--gF)}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:14px}
+  .tbl th{text-align:left;font:600 11px/1.3 var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--dim);padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl tr:hover td{background:rgba(148,163,184,.07)}
+  .tbl td.r{text-align:right}
+
+  .report{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .report .rh{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .report .rh .name{font:600 17px/1.2 var(--font-body);color:var(--txt)}
+  .report .rh .meta{font:500 12px/1.4 var(--font-mono);color:var(--dim)}
+  .report .rbody{display:grid;grid-template-columns:240px 1fr;gap:24px;padding:24px}
+  @media(max-width:760px){.report .rbody{grid-template-columns:1fr}}
+  .stamp{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--g);border-radius:8px;padding:4px 10px;color:var(--g);font:700 13px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase}
+  .checklist{display:flex;flex-direction:column;gap:10px}
+
+  .empty{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;max-width:420px}
+  .empty .tile{width:44px;height:44px;border-radius:10px;background:var(--green);display:grid;place-items:center}
+  .empty h4{font:700 18px/1.2 var(--font-display);letter-spacing:-.01em;color:var(--txt)}
+  .empty p{color:var(--dim);font-size:14px;max-width:52ch}
+
+  footer.foot{border-top:1px solid var(--line);padding:32px 0 56px;color:var(--dim);font-size:13px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  footer.foot .mono{margin-left:auto}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#gallery">Skip to components</a>
+<nav class="nav wrap" data-od-id="nav">
+  <a class="brand" href="index.html" aria-label="FoldReady home">
+    <svg class="mark" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="wordmark">foldready</span>
+  </a>
+  <div class="links">
+    <a href="index-ranking.html">Index</a>
+    <a href="report-page.html">Reports</a>
+    <a href="#tokens">Tokens</a>
+    <a href="#gallery">Components</a>
+    <a href="landing-page.html">Landing</a>
+  </div>
+  <div class="right">
+    <button type="button" class="tgl" id="theme-toggle" aria-pressed="false"><span id="theme-label">Light</span><span class="knob" aria-hidden="true"></span></button>
+    <a class="btn btn-pri" href="landing-page.html#pricing">Get scored</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="hero" data-od-id="hero">
+    <span class="kicker">Product design system · v2</span>
+    <h1>FoldReady design system</h1>
+    <p class="lede">FoldReady is a precision instrument: an audit that scores and ports iOS apps for the iPhone Fold. The system speaks like a calibrated tool — monospaced measurements, hairline structure, one vivid accent that means focus. Nothing bounces, nothing pleads; the numbers carry the confidence.</p>
+    <div class="meta">
+      <span>Components <b class="mono">12</b></span>
+      <span>Themes <b>Dark · Light</b></span>
+      <span>Tokens <b class="mono">22</b></span>
+      <span>Accents <b class="mono">2</b> · blue + green(ready)</span>
+      <span>Launch <b>Sept 2026</b></span>
+    </div>
+  </header>
+
+  <section class="block" id="tokens" data-od-id="tokens">
+    <div class="sec-head">
+      <h2>Tokens</h2><span class="id">DESIGN.md</span>
+    </div>
+    <p class="spec" style="margin-bottom:16px">Colors · type · spacing · radius · motion · grade bands. Toggle the theme in the nav to view both variants.</p>
+
+    <div class="swgrid" data-od-id="palette-dark">
+      <div class="sw"><div class="chipc" style="background:#0F172A"></div><div class="nm">Ink</div><div class="vl">#0F172A · canvas</div></div>
+      <div class="sw"><div class="chipc" style="background:#0B1220"></div><div class="nm">Ink 2</div><div class="vl">#0B1220 · inset</div></div>
+      <div class="sw"><div class="chipc" style="background:#1E293B"></div><div class="nm">Panel</div><div class="vl">#1E293B · card</div></div>
+      <div class="sw"><div class="chipc" style="background:#24344D"></div><div class="nm">Panel 2</div><div class="vl">#24344D · hover</div></div>
+      <div class="sw"><div class="chipc" style="background:#334155"></div><div class="nm">Slate 1</div><div class="vl">#334155 · border</div></div>
+      <div class="sw"><div class="chipc" style="background:#475569"></div><div class="nm">Slate 2</div><div class="vl">#475569 · line</div></div>
+      <div class="sw"><div class="chipc" style="background:#0EA5E9"></div><div class="nm">Screen Blue</div><div class="vl">#0EA5E9 · accent</div></div>
+      <div class="sw"><div class="chipc" style="background:#7DD3FC"></div><div class="nm">Sky</div><div class="vl">#7DD3FC · hover</div></div>
+      <div class="sw"><div class="chipc" style="background:#22C55E"></div><div class="nm">Ready Green</div><div class="vl">#22C55E · ready</div></div>
+      <div class="sw"><div class="chipc" style="background:#E2E8F0"></div><div class="nm">Text</div><div class="vl">#E2E8F0 · primary</div></div>
+      <div class="sw"><div class="chipc" style="background:#94A3B8"></div><div class="nm">Dim</div><div class="vl">#94A3B8 · secondary</div></div>
+    </div>
+
+    <div class="grades" data-od-id="grade-bands">
+      <span class="gchip a">A</span><span class="gchip b">B</span><span class="gchip c">C</span><span class="gchip d">D</span><span class="gchip f">F</span>
+      <span class="spec" style="align-self:center">Grade = letter + color, always together. A Ready Green · F Red.</span>
+    </div>
+
+    <div class="ramp" data-od-id="type-ramp">
+      <div class="r"><span class="pt">Display / 64</span><span class="sample" style="font:700 64px/1 var(--font-display);letter-spacing:-.03em">Your app, ready.</span><span class="val">Space Grotesk 700 · -0.03em</span></div>
+      <div class="r"><span class="pt">Display / 32</span><span class="sample" style="font:700 32px/1.1 var(--font-display);letter-spacing:-.02em">Fold-Ready Score</span><span class="val">Space Grotesk 700</span></div>
+      <div class="r"><span class="pt">Body / 17</span><span class="sample" style="font:400 17px/1.6 var(--font-body)">A static and pixel audit of your iOS source tree.</span><span class="val">Inter 400 · 1.6</span></div>
+      <div class="r"><span class="pt">Body / 13</span><span class="sample" style="font:500 13px/1.5 var(--font-body)">Adaptive navigation / sidebar</span><span class="val">Inter 500</span></div>
+      <div class="r"><span class="pt">Data / 15</span><span class="sample" style="font:700 15px/1.4 var(--font-mono)">214 h · 42 findings · 78.0</span><span class="val">JetBrains Mono · tabular</span></div>
+      <div class="r"><span class="pt">Caption / 11</span><span class="sample" style="font:600 11px/1.4 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Parallel view opt-in</span><span class="val">Inter 600 · +0.08em caps</span></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px">
+      <div data-od-id="spacing-scale">
+        <p class="spec" style="margin-bottom:8px">Spacing · 4px base</p>
+        <div class="space"><span class="nm">04</span><span class="ln" style="width:4px"></span><span class="px">4px</span></div>
+        <div class="space"><span class="nm">08</span><span class="ln" style="width:8px"></span><span class="px">8px</span></div>
+        <div class="space"><span class="nm">12</span><span class="ln" style="width:12px"></span><span class="px">12px</span></div>
+        <div class="space"><span class="nm">16</span><span class="ln" style="width:16px"></span><span class="px">16px</span></div>
+        <div class="space"><span class="nm">24</span><span class="ln" style="width:24px"></span><span class="px">24px</span></div>
+        <div class="space"><span class="nm">32</span><span class="ln" style="width:32px"></span><span class="px">32px</span></div>
+        <div class="space"><span class="nm">48</span><span class="ln" style="width:48px"></span><span class="px">48px</span></div>
+        <div class="space"><span class="nm">64</span><span class="ln" style="width:64px"></span><span class="px">64px</span></div>
+      </div>
+      <div data-od-id="radius-motion">
+        <p class="spec" style="margin-bottom:8px">Radius</p>
+        <div class="rp">
+          <div class="rpill" style="border-radius:0">0</div>
+          <div class="rpill" style="border-radius:8px">8</div>
+          <div class="rpill" style="border-radius:14px">14</div>
+          <div class="rpill" style="border-radius:999px">999</div>
+        </div>
+        <p class="spec" style="margin:20px 0 8px">Motion</p>
+        <div class="rp">
+          <div class="mcell"><div class="t">State change</div><span class="spec">150ms · ease-out · fade + 4–8px slide</span></div>
+          <div class="mcell"><div class="t">Gauge lands</div><span class="spec">spring · cubic-bezier(.16,1,.3,1) · once</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="gallery" data-od-id="gallery">
+    <div class="sec-head">
+      <h2>Components</h2><span class="id">01 — 12</span>
+    </div>
+    <div class="frame" data-od-id="component-gauge">
+      <div class="comphead"><span class="no">01</span><h3>Score gauge</h3><span class="spec">Arc · mono value · grade color · lands on load</span></div>
+      <div class="gauge" style="--g:var(--gA)">
+        <svg viewBox="0 0 240 132" aria-hidden="true"><path class="track" d="M28,120 A92,92 0 0 1 212,120"/><path class="arc" data-p=".78" d="M28,120 A92,92 0 0 1 212,120"/></svg>
+        <div class="body"><span class="gchip a">A</span><span class="val">78</span></div>
+        <span class="cap">Fold-Ready score</span>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-score-card">
+      <div class="comphead"><span class="no">02</span><h3>Score card</h3><span class="spec">Grade chip · risk · hours · weak checks</span></div>
+      <div class="row3">
+        <article class="scard">
+          <div class="top">
+            <span class="num" style="color:var(--gA)">78</span>
+            <div><h4>IceCubesApp</h4><p class="sub">424 Swift files · 37 findings</p></div>
+          </div>
+          <div class="stats">
+            <span>Risk<b>low</b></span>
+            <span>Port<b>214h</b></span>
+            <span>Best<b>100</b></span>
+          </div>
+          <div class="checks"><span class="chip weak">Sidebar 40</span><span class="chip weak">FoldState 70</span><span class="chip ready">ParallelView 100</span></div>
+          <a class="go" href="report-page.html">Full Fold-Ready report</a>
+        </article>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-check-bar">
+      <div class="comphead"><span class="no">03</span><h3>Check bar</h3><span class="spec">10-step segmented bar · one per foldable check</span></div>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:560px">
+        <div class="cbar" data-score="93" style="--c:var(--blue)"><span class="lbl">Adaptive layout</span><span class="segs"></span><span class="val">93</span><span class="wt">w 0.20</span></div>
+        <div class="cbar" data-score="100" style="--c:var(--green)"><span class="lbl">Parallel View opt-in</span><span class="segs"></span><span class="val">100</span><span class="wt">w 0.10</span></div>
+        <div class="cbar" data-score="40" style="--c:var(--gD)"><span class="lbl">Adaptive navigation</span><span class="segs"></span><span class="val">40</span><span class="wt">w 0.20</span></div>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-finding-row">
+      <div class="comphead"><span class="no">04</span><h3>Finding row</h3><span class="spec">Severity · check · message · file:line</span></div>
+      <div class="row2">
+        <div class="frow">
+          <span class="chip sev-m"><span class="dot"></span>Major</span>
+          <span class="chk">Adaptive layout</span>
+          <span class="msg">UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.</span>
+          <span class="file">SceneDelegate.swift:11</span>
+        </div>
+        <div class="frow">
+          <span class="chip sev-n"><span class="dot"></span>Minor</span>
+          <span class="chk">Fold state</span>
+          <span class="msg">Hardcoded frame width/height literals will not reflow on the 7.8in inner display.</span>
+          <span class="file">GalleryToolbarView.swift:31</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-stat-card">
+      <div class="comphead"><span class="no">05</span><h3>Stat card</h3><span class="spec">Label + large mono value</span></div>
+      <div class="row3">
+        <div class="stat"><span class="l">Est. port</span><span class="v">214<span class="u">h</span></span></div>
+        <div class="stat"><span class="l">Findings</span><span class="v">37</span></div>
+        <div class="stat"><span class="l">Risk</span><span class="v" style="color:var(--green)">low</span></div>
+        <div class="stat"><span class="l">Swift files</span><span class="v">424</span></div>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-button">
+      <div class="comphead"><span class="no">06</span><h3>Button</h3><span class="spec">Primary · secondary · ghost · disabled</span></div>
+      <div class="row3" style="align-items:center">
+        <a class="btn btn-pri" href="#">Score my app</a>
+        <a class="btn btn-sec" href="#">Read the methodology</a>
+        <a class="btn btn-ghost" href="#">View report</a>
+        <button class="btn btn-pri" disabled>Disabled</button>
+      </div>
+      <p class="spec" style="margin-top:14px">Primary = Screen Blue on Ink · hover → Sky. Secondary = ghost + hairline · hover lifts panel. Focus ring = Sky, 2px offset.</p>
+    </div>
+
+    <div class="frame" data-od-id="component-chip">
+      <div class="comphead"><span class="no">07</span><h3>Chip / pill</h3><span class="spec">Severity · weak check · tag · grade</span></div>
+      <div class="row3" style="align-items:center">
+        <span class="chip sev-b"><span class="dot"></span>Blocker</span>
+        <span class="chip sev-m"><span class="dot"></span>Major</span>
+        <span class="chip sev-n"><span class="dot"></span>Minor</span>
+        <span class="chip ready">Ready</span>
+        <span class="chip weak">Sidebar 40</span>
+        <span class="gchip a">A</span>
+        <span class="gchip c">C</span>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-table">
+      <div class="comphead"><span class="no">08</span><h3>Table</h3><span class="spec">Hairline rows · mono cells · numbers right-aligned</span></div>
+      <table class="tbl">
+        <thead><tr><th>App</th><th>Grade</th><th>Score</th><th>Risk</th><th>Port</th><th class="r">Findings</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">MochiDiffusion</td><td><span class="gchip a">A</span></td><td class="r mono">91</td><td>low</td><td class="r mono">27.5h</td><td class="r mono">0</td></tr>
+          <tr><td class="mono">IceCubesApp</td><td><span class="gchip a">A</span></td><td class="r mono">78</td><td>low</td><td class="r mono">214h</td><td class="r mono">37</td></tr>
+          <tr><td class="mono">isowords</td><td><span class="gchip a">A</span></td><td class="r mono">78</td><td>low</td><td class="r mono">185.5h</td><td class="r mono">30</td></tr>
+          <tr><td class="mono">MovieSwiftUI</td><td><span class="gchip b">B</span></td><td class="r mono">69</td><td>low</td><td class="r mono">76h</td><td class="r mono">18</td></tr>
+          <tr><td class="mono">Dime</td><td><span class="gchip c">C</span></td><td class="r mono">59</td><td>medium</td><td class="r mono">79.5h</td><td class="r mono">38</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="frame" data-od-id="component-report-shell">
+      <div class="comphead"><span class="no">09</span><h3>Report page shell</h3><span class="spec">Full shell → report-page.html</span></div>
+      <div class="report">
+        <div class="rh">
+          <span class="name">IceCubesApp</span>
+          <span class="meta">Dimillian/IceCubesApp</span>
+          <span class="stamp" style="--g:var(--gA);margin-left:auto">A · Ready</span>
+        </div>
+        <div class="rbody">
+          <div style="display:flex;flex-direction:column;gap:20px;align-items:center">
+            <div class="gauge" style="--g:var(--gA)">
+              <svg viewBox="0 0 240 132" aria-hidden="true"><path class="track" d="M28,120 A92,92 0 0 1 212,120"/><path class="arc" data-p=".78" d="M28,120 A92,92 0 0 1 212,120"/></svg>
+              <div class="body"><span class="gchip a">A</span><span class="val">78</span></div>
+              <span class="cap">Fold-Ready score</span>
+            </div>
+            <div class="stat" style="min-width:0;width:100%"><span class="l">Est. port</span><span class="v">214<span class="u">h</span></span></div>
+          </div>
+          <div class="checklist">
+            <div class="cbar" data-score="93" style="--c:var(--blue)"><span class="lbl" style="min-width:150px">Adaptive layout</span><span class="segs"></span><span class="val">93</span></div>
+            <div class="cbar" data-score="100" style="--c:var(--green)"><span class="lbl">Parallel View</span><span class="segs"></span><span class="val">100</span></div>
+            <div class="cbar" data-score="40" style="--c:var(--gD)"><span class="lbl">Navigation</span><span class="segs"></span><span class="val">40</span></div>
+            <div class="cbar" data-score="91" style="--c:var(--blue)"><span class="lbl">SwiftUI / UIKit</span><span class="segs"></span><span class="val">91</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-landing-hero">
+      <div class="comphead"><span class="no">10</span><h3>Landing hero</h3><span class="spec">Full page → landing-page.html</span></div>
+      <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:center">
+        <div>
+          <span class="kicker">Launching Sept 2026 · iOS 27</span>
+          <h4 style="font:700 40px/1.05 var(--font-display);letter-spacing:-.03em;margin:18px 0 12px">Your iOS app, ready for the iPhone Fold.</h4>
+          <p class="spec" style="max-width:44ch;color:var(--dim);font-size:14px;line-height:1.6">A static + pixel audit that scores your app 0–100, estimates the port in hours, and ships it featured-ready on the 7.8in inner display.</p>
+          <div class="row3" style="margin-top:20px;align-items:center">
+            <a class="btn btn-pri" href="#">Score my app free</a>
+            <a class="btn btn-ghost" href="#">Methodology</a>
+          </div>
+        </div>
+        <div class="gauge" style="--g:var(--gA);margin:0 auto">
+          <svg viewBox="0 0 240 132" aria-hidden="true"><path class="track" d="M28,120 A92,92 0 0 1 212,120"/><path class="arc" data-p=".78" d="M28,120 A92,92 0 0 1 212,120"/></svg>
+          <div class="body"><span class="gchip a">A</span><span class="val">78</span></div>
+          <span class="cap">Fold-Ready score</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-nav">
+      <div class="comphead"><span class="no">11</span><h3>Nav</h3><span class="spec">Mark + wordmark · links · one primary CTA</span></div>
+      <div class="nav" style="border:1px solid var(--line);border-radius:12px;padding:0 18px;height:64px">
+        <a class="brand" href="#"><svg class="mark" style="width:34px;height:34px" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wordmark" style="font-size:18px">foldready</span></a>
+        <div class="links"><a href="#">Index</a><a href="#">Reports</a><a href="#">Docs</a><a aria-current="page" href="#">Pricing</a></div>
+        <div class="right"><a class="btn btn-pri" style="padding:10px 18px;font-size:14px" href="#">Get scored</a></div>
+      </div>
+    </div>
+
+    <div class="frame" data-od-id="component-empty-state">
+      <div class="comphead"><span class="no">12</span><h3>Empty · no weak checks</h3><span class="spec">Confident, never empty</span></div>
+      <div class="empty">
+        <span class="tile"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5 L10.2 16.5 L18 8" fill="none" stroke="#052E16" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h4>All 7 checks pass</h4>
+        <p>Zero findings across every foldable check. IceCubesApp is ready for the 7.8in inner display — no port required.</p>
+        <a class="btn btn-sec" href="#">Download clean report</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap" data-od-id="footer">
+  <svg class="mark" style="width:32px;height:32px" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span>FoldReady · design system v2</span>
+  <span class="mono">DESIGN.md → components.html → report · index · landing</span>
+</footer>
+
+<script>
+  (function(){
+    var root=document.documentElement;
+    var tgl=document.getElementById('theme-toggle');
+    var lbl=document.getElementById('theme-label');
+    function apply(t){
+      root.dataset.theme=t;
+      tgl.setAttribute('aria-pressed',t==='light'?'true':'false');
+      lbl.textContent=t==='light'?'Dark':'Light';
+    }
+    try{var s=localStorage.getItem('fr-theme');}catch(e){var s='';}
+    apply(s==='light'||s==='dark'?s:'dark');
+    tgl.addEventListener('click',function(){
+      var next=root.dataset.theme==='light'?'dark':'light';
+      apply(next);
+      try{localStorage.setItem('fr-theme',next);}catch(e){}
+    });
+    function fillSegs(bar){
+      var host=bar.querySelector('.segs');
+      while(host.firstChild)host.removeChild(host.firstChild);
+      for(var i=0;i<10;i++){
+        var s=document.createElement('span');s.className='seg';host.appendChild(s);
+      }
+      var score=parseFloat(bar.getAttribute('data-score'));
+      var n=Math.max(0,Math.min(10,Math.round(score/10)));
+      bar.querySelectorAll('.seg').forEach(function(seg,i){
+        seg.classList.toggle('on',i<n);
+      });
+    }
+    document.querySelectorAll('.cbar[data-score]').forEach(fillSegs);
+    function land(arc){
+      var p=parseFloat(arc.getAttribute('data-p'));
+      arc.style.strokeDashoffset=String(289*(1-p));
+    }
+    var arcs=document.querySelectorAll('.gauge .arc');
+    requestAnimationFrame(function(){requestAnimationFrame(function(){arcs.forEach(land);});});
+  })();
+</script>
+</body>
+</html>

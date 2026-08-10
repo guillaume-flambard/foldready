@@ -8,6 +8,12 @@
   --sevBlocker: #F87171; --sevMajor: #FDBA74;
   --on-accent: #0F172A; --on-chip: #0F172A;
   --bg: var(--ink);
+
+  /* canonical tokens from design/ds-package/colors_and_type.css */
+  --r-container: 14px; --r-button: 11px; --r-chip: 999px;
+  --sp-4: 4px; --sp-8: 8px; --sp-12: 12px; --sp-16: 16px;
+  --sp-24: 24px; --sp-32: 32px; --sp-48: 48px; --sp-64: 64px;
+  --t-fast: .15s ease-out; --t-mid: .2s ease-out;
 }
 
 :root[data-theme="light"] {

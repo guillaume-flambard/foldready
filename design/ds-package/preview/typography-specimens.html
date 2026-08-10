@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady · Preview · Typography specimens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{background:var(--ink)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  .nav{display:flex;align-items:center;gap:12px;height:64px;border-bottom:1px solid var(--line)}
+  .nav a{font:600 13px/1 var(--font-body);color:var(--dim);text-decoration:none}
+  .nav a:hover{color:var(--txt)}
+  .nav .tag{margin-left:auto;font:500 11px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+  .hero{padding:40px 0 28px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .hero h1{font:700 clamp(30px,4vw,44px)/1.05 var(--font-display);letter-spacing:-.03em;margin:16px 0 10px}
+  .hero p{max-width:60ch;color:var(--dim);font-size:15px}
+  .fam{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:40px 0 8px}
+  @media(max-width:820px){.fam{grid-template-columns:1fr}}
+  .fcard{border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--panel)}
+  .fcard .lbl{font:600 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+  .fcard .spec{font:500 12px/1.5 var(--font-mono);color:var(--dim)}
+  .fcard .a{font-size:44px;line-height:1;margin-bottom:10px}
+  .fcard .ab{font-size:44px;line-height:1;font-weight:700;margin-bottom:12px}
+  .fam-display .a,.fam-display .ab{font-family:var(--font-display);letter-spacing:-.03em;color:var(--txt)}
+  .fam-body .a,.fam-body .ab{font-family:var(--font-body);color:var(--txt)}
+  .fam-mono .a,.fam-mono .ab{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--txt)}
+  .ramp{border-top:1px solid var(--line);margin-top:28px}
+  .r{display:flex;align-items:baseline;gap:28px;padding:18px 0;border-bottom:1px solid var(--line)}
+  .r .pt{font:500 12px/1 var(--font-mono);color:var(--dim);min-width:140px;flex:none}
+  .r .sample{color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .r .val{font:500 11px/1 var(--font-mono);color:var(--dim);margin-left:auto;white-space:nowrap}
+  @media(max-width:760px){.r{flex-wrap:wrap;gap:8px}.r .pt{min-width:120px}.r .val{margin-left:0}}
+  .rule{border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:32px;background:var(--panel);font-size:13px;color:var(--dim);line-height:1.6;max-width:76ch}
+  .rule b{color:var(--txt);font-weight:600}
+  footer{padding:20px 24px 44px;border-top:1px solid var(--line);color:var(--dim);font-size:12px;display:flex;gap:14px;align-items:center;margin-top:44px}
+  footer .mono{margin-left:auto}
+</style>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <a href="index.html">← Gallery</a>
+  <span class="tag">Preview 02 · type</span>
+</nav>
+
+<header class="hero wrap" data-od-id="hero">
+  <span class="kicker">Foundations · typography</span>
+  <h1>Typography specimens</h1>
+  <p>Space Grotesk for display, Inter for body and UI, JetBrains Mono for every measurement. Extreme scale contrast is the differentiator. Never sit in the safe middle.</p>
+</header>
+
+<main class="wrap">
+  <div class="fam" data-od-id="families">
+    <div class="fcard fam-display">
+      <div class="lbl">Display · headlines</div>
+      <div class="a">Aa Bb Cc</div>
+      <div class="ab">Your app, ready.</div>
+      <p class="spec">Space Grotesk · 500 / 700<br>tracking −0.03em ≥32px · −0.02em below</p>
+    </div>
+    <div class="fcard fam-body">
+      <div class="lbl">Body · UI</div>
+      <div class="a">Aa Bb Cc</div>
+      <div class="ab">A static + pixel audit.</div>
+      <p class="spec">Inter · 400 / 500 / 600 / 700<br>15-17px · line-height 1.5-1.6</p>
+    </div>
+    <div class="fcard fam-mono">
+      <div class="lbl">Data · scores · code</div>
+      <div class="a">Aa 0-100</div>
+      <div class="ab">214h · 37 · 78.0</div>
+      <p class="spec">JetBrains Mono · 500 / 700<br>tabular-nums · all numbers, everywhere</p>
+    </div>
+  </div>
+
+  <section class="ramp" data-od-id="type-ramp">
+    <div class="r"><span class="pt">Display / 64</span><span class="sample" style="font:700 64px/1 var(--font-display);letter-spacing:-.03em">Your app, ready.</span><span class="val">Space Grotesk 700 · −0.03em</span></div>
+    <div class="r"><span class="pt">Display / 32</span><span class="sample" style="font:700 32px/1.1 var(--font-display);letter-spacing:-.02em">Fold-Ready Score</span><span class="val">Space Grotesk 700</span></div>
+    <div class="r"><span class="pt">Display / 22</span><span class="sample" style="font:700 22px/1.15 var(--font-display);letter-spacing:-.01em">Section heading</span><span class="val">Space Grotesk 700</span></div>
+    <div class="r"><span class="pt">Body / 17</span><span class="sample" style="font:400 17px/1.6 var(--font-body)">A static and pixel audit of your iOS source tree.</span><span class="val">Inter 400 · 1.6</span></div>
+    <div class="r"><span class="pt">Body / 15</span><span class="sample" style="font:400 15px/1.55 var(--font-body)">Parallel View keeps every iOS app running on the iPhone Fold.</span><span class="val">Inter 400</span></div>
+    <div class="r"><span class="pt">Body / 13</span><span class="sample" style="font:500 13px/1.5 var(--font-body)">Adaptive navigation / sidebar</span><span class="val">Inter 500</span></div>
+    <div class="r"><span class="pt">Data / 15</span><span class="sample" style="font:700 15px/1.4 var(--font-mono)">214 h · 42 findings · 78.0 · w 0.20</span><span class="val">JetBrains Mono · tabular</span></div>
+    <div class="r"><span class="pt">Caption / 11</span><span class="sample" style="font:600 11px/1.4 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Parallel view opt-in</span><span class="val">Inter 600 · +0.08em caps</span></div>
+  </section>
+
+  <div class="rule" data-od-id="rule">
+    <b>Hierarchy is the differentiator.</b> A 96px score next to a 13px caption is welcome; a screen of 18px everything is not. All numbers are monospaced and tabular or the system is broken. Dim text is never set below 12px.
+  </div>
+</main>
+
+<footer class="wrap">
+  <span>Specimens match <span class="mono">components.html</span> · type ramp</span>
+  <span class="mono">display → body → data → caption</span>
+</footer>
+</body>
+</html>

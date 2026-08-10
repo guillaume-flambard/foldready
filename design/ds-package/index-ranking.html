@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fold-Ready Index — every iOS app, scored for the iPhone Fold</title>
+<meta name="description" content="Independent Fold-Ready Scores for open-source iOS apps, measured for the 7.8in inner display of the iPhone Fold.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --font-display:'Space Grotesk','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ink:#0F172A; --ink2:#0B1220; --panel:#1E293B; --panel2:#24344D;
+    --slate1:#334155; --slate2:#475569;
+    --blue:#0EA5E9; --sky:#7DD3FC;
+    --green:#22C55E; --checkink:#052E16;
+    --txt:#E2E8F0; --dim:#94A3B8; --line:rgba(226,232,240,.14);
+    --gA:#22C55E; --gB:#84CC16; --gC:#FACC15; --gD:#F97316; --gF:#EF4444;
+    --on-accent:#0F172A; --on-chip:#0F172A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink);color:var(--txt);font:15px/1.55 var(--font-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  a:hover{color:var(--sky)}
+  :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  ::selection{background:rgba(14,165,233,.3)}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .mark{width:40px;height:40px;flex:none;border-radius:10px;display:block;box-shadow:inset 0 0 0 1px rgba(226,232,240,.16)}
+
+  .nav{display:flex;align-items:center;gap:26px;height:72px;border-bottom:1px solid var(--line)}
+  .nav .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--txt)}
+  .nav .wordmark{font:700 21px/1 var(--font-display);letter-spacing:-.02em}
+  .nav .links{display:flex;gap:24px;margin-left:8px}
+  .nav .links a{color:var(--dim);text-decoration:none;font-size:14px;font-weight:500}
+  .nav .links a:hover{color:var(--txt)}
+  .nav .right{margin-left:auto;display:flex;align-items:center;gap:16px}
+  @media(max-width:720px){.nav .links{display:none}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1 var(--font-body);padding:11px 18px;border-radius:11px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background .15s ease-out,color .15s ease-out,border-color .15s ease-out}
+  .btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .btn-pri{background:var(--blue);color:var(--on-accent)}
+  .btn-pri:hover{background:var(--sky)}
+  .btn-sec{background:transparent;color:var(--txt);border-color:var(--line)}
+  .btn-sec:hover{background:var(--panel2);border-color:var(--slate2)}
+
+  .head{padding:56px 0 32px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .head h1{font:700 clamp(38px,4.6vw,60px)/1.03 var(--font-display);letter-spacing:-.03em;margin:20px 0 14px;max-width:20ch}
+  .head .lede{max-width:64ch;color:var(--dim);font-size:16px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:24px;font-size:13px;color:var(--dim)}
+  .legend .g{font:700 13px/1 var(--font-mono)}
+  .meta{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:18px;color:var(--dim);font:500 12px/1.5 var(--font-mono)}
+
+  .toolbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:22px 0 20px}
+  .toolbar label{font:600 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  select.sort{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px 36px 10px 14px;font:500 14px/1 var(--font-body);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2394A3B8' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+  select.sort:hover{border-color:var(--slate2)}
+  select.sort:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .fchips{display:flex;gap:8px}
+  .fc{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);font:600 13px/1 var(--font-body);cursor:pointer;transition:background .15s ease-out,color .15s ease-out,border-color .15s ease-out}
+  .fc:hover{border-color:var(--slate2);color:var(--txt)}
+  .fc .g{font:700 12px/1 var(--font-mono)}
+  .fc[aria-pressed="true"]{background:var(--panel);border-color:var(--slate2);color:var(--txt)}
+  .toolbar .count{margin-left:auto;font:500 12px/1 var(--font-mono);color:var(--dim)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;padding-bottom:64px}
+  .scard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;position:relative;transition:border-color .15s ease-out}
+  .scard:hover{border-color:var(--slate2)}
+  .scard .rank{position:absolute;top:14px;right:18px;font:700 40px/1 var(--font-display);letter-spacing:-.02em;color:rgba(148,163,184,.18)}
+  .scard .top{display:flex;align-items:flex-start;gap:14px}
+  .scard .num{font:700 46px/1 var(--font-mono);letter-spacing:-.03em;min-width:78px}
+  .scard h3{font:600 16px/1.25 var(--font-body);color:var(--txt)}
+  .scard .sub{font:500 12px/1.4 var(--font-mono);color:var(--dim);margin-top:4px}
+  .scard .stats{display:flex;gap:22px;font-size:13px;color:var(--dim);padding-top:12px;border-top:1px solid var(--line)}
+  .scard .stats b{display:block;font:700 15px/1.2 var(--font-mono);color:var(--txt)}
+  .scard .checks{display:flex;flex-wrap:wrap;gap:6px}
+  .scard .go{margin-top:auto;font:600 13px/1 var(--font-body);color:var(--blue);text-decoration:none}
+  .scard .go:hover{color:var(--sky)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font:500 12px/1 var(--font-body);letter-spacing:.02em;border:1px solid var(--line);color:var(--txt);background:var(--ink2)}
+  .chip.ready{color:var(--green);border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08)}
+  .gchip{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:8px;font:700 13px/1 var(--font-mono);color:var(--on-chip)}
+  .gchip.a{background:var(--gA)}.gchip.b{background:var(--gB)}.gchip.c{background:var(--gC)}.gchip.d{background:var(--gD)}.gchip.f{background:var(--gF)}
+
+  .cta{border-top:1px solid var(--line);padding:44px 0 56px;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+  .cta h2{font:700 26px/1.15 var(--font-display);letter-spacing:-.02em}
+  .cta p{color:var(--dim);font-size:14px;max-width:52ch;margin-top:6px}
+  .cta .btn{margin-left:auto}
+  footer.foot{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--dim);font-size:13px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  footer.foot .mono{margin-left:auto}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <a class="brand" href="index.html" aria-label="FoldReady home">
+    <svg class="mark" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="wordmark">foldready</span>
+  </a>
+  <div class="links">
+    <a href="index-ranking.html" aria-current="page" style="color:var(--txt)">Index</a>
+    <a href="report-page.html">Reports</a>
+    <a href="landing-page.html">Pricing</a>
+  </div>
+  <div class="right"><a class="btn btn-pri" href="landing-page.html#pricing">Score my app</a></div>
+</nav>
+
+<main class="wrap">
+  <header class="head" data-od-id="head">
+    <span class="kicker">Independent index · 7.8in inner display</span>
+    <h1>Fold-Ready Index</h1>
+    <p class="lede">Parallel View keeps every iOS app running on the iPhone Fold — these scores measure how good it will look. The index audits well-known open-source apps so you can see the difference a few hours of porting makes.</p>
+    <div class="legend" data-od-id="legend">
+      <span><b class="g" style="color:var(--gA)">A</b> ready · featured-grade</span>
+      <span><b class="g" style="color:var(--gB)">B</b> good · some polish needed</span>
+      <span><b class="g" style="color:var(--gC)">C</b> functional · not at home</span>
+      <span><b class="g" style="color:var(--gD)">D</b> visibly squeezed</span>
+      <span><b class="g" style="color:var(--gF)">F</b> needs a real port</span>
+    </div>
+    <p class="meta"><span id="count">0 apps audited</span><span>static + captured-layout · updated with the FoldReady CLI</span></p>
+  </header>
+
+  <div class="toolbar" data-od-id="toolbar">
+    <label for="sort">Sort</label>
+    <select class="sort" id="sort">
+      <option value="score">Score · high to low</option>
+      <option value="hours">Port hours · low to high</option>
+      <option value="name">Name · A to Z</option>
+    </select>
+    <div class="fchips" role="group" aria-label="Filter by grade" data-od-id="grade-filter">
+      <button type="button" class="fc" data-grade="all" aria-pressed="true">All</button>
+      <button type="button" class="fc" data-grade="A" aria-pressed="false"><span class="g" style="color:var(--gA)">A</span></button>
+      <button type="button" class="fc" data-grade="B" aria-pressed="false"><span class="g" style="color:var(--gB)">B</span></button>
+      <button type="button" class="fc" data-grade="C" aria-pressed="false"><span class="g" style="color:var(--gC)">C</span></button>
+    </div>
+    <span class="count" id="shown">6 / 6</span>
+  </div>
+
+  <div class="grid" id="grid" data-od-id="grid"></div>
+
+  <section class="cta" data-od-id="cta">
+    <div>
+      <h2>Get your app scored</h2>
+      <p>A static + pixel audit of your iOS source tree: 7 checks against the iOS 27 foldable requirements, a captured-layout pass, and an hours estimate for the port.</p>
+    </div>
+    <a class="btn btn-pri" href="landing-page.html#pricing">Get your app scored</a>
+  </section>
+</main>
+
+<footer class="foot wrap" data-od-id="footer">
+  <svg class="mark" style="width:32px;height:32px" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span>FoldReady · independent fold-readiness index</span>
+  <span class="mono">hello@foldready.com</span>
+</footer>
+
+<script>
+(function(){
+  var APPS=[
+    {name:"MochiDiffusion",score:91,grade:"A",risk:"low",hours:27.5,swiftFiles:58,findings:0,repo:"cjnevin/mochi-diffusion",checks:{adaptive:93,parallel:100,nav:100,scene:100,fold:70,state:70,framework:100}},
+    {name:"IceCubesApp",score:78,grade:"A",risk:"low",hours:214,swiftFiles:424,findings:37,repo:"Dimillian/IceCubesApp",checks:{adaptive:93,parallel:100,nav:40,scene:100,fold:70,state:70,framework:91}},
+    {name:"isowords",score:78,grade:"A",risk:"low",hours:185.5,swiftFiles:388,findings:30,repo:"pointfreeco/isowords",checks:{adaptive:95,parallel:100,nav:40,scene:100,fold:70,state:70,framework:89}},
+    {name:"MovieSwiftUI",score:69,grade:"B",risk:"low",hours:76,swiftFiles:105,findings:18,repo:"Dimillian/MovieSwiftUI",checks:{adaptive:85,parallel:100,nav:40,scene:20,fold:70,state:70,framework:97}},
+    {name:"Dime",score:59,grade:"C",risk:"medium",hours:79.5,swiftFiles:94,findings:38,repo:"noahsark769/Dime",checks:{adaptive:0,parallel:100,nav:40,scene:100,fold:70,state:70,framework:90}},
+    {name:"OpenFoodFacts",score:48,grade:"C",risk:"medium",hours:86,swiftFiles:218,findings:5,repo:"openfoodfacts/openfoodfacts-ios",checks:{adaptive:98,parallel:100,nav:50,scene:20,fold:20,state:30,framework:0}}
+  ];
+  var CHECK_LABELS={adaptive:"Adaptive",parallel:"ParallelView",nav:"Sidebar",scene:"Scene",fold:"FoldState",state:"State",framework:"SwiftUI"};
+  var GRADE_COLOR={A:"var(--gA)",B:"var(--gB)",C:"var(--gC)",D:"var(--gD)",F:"var(--gF)"};
+  var state={sort:"score",grade:"all"};
+
+  function card(app,i){
+    var weak=Object.keys(app.checks)
+      .filter(function(k){return app.checks[k]<70;})
+      .sort(function(a,b){return app.checks[a]-app.checks[b];})
+      .slice(0,3);
+    var chips=weak.length?weak.map(function(k){
+      return '<span class="chip">'+CHECK_LABELS[k]+' <b class="mono">'+app.checks[k]+'</b></span>';
+    }).join(''):'<span class="chip ready">all checks pass</span>';
+    var el=document.createElement('article');
+    el.className='scard';
+    el.setAttribute('data-od-id','score-card-'+app.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+    el.innerHTML=
+      '<span class="rank">'+String(i+1).padStart(2,'0')+'</span>'+
+      '<div class="top">'+
+        '<span class="num" style="color:'+GRADE_COLOR[app.grade]+'">'+app.score+'</span>'+
+        '<div><h3>'+app.name+'</h3><p class="sub">'+app.swiftFiles+' Swift files · '+app.findings+' findings</p></div>'+
+      '</div>'+
+      '<div class="stats">'+
+        '<span>Risk<b>'+app.risk+'</b></span>'+
+        '<span>Port<b class="mono">'+app.hours+'h</b></span>'+
+        '<span style="margin-left:auto"><span class="gchip '+app.grade.toLowerCase()+'">'+app.grade+'</span></span>'+
+      '</div>'+
+      '<div class="checks">'+chips+'</div>'+
+      '<a class="go" href="report-page.html">Full Fold-Ready report</a>';
+    return el;
+  }
+
+  function render(){
+    var list=APPS.filter(function(a){return state.grade==='all'||a.grade===state.grade;});
+    if(state.sort==='score')list.sort(function(a,b){return b.score-a.score;});
+    else if(state.sort==='hours')list.sort(function(a,b){return a.hours-b.hours;});
+    else list.sort(function(a,b){return a.name.localeCompare(b.name);});
+    var grid=document.getElementById('grid');
+    grid.innerHTML='';
+    list.forEach(function(a,i){grid.appendChild(card(a,i));});
+    document.getElementById('count').textContent=list.length+' app'+(list.length===1?'':'s')+' audited';
+    document.getElementById('shown').textContent=list.length+' / '+APPS.length;
+  }
+
+  document.getElementById('sort').addEventListener('change',function(){state.sort=this.value;render();});
+  document.querySelectorAll('.fc').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.fc').forEach(function(b){b.setAttribute('aria-pressed',b===btn?'true':'false');});
+      state.grade=btn.getAttribute('data-grade');render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

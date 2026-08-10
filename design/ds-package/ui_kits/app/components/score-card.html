@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady · Kit component · Score card + stat cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../colors_and_type.css">
+<style>
+  body{background:var(--ink)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  .nav{display:flex;align-items:center;gap:12px;height:64px;border-bottom:1px solid var(--line)}
+  .nav a{font:600 13px/1 var(--font-body);color:var(--dim);text-decoration:none}
+  .nav a:hover{color:var(--txt)}
+  .nav .tag{margin-left:auto;font:500 11px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+  .hero{padding:40px 0 28px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .hero h1{font:700 clamp(28px,3.6vw,40px)/1.05 var(--font-display);letter-spacing:-.03em;margin:14px 0 8px}
+  .hero p{max-width:60ch;color:var(--dim);font-size:14px;line-height:1.6}
+  .demo{padding:40px 0 56px}
+
+  .specimen{padding:36px 0;border-bottom:1px solid var(--line)}
+  .specimen:last-child{border-bottom:0;padding-bottom:0}
+  .spec-head{margin-bottom:20px}
+  .spec-head h2{font:700 22px/1.15 var(--font-display);letter-spacing:-.02em}
+  .spec-sub{font:500 12px/1.5 var(--font-mono);color:var(--dim);margin-top:6px}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+  .row + .row{margin-top:24px}
+  .anatomy{border-top:1px solid var(--line);margin-top:20px;padding-top:14px;font:500 12px/1.7 var(--font-mono);color:var(--dim);max-width:82ch}
+  .anatomy b{color:var(--txt);font-weight:600}
+
+  .scard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:340px;transition:transform .16s ease-out,border-color .16s ease-out}
+  .scard:hover{transform:translateY(-2px);border-color:var(--slate2)}
+  .scard:active{transform:translateY(0)}
+  .scard .top{display:flex;align-items:flex-start;gap:14px}
+  .scard .num{font:700 44px/1 var(--font-mono);letter-spacing:-.02em;min-width:74px}
+  .scard h4{font:600 16px/1.25 var(--font-body);color:var(--txt)}
+  .scard .sub{font:500 12px/1.4 var(--font-mono);color:var(--dim);margin-top:4px}
+  .scard .stats{display:flex;gap:22px;font-size:13px;color:var(--dim);padding-top:12px;border-top:1px solid var(--line)}
+  .scard .stats b{display:block;font:700 16px/1.2 var(--font-mono);color:var(--txt)}
+  .scard .checks{display:flex;flex-wrap:wrap;gap:6px}
+  .scard .go{margin-top:auto;font:600 13px/1 var(--font-body);color:var(--blue);text-decoration:none}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font:500 12px/1 var(--font-body);letter-spacing:.02em;border:1px solid var(--line);color:var(--txt);background:var(--ink2)}
+  .chip.ready{color:var(--green);border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.08)}
+  .chip.weak{color:var(--txt);border-color:var(--line);background:var(--ink2)}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:150px;transition:transform .16s ease-out,border-color .16s ease-out}
+  .stat:hover{transform:translateY(-2px);border-color:var(--slate2)}
+  .stat:active{transform:translateY(0)}
+  .stat .l{font:600 11px/1.2 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .stat .v{font:700 34px/1 var(--font-mono);letter-spacing:-.02em;color:var(--txt)}
+  .stat .u{font:600 13px/1 var(--font-mono);color:var(--dim);margin-left:6px}
+
+  .states{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+  .states .st{padding:16px 18px}
+  .states .st + .st{border-left:1px solid var(--line)}
+  .states .st .t{font:600 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  .states .st p{font-size:13px;line-height:1.55;color:var(--txt);max-width:42ch}
+  @media(max-width:720px){.states{grid-template-columns:1fr}.states .st + .st{border-left:0;border-top:1px solid var(--line)}}
+
+  /* Entry reveal. .js is added in <head> before first paint, so content
+     is hidden only while the animation is pending, with no flash of
+     shown-then-hidden content. */
+  html.js .demo .scard,html.js .demo .stat{opacity:0}
+  html.js .demo .scard.in,html.js .demo .stat.in{animation:fr-rise .26s ease-out both}
+  @keyframes fr-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){
+    html.js .demo .scard,html.js .demo .stat{opacity:1}
+    html.js .demo .scard.in,html.js .demo .stat.in{animation:none}
+    .scard:hover,.stat:hover{transform:none}
+  }
+  footer{padding:20px 24px 44px;border-top:1px solid var(--line);color:var(--dim);font-size:12px;display:flex;gap:14px;align-items:center}
+  footer .mono{margin-left:auto}
+</style>
+<script>
+(function(){var m=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!m)document.documentElement.classList.add('js');})();
+</script>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <a href="../index.html">← Kit index</a>
+  <span class="tag">components/score-card.html</span>
+</nav>
+
+<header class="hero wrap" data-od-id="hero">
+  <span class="kicker">Applied kit · score card + stat card</span>
+  <h1>Score card &amp; stat cards</h1>
+  <p>Reusable for the Fold-Ready Index grid and the report hero. Both specimens below carry real audited data; swap in your own values and keep the tokens bound.</p>
+</header>
+
+<main class="wrap">
+  <div class="demo" data-od-id="demo">
+    <section class="specimen" data-od-id="specimen-score-card">
+      <div class="spec-head">
+        <h2>Score card</h2>
+        <p class="spec-sub">Component 02 · index grid and report hero</p>
+      </div>
+      <div class="row">
+        <article class="scard" data-od-id="score-card-icecubes">
+          <div class="top">
+            <span class="num" style="color:var(--gA)">78</span>
+            <div><h4>IceCubesApp</h4><p class="sub">424 Swift files · 37 findings</p></div>
+          </div>
+          <div class="stats"><span>Risk<b>low</b></span><span>Port<b>214h</b></span><span>Best<b>100</b></span></div>
+          <div class="checks"><span class="chip weak">Sidebar 40</span><span class="chip weak">FoldState 70</span><span class="chip ready">ParallelView 100</span></div>
+          <a class="go" href="../../../report-page.html">Full Fold-Ready report</a>
+        </article>
+        <article class="scard" data-od-id="score-card-mochi">
+          <div class="top">
+            <span class="num" style="color:var(--gA)">91</span>
+            <div><h4>MochiDiffusion</h4><p class="sub">58 Swift files · 0 findings</p></div>
+          </div>
+          <div class="stats"><span>Risk<b>low</b></span><span>Port<b>27.5h</b></span><span>Best<b>100</b></span></div>
+          <div class="checks"><span class="chip ready">all checks pass</span></div>
+          <a class="go" href="../../../index-ranking.html">Open in the Fold-Ready Index</a>
+        </article>
+      </div>
+      <p class="anatomy">Anatomy: <b>44px mono</b> score in the grade color, grade chip, risk / port / best stats, weak and ready chips, report link. Radius 14, padding 20, hairline border.</p>
+    </section>
+
+    <section class="specimen" data-od-id="specimen-stat-card">
+      <div class="spec-head">
+        <h2>Stat card</h2>
+        <p class="spec-sub">Component 05 · report hero and dashboards</p>
+      </div>
+      <div class="row">
+        <div class="stat"><span class="l">Est. port</span><span class="v">214<span class="u">h</span></span></div>
+        <div class="stat"><span class="l">Findings</span><span class="v">37</span></div>
+        <div class="stat"><span class="l">Risk</span><span class="v" style="color:var(--green)">low</span></div>
+        <div class="stat"><span class="l">Swift files</span><span class="v">424</span></div>
+      </div>
+      <p class="anatomy">Anatomy: <b>11px caps</b> label, <b>34px mono</b> value, optional unit suffix. Radius 12, padding 16 / 18, hairline border.</p>
+    </section>
+
+    <section class="specimen" data-od-id="specimen-states">
+      <div class="spec-head">
+        <h2>Interaction states</h2>
+        <p class="spec-sub">Contract enforced by colors_and_type.css on every surface</p>
+      </div>
+      <div class="states">
+        <div class="st" data-od-id="state-hover"><div class="t">Hover</div><p>Cards lift 2px, the border brightens to slate2, 160ms ease-out. The foreground is never dimmed.</p></div>
+        <div class="st" data-od-id="state-focus"><div class="t">Focus</div><p>Screen Blue ring, 2px width, 2px offset, on the report and index links.</p></div>
+        <div class="st" data-od-id="state-reduced-motion"><div class="t">Reduced motion</div><p>Reveal, lift and the score count-up all collapse to static. Values land instantly.</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="wrap">
+  <span>Part of the FoldReady applied UI kit · <span class="mono">ui_kits/app/components/</span></span>
+  <span class="mono">tokens → card → table → surfaces</span>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var els=Array.prototype.slice.call(document.querySelectorAll('.demo .scard,.demo .stat'));
+  if(!els.length)return;
+  if(!root.classList.contains('js'))return;
+  var delays=[0,60,140,160,180,200];
+
+  var cards=Array.prototype.slice.call(document.querySelectorAll('.demo .scard'));
+  var counts=[];
+  cards.forEach(function(c,i){
+    var n=c.querySelector('.num');
+    if(!n)return;
+    counts.push({el:n,to:parseFloat(n.textContent)||0,start:null,started:false,delay:delays[i]||0});
+  });
+
+  function landCounts(ts){
+    if(landCounts.t0===undefined)landCounts.t0=ts;
+    var allDone=true;
+    counts.forEach(function(c){
+      if(!c.started){
+        if(ts-landCounts.t0>=c.delay){c.started=true;c.start=ts;}
+        else{allDone=false;}
+      }
+      if(c.started){
+        var p=Math.min(1,(ts-c.start)/600);
+        var e=1-Math.pow(1-p,4);
+        c.el.textContent=String(Math.round(c.to*e));
+        if(p<1)allDone=false;
+      }
+    });
+    if(!allDone)requestAnimationFrame(landCounts);
+  }
+
+  els.forEach(function(el,i){el.style.animationDelay=(delays[i]||0)+'ms';el.classList.add('in');});
+  requestAnimationFrame(function(){requestAnimationFrame(function(){requestAnimationFrame(landCounts);});});
+})();
+</script>
+</body>
+</html>

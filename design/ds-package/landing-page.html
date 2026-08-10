@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady — Your iOS app, ready for the iPhone Fold</title>
+<meta name="description" content="A static + pixel audit that scores your iOS app 0–100 for the iPhone Fold inner display, estimates the port in hours, and ships it featured-ready.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --font-display:'Space Grotesk','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ink:#0F172A; --ink2:#0B1220; --panel:#1E293B; --panel2:#24344D;
+    --slate1:#334155; --slate2:#475569;
+    --blue:#0EA5E9; --sky:#7DD3FC;
+    --green:#22C55E; --checkink:#052E16;
+    --txt:#E2E8F0; --dim:#94A3B8; --line:rgba(226,232,240,.14);
+    --gA:#22C55E; --gB:#84CC16; --gC:#FACC15; --gD:#F97316; --gF:#EF4444;
+    --on-accent:#0F172A; --on-chip:#0F172A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink);color:var(--txt);font:15px/1.55 var(--font-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  a:hover{color:var(--sky)}
+  :focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  ::selection{background:rgba(14,165,233,.3)}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  .mark{width:40px;height:40px;flex:none;border-radius:10px;display:block;box-shadow:inset 0 0 0 1px rgba(226,232,240,.16)}
+
+  .nav{display:flex;align-items:center;gap:26px;height:72px;border-bottom:1px solid var(--line)}
+  .nav .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--txt)}
+  .nav .wordmark{font:700 21px/1 var(--font-display);letter-spacing:-.02em}
+  .nav .links{display:flex;gap:24px;margin-left:8px}
+  .nav .links a{color:var(--dim);text-decoration:none;font-size:14px;font-weight:500}
+  .nav .links a:hover{color:var(--txt)}
+  .nav .right{margin-left:auto;display:flex;align-items:center;gap:16px}
+  @media(max-width:720px){.nav .links{display:none}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 15px/1 var(--font-body);padding:13px 22px;border-radius:11px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background .15s ease-out,color .15s ease-out,border-color .15s ease-out}
+  .btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .btn-pri{background:var(--blue);color:var(--on-accent)}
+  .btn-pri:hover{background:var(--sky)}
+  .btn-sec{background:transparent;color:var(--txt);border-color:var(--line)}
+  .btn-sec:hover{background:var(--panel2);border-color:var(--slate2)}
+  .btn-ghost{background:transparent;color:var(--blue);border-color:transparent;padding-left:8px;padding-right:8px}
+  .btn-ghost:hover{color:var(--sky)}
+
+  .hero{display:grid;grid-template-columns:1.12fr .88fr;gap:48px;align-items:center;padding:72px 0 64px;border-bottom:1px solid var(--line)}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;padding:48px 0 40px}}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .hero h1{font:700 clamp(42px,5.2vw,72px)/1.02 var(--font-display);letter-spacing:-.035em;margin:24px 0 18px;max-width:13ch}
+  .hero .lede{max-width:52ch;color:var(--dim);font-size:17px}
+  .hero .ctas{display:flex;align-items:center;gap:6px;margin-top:28px;flex-wrap:wrap}
+  .hero .proof-note{display:flex;align-items:center;gap:10px;margin-top:30px;color:var(--dim);font-size:13px}
+  .hero .proof-note .row{display:flex}
+  .hero .proof-note .row span{font:700 13px/1 var(--font-mono);padding:3px 7px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+  .hero .proof-note .row span+span{margin-left:-4px}
+
+  .gauge{position:relative;width:300px;height:164px;margin:0 auto}
+  .gauge svg{position:absolute;inset:0}
+  .gauge .track{fill:none;stroke:var(--slate1);stroke-width:12;stroke-linecap:round;opacity:.45}
+  .gauge .arc{fill:none;stroke:var(--g);stroke-width:12;stroke-linecap:round;stroke-dasharray:370.7;stroke-dashoffset:370.7;transition:stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)}
+  .gauge .body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding-top:10px}
+  .gauge .val{font:700 60px/1 var(--font-mono);color:var(--g);letter-spacing:-.03em}
+  .gauge .cap{position:absolute;left:0;right:0;bottom:2px;text-align:center;font:600 10px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .gauge .src{position:absolute;bottom:-24px;left:0;right:0;text-align:center;font:500 12px/1.4 var(--font-mono);color:var(--dim)}
+  .gchip{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 9px;border-radius:8px;font:700 15px/1 var(--font-mono);color:var(--on-chip);background:var(--gA)}
+
+  .proof{border-bottom:1px solid var(--line);padding:30px 0}
+  .proof .lab{font:600 11px/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:18px}
+  .proof .row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  @media(max-width:900px){.proof .row{grid-template-columns:repeat(3,1fr)}}
+  .proof .app{border:1px solid var(--line);border-radius:11px;padding:14px;background:var(--panel);text-decoration:none;transition:border-color .15s ease-out}
+  .proof .app:hover{border-color:var(--slate2)}
+  .proof .app .n{font:700 26px/1 var(--font-mono);letter-spacing:-.02em}
+  .proof .app .nm{display:flex;justify-content:space-between;align-items:center;gap:6px;font:500 12px/1.3 var(--font-body);color:var(--dim);margin-top:8px}
+
+  section.block{padding:64px 0;border-bottom:1px solid var(--line)}
+  .sec-head{max-width:620px;margin-bottom:36px}
+  .sec-head .lab{font:600 11px/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+  .sec-head h2{font:700 clamp(30px,3.6vw,44px)/1.05 var(--font-display);letter-spacing:-.03em}
+  .sec-head p{color:var(--dim);font-size:15px;margin-top:12px}
+
+  .offer{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.offer{grid-template-columns:1fr}}
+  .ocard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column;gap:16px}
+  .ocard .ico{width:40px;height:40px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--blue);background:var(--ink2)}
+  .ocard h3{font:700 20px/1.2 var(--font-display);letter-spacing:-.01em}
+  .ocard p{font-size:14px;color:var(--dim);flex:1}
+  .ocard .tag{font:500 12px/1.4 var(--font-mono);color:var(--dim)}
+
+  .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+  @media(max-width:860px){.pricing{grid-template-columns:1fr}}
+  .pcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:18px;position:relative}
+  .pcard.featured{border-color:var(--slate2);background:var(--ink2)}
+  .pcard .flag{position:absolute;top:-11px;left:26px;font:600 11px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.5);border-radius:999px;background:var(--ink)}
+  .pcard h3{font:700 19px/1.2 var(--font-display);letter-spacing:-.01em}
+  .pcard .price{font:700 40px/1 var(--font-mono);letter-spacing:-.02em;color:var(--txt)}
+  .pcard .price small{font:500 14px/1 var(--font-mono);color:var(--dim);letter-spacing:0}
+  .pcard .what{font-size:14px;color:var(--dim);flex:1}
+  .pcard ul{list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13px;color:var(--txt)}
+  .pcard li{display:flex;gap:9px;align-items:baseline}
+  .pcard li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--blue);transform:translateY(-2px)}
+  .pcard .btn{margin-top:8px}
+
+  .obj{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:860px){.obj{grid-template-columns:1fr}}
+  .ocard2{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px}
+  .ocard2 .q{font:600 16px/1.35 var(--font-body);color:var(--txt)}
+  .ocard2 .a{font-size:14px;color:var(--dim);max-width:54ch}
+
+  footer.foot{border-top:1px solid var(--line);padding:40px 0 64px}
+  .foot .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .foot .top .wordmark{font:700 20px/1 var(--font-display);letter-spacing:-.02em}
+  .foot .top .mono{margin-left:auto}
+  .foot .cols{display:flex;gap:64px;flex-wrap:wrap;margin-top:28px}
+  .foot .col h4{font:600 11px/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+  .foot .col a{display:block;color:var(--txt);text-decoration:none;font-size:14px;padding:4px 0}
+  .foot .col a:hover{color:var(--blue)}
+  .foot .base{display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-top:1px solid var(--line);margin-top:32px;padding-top:20px;color:var(--dim);font-size:12px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <a class="brand" href="index.html" aria-label="FoldReady home">
+    <svg class="mark" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="wordmark">foldready</span>
+  </a>
+  <div class="links">
+    <a href="index-ranking.html">Index</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#objections">Why port</a>
+  </div>
+  <div class="right"><a class="btn btn-ghost" href="#pricing">Score my app</a></div>
+</nav>
+
+<main class="wrap">
+  <header class="hero" data-od-id="hero">
+    <div>
+      <span class="kicker">Launching Sept 2026 · iOS 27</span>
+      <h1>Your iOS app, ready for the iPhone Fold.</h1>
+      <p class="lede">A static + pixel audit that scores your app 0–100 against the foldable requirements, estimates the port in hours, and ships it featured-ready on the 7.8in inner display.</p>
+      <div class="ctas">
+        <a class="btn btn-pri" href="#pricing">Score my app free</a>
+        <a class="btn btn-ghost" href="#how">Read the methodology</a>
+      </div>
+      <p class="proof-note"><span class="row"><span class="mono" style="color:var(--gA)">91</span><span class="mono" style="color:var(--gB)">78</span><span class="mono" style="color:var(--gC)">59</span></span>Open-source apps already indexed</p>
+    </div>
+    <div>
+      <div class="gauge" style="--g:var(--gA)">
+        <svg viewBox="0 0 300 164" aria-hidden="true"><path class="track" d="M34,152 A118,118 0 0 1 266,152"/><path class="arc" data-p=".91" d="M34,152 A118,118 0 0 1 266,152"/></svg>
+        <div class="body">
+          <span class="gchip">A</span>
+          <span class="val">91</span>
+        </div>
+        <span class="cap">Fold-Ready score</span>
+        <p class="src">MochiDiffusion · indexed</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="proof" data-od-id="proof-strip">
+    <p class="lab">The Fold-Ready Index so far</p>
+    <div class="row" data-od-id="proof-apps">
+      <a class="app" href="report-page.html"><span class="n" style="color:var(--gA)">91</span><span class="nm">MochiDiffusion<span class="mono">A</span></span></a>
+      <a class="app" href="report-page.html"><span class="n" style="color:var(--gA)">78</span><span class="nm">IceCubesApp<span class="mono">A</span></span></a>
+      <a class="app" href="report-page.html"><span class="n" style="color:var(--gA)">78</span><span class="nm">isowords<span class="mono">A</span></span></a>
+      <a class="app" href="report-page.html"><span class="n" style="color:var(--gB)">69</span><span class="nm">MovieSwiftUI<span class="mono">B</span></span></a>
+      <a class="app" href="report-page.html"><span class="n" style="color:var(--gC)">59</span><span class="nm">Dime<span class="mono">C</span></span></a>
+      <a class="app" href="report-page.html"><span class="n" style="color:var(--gC)">48</span><span class="nm">OpenFoodFacts<span class="mono">C</span></span></a>
+    </div>
+  </section>
+  <section class="block" id="how" data-od-id="offering">
+    <div class="sec-head">
+      <p class="lab">What you get</p>
+      <h2>A measurement, a plan, and a ship date.</h2>
+      <p>One pipeline from source tree to featured-ready. Each tier feeds the next, so you never re-explain your app.</p>
+    </div>
+    <div class="offer">
+      <div class="ocard" data-od-id="offer-static">
+        <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 16a7 7 0 1 1 14 0"/><path d="M12 16l4-5.5"/><circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg></span>
+        <h3>Static audit</h3>
+        <p>Seven checks against the iOS 27 foldable requirements. You get a 0–100 Fold-Ready Score, a grade, and a port estimate in hours — in minutes, not weeks.</p>
+        <span class="tag">self-serve · free</span>
+      </div>
+      <div class="ocard" data-od-id="offer-captured">
+        <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/><path d="M9 9l-1.5-1.5M15 9l1.5-1.5M9 15l-1.5 1.5M15 15l1.5 1.5" stroke-width="1.2"/></svg></span>
+        <h3>Captured-layout pass</h3>
+        <p>We build your app and open it on the 7.8in inner display. Every finding cites file:line, so your team ships fixes instead of reading essays.</p>
+        <span class="tag">in the full report</span>
+      </div>
+      <div class="ocard" data-od-id="offer-porting">
+        <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M12 5v14"/><path d="M6.5 12l2.2 2.2 4.6-4.6"/></svg></span>
+        <h3>Porting service</h3>
+        <p>Engineers who shipped foldable UI port your app behind a fixed price and a date. Featured-ready on day one, QA'd on device, before launch.</p>
+        <span class="tag">fixed price</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="pricing" data-od-id="pricing">
+    <div class="sec-head">
+      <p class="lab">Pricing</p>
+      <h2>Pay for the port, not the guesswork.</h2>
+      <p>Audit yourself for free. Buy the captured pass when you need receipts. Let us port it when you need it shipped.</p>
+    </div>
+    <div class="pricing">
+      <div class="pcard" data-od-id="pricing-audit">
+        <h3>Self-serve audit</h3>
+        <p class="price">Free</p>
+        <p class="what">Score and hours estimate, generated from your source tree.</p>
+        <ul>
+          <li>7 static checks, weighted</li>
+          <li>0–100 score · A–F grade</li>
+          <li>Port estimate in hours</li>
+          <li>Findings with file:line</li>
+        </ul>
+        <a class="btn btn-sec" href="#pricing">Score it yourself</a>
+      </div>
+      <div class="pcard featured" data-od-id="pricing-report">
+        <span class="flag">Recommended</span>
+        <h3>Full report</h3>
+        <p class="price">$349 <small>/ app</small></p>
+        <p class="what">The static audit plus a captured-layout pass with receipts and a roadmap.</p>
+        <ul>
+          <li>Everything in self-serve</li>
+          <li>Captured 7.8in layout pass</li>
+          <li>Findings with file:line</li>
+          <li>Remediation roadmap by effort</li>
+          <li>Re-score included for 90 days</li>
+        </ul>
+        <a class="btn btn-pri" href="#pricing">Buy full report</a>
+      </div>
+      <div class="pcard" data-od-id="pricing-porting">
+        <h3>Porting service</h3>
+        <p class="price">From $4,900</p>
+        <p class="what">A fixed-price port by engineers who shipped foldable UI.</p>
+        <ul>
+          <li>Full report included</li>
+          <li>Sidebar + adaptive navigation</li>
+          <li>Fold-state &amp; scene lifecycles</li>
+          <li>QA on device · ship-by date</li>
+        </ul>
+        <a class="btn btn-sec" href="#pricing">Talk to us</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="objections" data-od-id="objections">
+    <div class="sec-head">
+      <p class="lab">Why port</p>
+      <h2>The objections we hear, measured.</h2>
+    </div>
+    <div class="obj">
+      <div class="ocard2">
+        <p class="q">Parallel View already runs every app — why port?</p>
+        <p class="a">It runs them — squeezed into the narrow column. Porting opts your app into the full inner display: a real sidebar on wide, scene lifecycles that survive the hinge, and a Fold-Ready Score you can print in your App Store listing.</p>
+      </div>
+      <div class="ocard2">
+        <p class="q">Can a static check really judge how my UI looks?</p>
+        <p class="a">The Fold-Ready audit is static plus a captured-layout pass: we build your app, open it on a 7.8in display, and pixel-check the frames. Findings cite file:line, not vibes.</p>
+      </div>
+      <div class="ocard2">
+        <p class="q">We have no foldable hardware and no time.</p>
+        <p class="a">You don't need either. The audit runs headless on your CI and returns an hours estimate; device QA is part of the porting tier, not your problem to source.</p>
+      </div>
+      <div class="ocard2">
+        <p class="q">We're SwiftUI already — aren't we safe?</p>
+        <p class="a">Mostly — the framework check is worth only 15% of the score. Navigation and layout carry the weight, and the index shows pure-SwiftUI apps still dropping to C for a single squeezed tab bar.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap" data-od-id="footer">
+  <div class="top">
+    <svg class="mark" style="width:36px;height:36px" viewBox="0 0 512 512" role="img" aria-label="FoldReady mark"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="wordmark">foldready</span>
+    <span class="mono" style="margin-left:auto">hello@foldready.com</span>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <h4>Product</h4>
+      <a href="index-ranking.html">Fold-Ready Index</a>
+      <a href="report-page.html">Sample report</a>
+      <a href="components.html">Design system</a>
+    </div>
+    <div class="col">
+      <h4>Company</h4>
+      <a href="#pricing">Pricing</a>
+      <a href="#objections">Why port</a>
+      <a href="#how">Methodology</a>
+    </div>
+    <div class="col">
+      <h4>Contact</h4>
+      <a href="#pricing">Score your app</a>
+      <a href="mailto:hello@foldready.com">hello@foldready.com</a>
+    </div>
+  </div>
+  <div class="base">
+    <span>© 2026 FoldReady</span>
+    <span>iOS audit + porting for the iPhone Fold · iPhone Fold and iOS are trademarks of Apple Inc.</span>
+    <span class="mono" style="margin-left:auto">7.8in inner display · Sept 2026</span>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var arcs=document.querySelectorAll('.gauge .arc');
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      arcs.forEach(function(a){a.style.strokeDashoffset=String(370.7*(1-parseFloat(a.getAttribute('data-p'))));});
+    });});
+  })();
+</script>
+</body>
+</html>

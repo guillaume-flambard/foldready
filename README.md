@@ -116,6 +116,19 @@ by `Scripts/build-index.sh`:
 ./Scripts/build-index.sh <repo1> <repo2> ...
 ```
 
+## Design system
+
+The authoritative design system lives in `design/ds-package/` — the exported Open
+Design package: `DESIGN.md` (tokens), `DESIGN-HANDOFF.md` (implementation contract),
+`DESIGN-MANIFEST.json` (machine-readable map), `colors_and_type.css` (canonical token
+CSS), the 5 screens, `preview/` cards and `ui_kits/app/` (token-bound component demos).
+
+The web app consumes the same tokens: colors are identical, and the canonical
+radius/spacing/motion names (`--r-container`, `--sp-*`, `--t-fast`…) are declared in
+`web/app/globals.css`. Reconcile any drift against `design/ds-package/` before
+changing a color. The design prompt used to generate the system is in
+`design/DESIGN-SYSTEM-PROMPT.md`.
+
 ## Product
 
 The CLI is the entry product: pay-per-audit reports that open the door to fixed-price

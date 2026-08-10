@@ -1,0 +1,102 @@
+/* ============================================================================
+   FoldReady · colors_and_type.css
+   Reusable color + typography foundation (dark default identity, light variant).
+   Paste into the first <style> of any FoldReady artifact and bind tokens.
+   Source: FoldReady design system v2 · extracted from components.html :root.
+   Numbers in this system are ALWAYS monospaced + tabular (font-variant-numeric).
+   ============================================================================ */
+
+:root{
+  /* Typography ----------------------------------------------------------- */
+  --font-display:'Space Grotesk','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+  --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  /* Color: dark (default identity) -------------------------------------- */
+  --ink:#0F172A;        /* primary canvas; never pure black */
+  --ink2:#0B1220;       /* deeper inset / focus-plate tone */
+  --panel:#1E293B;      /* cards, containers, secondary surface */
+  --panel2:#24344D;     /* hover fill, raised inset on panel */
+  --slate1:#334155;     /* borders, track, bezel */
+  --slate2:#475569;     /* stronger structural line, icon base */
+  --blue:#0EA5E9;       /* THE one vivid accent: focus, active, links, open screen, needle */
+  --sky:#7DD3FC;        /* hover / highlight state of Screen Blue */
+  --green:#22C55E;      /* ready only: the check, a passing score, zero risk */
+  --checkink:#052E16;   /* checkmark stroke on the green tile */
+  --txt:#E2E8F0;        /* primary text on Ink */
+  --dim:#94A3B8;        /* secondary / caption text (never below 12px) */
+  --line:rgba(226,232,240,.14);  /* 1px hairlines and dividers */
+
+  /* Grade bands: color + letter ALWAYS travel together ------------------ */
+  --gA:#22C55E;   /* A ready · featured-grade */
+  --gB:#84CC16;   /* B good · some polish */
+  --gC:#FACC15;   /* C functional · not at home */
+  --gD:#F97316;   /* D visibly squeezed */
+  --gF:#EF4444;   /* F needs a real port */
+
+  /* Semantic accents ------------------------------------------------------ */
+  --sevBlocker:#F87171;
+  --sevMajor:#FDBA74;
+  --on-accent:#0F172A;   /* text on Screen Blue */
+  --on-chip:#0F172A;     /* letter on grade chips (dark) */
+
+  /* Shape & spacing -------------------------------------------------------- */
+  --r-container:14px;   /* 12-16 allowed */
+  --r-button:11px;      /* 10-14 */
+  --r-chip:999px;
+  --sp-4:4px; --sp-8:8px; --sp-12:12px; --sp-16:16px;
+  --sp-24:24px; --sp-32:32px; --sp-48:48px; --sp-64:64px;
+
+  /* Motion ------------------------------------------------------------------ */
+  --ease-out:cubic-bezier(.16,1,.3,1); /* gauge landing spring */
+  --t-fast:.15s ease-out;               /* state changes */
+  --t-mid:.2s ease-out;
+
+  --bg:var(--ink);
+}
+
+/* Light variant: bind with <html data-theme="light"> or JS toggle */
+:root[data-theme="light"]{
+  --ink:#FBFBFE; --ink2:#F6F7FB; --panel:#FFFFFF; --panel2:#F1F5F9;
+  --slate1:#CBD5E1; --slate2:#94A3B8;
+  --txt:#0F172A; --dim:#475569; --line:rgba(15,23,42,.12);
+  --gA:#15803D; --gB:#4D7C0F; --gC:#A16207; --gD:#C2410C; --gF:#B91C1C;
+  --sevBlocker:#DC2626; --sevMajor:#C2410C;
+  --on-chip:#FFFFFF;
+  --bg:var(--ink);
+  /* Elevation: very soft, low-opacity shadows only. Dark mode: none. */
+}
+
+/* Base ---------------------------------------------------------------- */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--txt);
+  font:15px/1.55 var(--font-body);
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  transition:background var(--t-mid),color var(--t-mid);
+}
+a{color:var(--blue)}
+a:hover{color:var(--sky)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+::selection{background:rgba(14,165,233,.3)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+/* Layout shell ----------------------------------------------------------- */
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* Type ramp (source specimens) ------------------------------------------ */
+/* Display / 64+: Space Grotesk 700, letter-spacing -.03em                 */
+/* Display / 28-44: Space Grotesk 700, letter-spacing -.02em               */
+/* Body / 15-17: Inter 400, line-height 1.5-1.6                            */
+/* Data / 13-16: JetBrains Mono 700, tabular, letter-spacing -.02em        */
+/* Caption / 11: Inter 600, +.08em caps, --dim                              */
+
+/* Grade chips -------------------------------------------------------------- */
+.gchip{display:inline-flex;align-items:center;justify-content:center;
+  min-width:32px;height:32px;padding:0 9px;border-radius:8px;
+  font:700 14px/1 var(--font-mono);color:var(--on-chip)}
+.gchip.a{background:var(--gA)}.gchip.b{background:var(--gB)}
+.gchip.c{background:var(--gC)}.gchip.d{background:var(--gD)}.gchip.f{background:var(--gF)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}

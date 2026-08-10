@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady · Design System Review Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html{scroll-behavior:smooth}
+  body{background:var(--ink)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .nav{display:flex;align-items:center;gap:12px;height:72px;border-bottom:1px solid var(--line)}
+  .nav .wordmark{font:700 21px/1 var(--font-display);letter-spacing:-.02em}
+  .nav .tag{margin-left:auto;font:500 12px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+  .hero{padding:56px 0 36px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font:500 11px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);padding:6px 12px;border:1px solid rgba(14,165,233,.4);border-radius:999px}
+  .hero h1{font:700 clamp(34px,4.4vw,52px)/1.05 var(--font-display);letter-spacing:-.03em;margin:18px 0 12px;max-width:22ch}
+  .hero p{max-width:62ch;color:var(--dim);font-size:16px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:40px 0 24px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;text-decoration:none;transition:border-color .15s ease-out}
+  .card:hover{border-color:var(--slate2)}
+  .card .num{font:700 12px/1 var(--font-mono);color:var(--blue);letter-spacing:.1em}
+  .card h2{font:700 18px/1.2 var(--font-display);letter-spacing:-.01em;color:var(--txt)}
+  .card p{font-size:13px;color:var(--dim);flex:1}
+  .card .go{font:600 13px/1 var(--font-body);color:var(--blue)}
+  .thumb{height:92px;border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative;background:var(--ink2)}
+  .thumb .strip{position:absolute;inset:0;display:flex}
+  .thumb .strip i{flex:1}
+  section.sources{padding:28px 0 64px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:18px}
+  .sec-head h2{font:700 22px/1.15 var(--font-display);letter-spacing:-.02em}
+  .sec-head .id{font:500 12px/1 var(--font-mono);color:var(--dim);letter-spacing:.08em}
+  .rows{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:16px;padding:16px 20px;text-decoration:none;border-bottom:1px solid var(--line);background:var(--panel)}
+  .row:last-child{border-bottom:0}
+  .row:hover{background:var(--panel2)}
+  .row .n{font:700 12px/1 var(--font-mono);color:var(--dim);min-width:44px;letter-spacing:.08em}
+  .row .t{font:600 15px/1.3 var(--font-body);color:var(--txt)}
+  .row .d{font-size:12px;color:var(--dim)}
+  .row .go{margin-left:auto;font:600 12px/1 var(--font-mono);color:var(--blue);white-space:nowrap}
+</style>
+</head>
+<body>
+<nav class="nav wrap" data-od-id="nav">
+  <img src="../assets/mark.svg" alt="" style="width:44px;height:44px;border-radius:10px">
+  <span class="wordmark">foldready</span>
+  <span class="tag">Design-system previews · v2</span>
+</nav>
+
+<header class="hero wrap" data-od-id="hero">
+  <span class="kicker">Review gallery</span>
+  <h1>FoldReady design system previews</h1>
+  <p>Focused cards for every foundation of the system: colors, typography, spacing &amp; radius, components, brand assets, and the applied surfaces. Each card reads the shared token file (<code class="mono">colors_and_type.css</code>) and points back to the preserved source screens.</p>
+</header>
+
+<main class="wrap">
+  <div class="cards" data-od-id="preview-cards">
+    <a class="card" href="colors-primary.html" data-od-id="preview-colors">
+      <span class="num">01 · COLOR</span>
+      <div class="thumb"><div class="strip"><i style="background:#0F172A"></i><i style="background:#1E293B"></i><i style="background:#24344D"></i><i style="background:#334155"></i><i style="background:#0EA5E9"></i><i style="background:#22C55E"></i></div></div>
+      <h2>Color &amp; grade bands</h2>
+      <p>Dark + light palettes, the two-accent rule, semantic grade chips A-F with light-mode text values.</p>
+      <span class="go">Open color preview</span>
+    </a>
+    <a class="card" href="typography-specimens.html" data-od-id="preview-typography">
+      <span class="num">02 · TYPE</span>
+      <div class="thumb" style="display:grid;place-items:center;padding:0 14px"><span class="mono" style="font:700 30px/1 var(--font-display);color:var(--txt)">Aa</span></div>
+      <h2>Typography specimens</h2>
+      <p>Space Grotesk display, Inter body, JetBrains Mono data. The full ramp with tracking and weights.</p>
+      <span class="go">Open typography preview</span>
+    </a>
+    <a class="card" href="spacing-tokens.html" data-od-id="preview-spacing">
+      <span class="num">03 · SPACE</span>
+      <div class="thumb" style="display:grid;place-items:center"><div class="mono" style="display:flex;gap:6px;align-items:flex-end"><i style="width:6px;height:18px;background:var(--blue);border-radius:2px"></i><i style="width:6px;height:26px;background:var(--blue);border-radius:2px"></i><i style="width:6px;height:34px;background:var(--sky);border-radius:2px"></i><i style="width:6px;height:44px;background:var(--blue);border-radius:2px"></i></div></div>
+      <h2>Spacing, radius &amp; motion</h2>
+      <p>4px spacing scale, the radius set, motion timings, and the gauge landing spring.</p>
+      <span class="go">Open spacing preview</span>
+    </a>
+    <a class="card" href="components-buttons.html" data-od-id="preview-components">
+      <span class="num">04 · COMPONENTS</span>
+      <div class="thumb" style="display:grid;place-items:center;padding:0 16px;align-content:center;gap:8px">
+        <span style="display:inline-flex;gap:8px"><i style="width:9px;height:18px;background:var(--gA);border-radius:2px"></i><i style="width:9px;height:18px;background:var(--gA);border-radius:2px"></i><i style="width:9px;height:18px;background:var(--slate1);opacity:.4;border-radius:2px"></i><i style="width:9px;height:18px;background:var(--slate1);opacity:.4;border-radius:2px"></i></span>
+        <span class="mono" style="font:700 13px/1 var(--font-mono);color:var(--gA)">93 · w 0.20</span>
+      </div>
+      <h2>Component previews</h2>
+      <p>Buttons, chips, gauge, check bars, score cards, stat cards. The reusable kit in action.</p>
+      <span class="go">Open component preview</span>
+    </a>
+    <a class="card" href="brand-assets.html" data-od-id="preview-brand">
+      <span class="num">05 · BRAND</span>
+      <div class="thumb" style="display:grid;place-items:center"><img src="../assets/mark.svg" alt="Hinge Check mark" style="width:64px;height:64px;border-radius:12px"></div>
+      <h2>Brand assets</h2>
+      <p>The Hinge Check mark, check tile, favicon, wordmark lockup, and the logo usage rule.</p>
+      <span class="go">Open brand preview</span>
+    </a>
+    <a class="card" href="surfaces.html" data-od-id="preview-surfaces">
+      <span class="num">06 · SURFACES</span>
+      <div class="thumb" style="display:grid;place-items:center"><span class="mono" style="font:700 34px/1 var(--font-mono);color:var(--gA)">78</span></div>
+      <h2>Applied UI surfaces</h2>
+      <p>The report, index, and landing rendered from the preserved screens. The system applied.</p>
+      <span class="go">Open surfaces preview</span>
+    </a>
+  </div>
+
+  <section class="sources" data-od-id="preserved-sources">
+    <div class="sec-head"><h2>Preserved source evidence</h2><span class="id">PROJECT ROOT · UNMODIFIED</span></div>
+    <div class="rows">
+      <a class="row" href="../components.html"><span class="n">CATALOG</span><div><div class="t">components.html</div><div class="d">12-component catalog on dark + light, token reference</div></div><span class="go">Open →</span></a>
+      <a class="row" href="../report-page.html"><span class="n">SCREEN 01</span><div><div class="t">report-page.html</div><div class="d">Fold-Ready report · IceCubesApp 78 / A</div></div><span class="go">Open →</span></a>
+      <a class="row" href="../index-ranking.html"><span class="n">SCREEN 02</span><div><div class="t">index-ranking.html</div><div class="d">Sortable Fold-Ready Index of 6 apps</div></div><span class="go">Open →</span></a>
+      <a class="row" href="../landing-page.html"><span class="n">SCREEN 03</span><div><div class="t">landing-page.html</div><div class="d">Marketing landing · pricing · objections</div></div><span class="go">Open →</span></a>
+      <a class="row" href="../DESIGN.md"><span class="n">RULES</span><div><div class="t">DESIGN.md</div><div class="d">Token + rule file (context, voice, anti-patterns)</div></div><span class="go">Open →</span></a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap" style="padding:24px 24px 56px;border-top:1px solid var(--line);color:var(--dim);font-size:13px;display:flex;gap:16px;align-items:center">
+  <span>FoldReady · design system v2 previews</span>
+  <span class="mono" style="margin-left:auto">colors → type → space → components → brand → surfaces</span>
+</footer>
+</body>
+</html>
