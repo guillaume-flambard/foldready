@@ -139,6 +139,7 @@ enum AuditEngine {
         var findings: [Finding] = []
         var fixedFrames = 0
         var screenMain = 0
+        var screenMainOther = 0
 
         for file in swiftFiles {
             let lines = file.content.components(separatedBy: .newlines)
@@ -147,6 +148,11 @@ enum AuditEngine {
                     screenMain += 1
                     findings.append(Finding(check: "adaptive-layout", severity: .major,
                         message: "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+                        file: file.path, line: idx + 1))
+                } else if line.range(of: #"UIScreen\.main\b"#, options: .regularExpression) != nil {
+                    screenMainOther += 1
+                    findings.append(Finding(check: "adaptive-layout", severity: .minor,
+                        message: "UIScreen.main is deprecated in iOS 27; derive scale and geometry from the window scene and trait collection.",
                         file: file.path, line: idx + 1))
                 }
                 if line.range(of: #"\.frame\(width:\s*\d+\.?\d*[a-zA-Z]*\s*,\s*height:\s*\d+\.?\d*[a-zA-Z]*"#, options: .regularExpression) != nil {
@@ -159,11 +165,11 @@ enum AuditEngine {
         }
 
         let total = max(1, swiftFiles.count)
-        let load = Double(fixedFrames) * 0.5 + Double(screenMain) * 2.0
+        let load = Double(fixedFrames) * 0.5 + Double(screenMain) * 2.0 + Double(screenMainOther) * 0.6
         let score = max(0.0, 1.0 - min(1.0, load / Double(total)))
-        let detail = "\(fixedFrames) hardcoded frames, \(screenMain) UIScreen.main.bounds reads across \(swiftFiles.count) files"
+        let detail = "\(fixedFrames) hardcoded frames, \(screenMain) UIScreen.main.bounds, \(screenMainOther) other UIScreen.main reads across \(swiftFiles.count) files"
         let outcome = CheckOutcome(key: "adaptive-layout", title: "Adaptive layout",
-            weight: 0.20, score: score, detail: detail, findings: findings)
+            weight: 0.22, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
@@ -188,7 +194,7 @@ enum AuditEngine {
         else { score = 1 }
         let detail = blocked ? "UIRequiresFullScreen=true found" : (scanned == 0 ? "no Info.plist scanned, verify build settings" : "Parallel View not blocked")
         let outcome = CheckOutcome(key: "full-screen", title: "Parallel View opt-in",
-            weight: 0.10, score: score, detail: detail, findings: findings)
+            weight: 0.08, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
@@ -222,7 +228,7 @@ enum AuditEngine {
 
         let detail = "\(split) NavigationSplitView, \(sidebar) sidebar opt-ins, \(stack) stacks"
         let outcome = CheckOutcome(key: "navigation", title: "Adaptive navigation / sidebar",
-            weight: 0.20, score: score, detail: detail, findings: findings)
+            weight: 0.25, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
@@ -251,7 +257,7 @@ enum AuditEngine {
 
         let detail = swiftuiApp ? "SwiftUI @main App scene" : (sceneDelegate ? "UIKit scene delegate" : "scene lifecycle missing")
         let outcome = CheckOutcome(key: "scene", title: "UIScene lifecycle",
-            weight: 0.10, score: score, detail: detail, findings: findings)
+            weight: 0.15, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
@@ -299,7 +305,7 @@ enum AuditEngine {
 
         let detail = "\(effectiveGeometry) effectiveGeometry, \(sizeClasses) size classes, \(geometryReader) GeometryReader, \(internalStrings) internal strings"
         let outcome = CheckOutcome(key: "fold-state", title: "Adaptive geometry (fold-aware)",
-            weight: 0.15, score: penalized, detail: detail, findings: findings)
+            weight: 0.12, score: penalized, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
@@ -330,7 +336,7 @@ enum AuditEngine {
 
         let detail = "\(sceneStorage) @SceneStorage, \(restoration) restoration, \(viewModels) view models"
         let outcome = CheckOutcome(key: "state", title: "State preservation",
-            weight: 0.10, score: score, detail: detail, findings: findings)
+            weight: 0.08, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
@@ -348,7 +354,7 @@ enum AuditEngine {
         }
         let detail = "\(stats.swiftuiFiles) SwiftUI files, \(stats.uikitFiles) UIKit files"
         let outcome = CheckOutcome(key: "framework", title: "SwiftUI vs UIKit",
-            weight: 0.15, score: score, detail: detail, findings: findings)
+            weight: 0.10, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 

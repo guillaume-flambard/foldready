@@ -28,19 +28,19 @@ export const CHECK_LABELS: Record<keyof Checks, string> = {
   parallel: "ParallelView",
   nav: "Sidebar",
   scene: "Scene",
-  fold: "FoldState",
+  fold: "Adaptive geometry",
   state: "State",
   framework: "SwiftUI",
 };
 
 export const CHECK_WEIGHTS: Record<keyof Checks, string> = {
-  adaptive: "w 0.20",
-  parallel: "w 0.10",
-  nav: "w 0.20",
-  scene: "w 0.10",
-  fold: "w 0.15",
-  state: "w 0.10",
-  framework: "w 0.15",
+  adaptive: "w 0.22",
+  parallel: "w 0.08",
+  nav: "w 0.25",
+  scene: "w 0.15",
+  fold: "w 0.12",
+  state: "w 0.08",
+  framework: "w 0.10",
 };
 
 export const GRADE_COLOR: Record<Grade, string> = {
@@ -52,12 +52,12 @@ export const GRADE_COLOR: Record<Grade, string> = {
 };
 
 export const APPS: AppScore[] = [
-  { name: "MochiDiffusion", slug: "mochidiffusion", score: 91, grade: "A", risk: "low", hours: 27.5, swiftFiles: 58, findings: 0, repo: "cjnevin/mochi-diffusion", checks: { adaptive: 93, parallel: 100, nav: 100, scene: 100, fold: 70, state: 70, framework: 100 } },
-  { name: "IceCubesApp", slug: "icecubesapp", score: 78, grade: "A", risk: "low", hours: 214, swiftFiles: 424, findings: 37, repo: "Dimillian/IceCubesApp", checks: { adaptive: 93, parallel: 100, nav: 40, scene: 100, fold: 70, state: 70, framework: 91 } },
-  { name: "isowords", slug: "isowords", score: 78, grade: "A", risk: "low", hours: 185.5, swiftFiles: 388, findings: 30, repo: "pointfreeco/isowords", checks: { adaptive: 95, parallel: 100, nav: 40, scene: 100, fold: 70, state: 70, framework: 89 } },
-  { name: "MovieSwiftUI", slug: "movieswiftui", score: 69, grade: "B", risk: "low", hours: 76, swiftFiles: 105, findings: 18, repo: "Dimillian/MovieSwiftUI", checks: { adaptive: 85, parallel: 100, nav: 40, scene: 20, fold: 70, state: 70, framework: 97 } },
-  { name: "Dime", slug: "dime", score: 59, grade: "C", risk: "medium", hours: 79.5, swiftFiles: 94, findings: 38, repo: "noahsark769/Dime", checks: { adaptive: 0, parallel: 100, nav: 40, scene: 100, fold: 70, state: 70, framework: 90 } },
-  { name: "Open Food Facts", slug: "openfoodfacts", score: 48, grade: "C", risk: "medium", hours: 86, swiftFiles: 218, findings: 5, repo: "openfoodfacts/openfoodfacts-ios", checks: { adaptive: 98, parallel: 100, nav: 50, scene: 20, fold: 20, state: 30, framework: 0 } },
+  { name: "MochiDiffusion", slug: "mochidiffusion", score: 92, grade: "A", risk: "low", hours: 27.5, swiftFiles: 58, findings: 0, repo: "cjnevin/mochi-diffusion", checks: { adaptive: 93, parallel: 100, nav: 100, scene: 100, fold: 70, state: 70, framework: 100 } },
+  { name: "IceCubesApp", slug: "icecubesapp", score: 72, grade: "B", risk: "low", hours: 214, swiftFiles: 424, findings: 37, repo: "Dimillian/IceCubesApp", checks: { adaptive: 93, parallel: 100, nav: 40, scene: 100, fold: 30, state: 70, framework: 91 } },
+  { name: "isowords", slug: "isowords", score: 76, grade: "A", risk: "low", hours: 185.5, swiftFiles: 388, findings: 30, repo: "pointfreeco/isowords", checks: { adaptive: 95, parallel: 100, nav: 40, scene: 100, fold: 65, state: 70, framework: 89 } },
+  { name: "MovieSwiftUI", slug: "movieswiftui", score: 63, grade: "B", risk: "low", hours: 76, swiftFiles: 105, findings: 18, repo: "Dimillian/MovieSwiftUI", checks: { adaptive: 85, parallel: 100, nav: 40, scene: 20, fold: 70, state: 70, framework: 97 } },
+  { name: "Dime", slug: "dime", score: 56, grade: "C", risk: "medium", hours: 80, swiftFiles: 94, findings: 38, repo: "noahsark769/Dime", checks: { adaptive: 0, parallel: 100, nav: 40, scene: 100, fold: 70, state: 70, framework: 90 } },
+  { name: "Open Food Facts", slug: "openfoodfacts", score: 50, grade: "C", risk: "medium", hours: 86, swiftFiles: 218, findings: 3, repo: "openfoodfacts/openfoodfacts-ios", checks: { adaptive: 98, parallel: 100, nav: 50, scene: 20, fold: 20, state: 30, framework: 0 } },
 ];
 
 export const appBySlug = (slug: string) => APPS.find((a) => a.slug === slug);
