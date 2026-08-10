@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { APPS } from "@/lib/data";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { ScoreCard, SegBar, CheckBar } from "@/components/ScoreCard";
+import { href } from "@/lib/href";
 
 export const metadata: Metadata = {
   title: "FoldReady · Design System v2",
@@ -223,9 +224,9 @@ export default function ComponentsPage() {
         <div className="frame" style={{ marginBottom: 16 }}>
           <div className="comphead"><span className="no">11</span><h3>Nav</h3><span className="spec">Mark + wordmark · links · one primary CTA</span></div>
           <div className="nav" style={{ border: "1px solid var(--line)", borderRadius: 12, padding: "0 18px", height: 64 }}>
-            <a className="brand" href="/"><span style={{ fontSize: 18 }} className="wordmark">foldready</span></a>
-            <div className="links"><a href="/ranking">Index</a><a href="/report/icecubesapp">Reports</a><a href="/components" aria-current="page">Design system</a></div>
-            <div className="right"><a className="btn btn-pri" style={{ padding: "10px 18px", fontSize: 14 }} href="/#pricing">Get scored</a></div>
+            <a className="brand" href={href("/")}><span style={{ fontSize: 18 }} className="wordmark">foldready</span></a>
+            <div className="links"><a href={href("/ranking")}>Index</a><a href={href("/report/icecubesapp")}>Reports</a><a href={href("/components")} aria-current="page">Design system</a></div>
+            <div className="right"><a className="btn btn-pri" style={{ padding: "10px 18px", fontSize: 14 }} href={href("/#pricing")}>Get scored</a></div>
           </div>
         </div>
 
@@ -237,7 +238,7 @@ export default function ComponentsPage() {
             </span>
             <h4>All 7 checks pass</h4>
             <p>Zero findings across every foldable check. MochiDiffusion is ready for the 7.8in inner display — no port required.</p>
-            <a className="btn btn-sec" href="/report/mochidiffusion">Download clean report</a>
+            <a className="btn btn-sec" href={href("/report/mochidiffusion")}>Download clean report</a>
           </div>
         </div>
       </section>

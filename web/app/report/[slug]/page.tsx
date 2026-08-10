@@ -5,6 +5,7 @@ import { ScoreGauge } from "@/components/ScoreGauge";
 import { SeverityChip, SegBar } from "@/components/ScoreCard";
 import { PageMotion } from "@/components/Motion";
 import { PortPlan } from "@/components/PortPlan";
+import { href } from "@/lib/href";
 
 export function generateStaticParams() {
   return APPS.map((a) => ({ slug: a.slug }));
@@ -186,7 +187,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
               <svg className="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/></svg>
               Re-run audit
             </a>
-            <a className="btn btn-sec" href="/#pricing">Get it ported
+            <a className="btn btn-sec" href={href("/#pricing")}>Get it ported
               <svg className="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16"/><path d="M13 6l6 6-6 6"/></svg>
             </a>
           </div>

@@ -1,5 +1,6 @@
 import portsData from "@/lib/ports-data.json";
 import { CopyButton } from "@/components/CopyButton";
+import { href } from "@/lib/href";
 
 const TIER_LABEL: Record<string, string> = { safe: "SAFE", review: "REVIEW", manual: "MANUAL" };
 const TIER_LETTER: Record<string, string> = { safe: "s", review: "r", manual: "m" };
@@ -36,7 +37,7 @@ export function PortPlan({ slug, repoPath = "" }: { slug: string; repoPath?: str
               {t.title} <span style={{ color: "var(--dim)" }}>· {t.files} file{t.files === 1 ? "" : "s"}</span>
             </span>
             {t.hasPatch ? (
-              <a href={`/ports/${slug}/patches/${t.id}.patch`} download style={{ color: "var(--blue)", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
+              <a href={href(`/ports/${slug}/patches/${t.id}.patch`)} download style={{ color: "var(--blue)", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
                 Patch ↓
               </a>
             ) : (
@@ -47,11 +48,11 @@ export function PortPlan({ slug, repoPath = "" }: { slug: string; repoPath?: str
       </div>
       <div className="band-acts" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
         {entry.hasPatch ? (
-          <a className="btn btn-pri" href={`/ports/${slug}/port.patch`} download>Download all patches</a>
+          <a className="btn btn-pri" href={href(`/ports/${slug}/port.patch`)} download>Download all patches</a>
         ) : (
           <span className="chip ready">guidance only — no patch edits to apply</span>
         )}
-        <a className="btn btn-sec" href={`/ports/${slug}/porting-report.md`} download>Full porting report</a>
+        <a className="btn btn-sec" href={href(`/ports/${slug}/porting-report.md`)} download>Full porting report</a>
       </div>
       {entry.hasPatch && (
         <div className="copybox" style={{ marginTop: 18, maxWidth: 640 }}>

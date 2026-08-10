@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { APPS, type Grade } from "@/lib/data";
 import { ScoreCard } from "@/components/ScoreCard";
+import { href } from "@/lib/href";
 
 type SortKey = "score" | "hours" | "name";
 type Filter = "all" | Grade;
@@ -81,7 +82,7 @@ export function RankingClient() {
             foldable requirements, a captured-layout pass, and an hours estimate for the port.
           </p>
         </div>
-        <a className="btn btn-pri" href="/get-scored">Get your app scored</a>
+        <a className="btn btn-pri" href={href("/get-scored")}>Get your app scored</a>
       </section>
     </>
   );

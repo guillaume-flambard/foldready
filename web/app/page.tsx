@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { APPS, GRADE_COLOR, type AppScore } from "@/lib/data";
 import { ScoreGauge } from "@/components/ScoreGauge";
+import { href } from "@/lib/href";
 
 export default function LandingPage() {
   const hero = APPS[0];
@@ -16,7 +17,7 @@ export default function LandingPage() {
             the 7.8in inner display.
           </p>
           <div className="ctas">
-            <a className="btn btn-pri" href="/get-scored">Score my app free</a>
+            <a className="btn btn-pri" href={href("/get-scored")}>Score my app free</a>
             <a className="btn btn-ghost" href="#how">Read the methodology</a>
           </div>
           <p className="proof-note">
