@@ -42,7 +42,7 @@ export function Nav() {
       </div>
       <div className="right">
         <ThemeToggle />
-        <Link className="btn btn-pri" href="/#pricing" style={{ padding: "11px 18px", fontSize: "14px" }}>
+        <Link className="btn btn-pri" href="/get-scored" style={{ padding: "11px 18px", fontSize: "14px" }}>
           Score my app
         </Link>
       </div>

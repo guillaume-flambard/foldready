@@ -16,7 +16,7 @@ export default function LandingPage() {
             the 7.8in inner display.
           </p>
           <div className="ctas">
-            <a className="btn btn-pri" href="#pricing">Score my app free</a>
+            <a className="btn btn-pri" href="/get-scored">Score my app free</a>
             <a className="btn btn-ghost" href="#how">Read the methodology</a>
           </div>
           <p className="proof-note">
