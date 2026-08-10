@@ -32,6 +32,27 @@ swift build
 Outputs `foldready-report.html` (and `result.json` with `--json`) into the audited
 folder by default, or into `--out <dir>`.
 
+## Visual grading (captured layout)
+
+A 10% "Captured layout" check is added when screenshots are supplied. It detects
+letterboxing: uniform near-black/white margin bands around the app content, the exact
+signature of a portrait app rendered on the wider iPhone Fold canvas.
+
+```sh
+# 1. Capture (needs an .xcodeproj in the repo; simulator build, no signing)
+./Scripts/capture.sh <repo> --name "App" --out shots
+
+# 2. Audit with the visual check
+./.build/debug/foldready <repo> --with-screenshots shots --name "App" --open
+
+# Standalone screenshot analysis
+./.build/debug/foldready visual shots
+```
+
+The pixel engine (`Sources/foldready/VisualAnalysis.swift`) is unit-tested against
+synthetic full-screen vs letterboxed images. The iPhone Fold simulator device type
+ships with Xcode 27; `capture.sh` targets the widest available device until then.
+
 ## What the score means
 
 Parallel View keeps every app running on the iPhone Fold without crashing. The score

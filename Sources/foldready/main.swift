@@ -14,6 +14,8 @@ struct CliOptions {
     var outDir: String?
     var json: Bool = false
     var open: Bool = false
+    var visual: Bool = false
+    var screenshotsDir: String?
 }
 
 func usage() -> Never {
@@ -21,15 +23,17 @@ func usage() -> Never {
     foldready v\(version) - Fold-Ready audit of an iOS app source tree.
 
     USAGE
-      foldready <path> [options]
+      foldready <path> [options]          Audit an iOS source tree
+      foldready visual <dir> [--open]     Analyze screenshots only (captured layout)
 
     OPTIONS
-      --name <name>      App name used in the report (default: folder name)
-      --out <dir>        Write report files to <dir> (default: ./foldready-report)
-      --json             Also write result.json (machine readable)
-      --open             Open the HTML report in the default browser
-      --version          Print version
-      -h, --help         Show this help
+      --name <name>           App name used in the report (default: folder name)
+      --out <dir>             Write report files to <dir> (default: ./foldready-report)
+      --with-screenshots <dir> Add a "Captured layout" check from PNG screenshots in <dir>
+      --json                  Also write result.json (machine readable)
+      --open                  Open the HTML report in the default browser
+      --version               Print version
+      -h, --help              Show this help
     """)
     exit(0)
 }
@@ -44,12 +48,17 @@ func parseArgs(_ args: [String]) -> CliOptions {
         case "--version":
             print("foldready \(version)")
             exit(0)
+        case "visual":
+            opts.visual = true
         case "--name":
             i += 1
             if i < args.count { opts.appName = args[i] }
         case "--out":
             i += 1
             if i < args.count { opts.outDir = args[i] }
+        case "--with-screenshots":
+            i += 1
+            if i < args.count { opts.screenshotsDir = args[i] }
         case "--json": opts.json = true
         case "--open": opts.open = true
         default:
@@ -63,6 +72,15 @@ func parseArgs(_ args: [String]) -> CliOptions {
         usage()
     }
     return opts
+}
+
+func listPNGs(in dir: String) -> [String] {
+    let fm = FileManager.default
+    guard let files = try? fm.contentsOfDirectory(atPath: dir) else { return [] }
+    return files
+        .filter { $0.hasSuffix(".png") }
+        .sorted()
+        .map { (dir as NSString).appendingPathComponent($0) }
 }
 
 func color(_ s: String, _ code: String) -> String {
@@ -82,7 +100,30 @@ func main() {
     }
 
     let appName = opts.appName ?? (root as NSString).lastPathComponent
-    let result = AuditEngine.run(root: root, appName: appName)
+
+    if opts.visual {
+        let shots = listPNGs(in: root)
+        guard !shots.isEmpty else {
+            print("error: no PNG files found in \(root)")
+            exit(1)
+        }
+        var results: [VisualResult] = []
+        for s in shots {
+            if let r = try? VisualAnalysis.analyze(png: s) { results.append(r) }
+            else { print("  skip (undecodable): \(s)") }
+        }
+        let avg = VisualAnalysis.averageScore(results)
+        print(color("FoldReady visual", "36") + " - \(shots.count) screenshot(s)")
+        for r in results {
+            let pct = Int((r.layoutScore * 100).rounded())
+            print("  \(color(String(format: "%3d", pct) + "%", pct >= 60 ? "32" : (pct >= 35 ? "33" : "31")))  \(r.file)  \(r.width)x\(r.height)  letterbox \(String(format: "%.0f%%", r.letterbox * 100))")
+        }
+        print("  combined captured-layout: \(color(String(format: "%.0f%%", avg * 100), avg >= 0.6 ? "32" : "33"))")
+        exit(0)
+    }
+
+    let screenshots = opts.screenshotsDir.map { listPNGs(in: $0) } ?? []
+    let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
 
     let outDir = opts.outDir ?? (root as NSString).appendingPathComponent("foldready-report")
     try? fm.createDirectory(atPath: outDir, withIntermediateDirectories: true)

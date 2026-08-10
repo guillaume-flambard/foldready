@@ -46,7 +46,7 @@ struct AuditResult: Sendable {
 
 enum AuditEngine {
 
-    static func run(root: String, appName: String) -> AuditResult {
+    static func run(root: String, appName: String, screenshots: [String] = []) -> AuditResult {
         let swift = walk(extension: "swift", at: root)
         let plists = walk(extension: "plist", at: root)
 
@@ -55,33 +55,29 @@ enum AuditEngine {
         var outcomes: [CheckOutcome] = []
         var findings: [Finding] = []
 
-        let adaptive = adaptiveLayout(swiftFiles: swift)
-        outcomes.append(adaptive.outcome)
-        findings.append(contentsOf: adaptive.outcome.findings)
+        func add(_ pair: (outcome: CheckOutcome, findings: [Finding])) {
+            outcomes.append(pair.outcome)
+            findings.append(contentsOf: pair.outcome.findings)
+        }
 
-        let fullScreen = requiresFullScreen(plists: plists)
-        outcomes.append(fullScreen.outcome)
-        findings.append(contentsOf: fullScreen.outcome.findings)
+        add(adaptiveLayout(swiftFiles: swift))
+        add(requiresFullScreen(plists: plists))
+        add(navigation(swiftFiles: swift))
+        add(sceneLifecycle(swiftFiles: swift))
+        add(foldState(swiftFiles: swift))
+        add(statePreservation(swiftFiles: swift))
+        add(frameworkRatio(stats: stats))
 
-        let nav = navigation(swiftFiles: swift)
-        outcomes.append(nav.outcome)
-        findings.append(contentsOf: nav.outcome.findings)
-
-        let scene = sceneLifecycle(swiftFiles: swift)
-        outcomes.append(scene.outcome)
-        findings.append(contentsOf: scene.outcome.findings)
-
-        let fold = foldState(swiftFiles: swift)
-        outcomes.append(fold.outcome)
-        findings.append(contentsOf: fold.outcome.findings)
-
-        let state = statePreservation(swiftFiles: swift)
-        outcomes.append(state.outcome)
-        findings.append(contentsOf: state.outcome.findings)
-
-        let ratio = frameworkRatio(stats: stats)
-        outcomes.append(ratio.outcome)
-        findings.append(contentsOf: ratio.outcome.findings)
+        // Optional visual check: screenshots captured on the widest simulator.
+        if !screenshots.isEmpty {
+            let captured = capturedLayout(screenshots: screenshots)
+            add(captured)
+            let scale = 1.0 - captured.outcome.weight
+            outcomes = outcomes.map { o in
+                CheckOutcome(key: o.key, title: o.title, weight: o.weight * scale,
+                    score: o.score, detail: o.detail, findings: o.findings)
+            }
+        }
 
         let weighted = outcomes.reduce(0.0) { $0 + $1.score * $1.weight }
         let total = weighted * 100.0
@@ -335,6 +331,36 @@ enum AuditEngine {
         let detail = "\(stats.swiftuiFiles) SwiftUI files, \(stats.uikitFiles) UIKit files"
         let outcome = CheckOutcome(key: "framework", title: "SwiftUI vs UIKit",
             weight: 0.15, score: score, detail: detail, findings: findings)
+        return (outcome, findings)
+    }
+
+    // MARK: - Visual check
+
+    private static func capturedLayout(screenshots: [String]) -> (outcome: CheckOutcome, findings: [Finding]) {
+        var findings: [Finding] = []
+        var scores: [Double] = []
+        var analyzed = 0
+
+        for path in screenshots {
+            if let result = try? VisualAnalysis.analyze(png: path) {
+                analyzed += 1
+                scores.append(result.layoutScore)
+                if result.letterbox > 0.08 {
+                    findings.append(Finding(check: "captured-layout", severity: .major,
+                        message: String(format: "Letterboxing detected (%.0f%% of the frame is uniform margin). The layout hardcodes a portrait fit and will show bands when it gets horizontal room.",
+                            result.letterbox * 100),
+                        file: result.file, line: nil))
+                }
+            }
+        }
+
+        let score = analyzed == 0 ? 0.5 : scores.reduce(0, +) / Double(analyzed)
+
+        let detail = analyzed == 0
+            ? "no screenshot could be decoded"
+            : "\(analyzed) screenshot(s) analyzed, avg layout score \(Int((score * 100).rounded()))%"
+        let outcome = CheckOutcome(key: "captured-layout", title: "Captured layout (simulator)",
+            weight: 0.10, score: score, detail: detail, findings: findings)
         return (outcome, findings)
     }
 
