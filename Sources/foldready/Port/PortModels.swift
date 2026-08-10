@@ -62,6 +62,33 @@ struct PortResult {
 }
 
 enum Diff {
+    enum Op {
+        case context(String)
+        case remove(String)
+        case insert(String)
+    }
+
+    /// Ordered line operations (LCS-based) to turn `a` into `b`.
+    static func operations(_ a: [String], _ b: [String]) -> [Op] {
+        let n = a.count, m = b.count
+        var dp = [[Int]](repeating: [Int](repeating: 0, count: m + 1), count: n + 1)
+        for i in stride(from: n - 1, through: 0, by: -1) {
+            for j in stride(from: m - 1, through: 0, by: -1) {
+                dp[i][j] = a[i] == b[j] ? dp[i + 1][j + 1] + 1 : max(dp[i + 1][j], dp[i][j + 1])
+            }
+        }
+        var ops: [Op] = []
+        var i = 0, j = 0
+        while i < n && j < m {
+            if a[i] == b[j] { ops.append(.context(a[i])); i += 1; j += 1 }
+            else if dp[i + 1][j] >= dp[i][j + 1] { ops.append(.remove(a[i])); i += 1 }
+            else { ops.append(.insert(b[j])); j += 1 }
+        }
+        while i < n { ops.append(.remove(a[i])); i += 1 }
+        while j < m { ops.append(.insert(b[j])); j += 1 }
+        return ops
+    }
+
     static func unified(_ edit: FileEdit) -> String {
         let a = edit.before.components(separatedBy: .newlines)
         let b = edit.after.components(separatedBy: .newlines)

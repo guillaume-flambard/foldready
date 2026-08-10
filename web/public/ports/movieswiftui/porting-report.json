@@ -32,10 +32,10 @@
       "id" : "adaptive-navigation",
       "newFiles" : 0,
       "notes" : [
-        "No top-level NavigationStack without an existing NavigationSplitView found."
+        "No root NavigationStack without an existing NavigationSplitView found."
       ],
       "tier" : "review",
-      "title" : "NavigationStack → NavigationSplitView"
+      "title" : "Root NavigationStack → NavigationSplitView"
     },
     {
       "edits" : 0,

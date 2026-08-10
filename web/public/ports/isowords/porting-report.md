@@ -8,36 +8,22 @@
 
 ## Replace UIScreen.main.bounds · REVIEW (check the diff)
 
-- Sources/GameOverFeature/GameOverView.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.
 - Sources/CubeCore/CubeSceneView.swift: 4 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.
 - Sources/Styleguide/AdaptiveSize.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.
 - UIScreen.main is deprecated in iOS 27; reads must come from the window scene / effective geometry.
 
-## NavigationStack → NavigationSplitView · REVIEW (check the diff)
-
-- Sources/AppFeature/AppView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
-- Sources/AppFeature/AppView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
-- Sources/GameCore/Views/GameView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
-- Sources/GameCore/Views/GameView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
-
 ```diff
---- a/Sources/AppFeature/AppView.swift
-+++ b/Sources/AppFeature/AppView.swift
-@@ -313,1 +313,1 @@
-+        NavigationSplitView { NavigationStack {
--        NavigationStack {
-@@ -335,1 +335,1 @@
-+      } } detail: { Color.clear }
--      }
---- a/Sources/GameCore/Views/GameView.swift
-+++ b/Sources/GameCore/Views/GameView.swift
-@@ -145,1 +145,1 @@
-+        NavigationSplitView { NavigationStack {
--        NavigationStack {
-@@ -148,1 +148,1 @@
-+      } } detail: { Color.clear }
--      }
+--- a/Sources/GameOverFeature/GameOverView.swift
++++ b/Sources/GameOverFeature/GameOverView.swift
+@@ -805,1 +805,1 @@
++        .frame(maxWidth: .infinity)
+-        .frame(width: UIScreen.main.bounds.size.width)
 ```
+
+## Root NavigationStack → NavigationSplitView · REVIEW (check the diff)
+
+- Sources/AppFeature/AppView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
+- Sources/GameCore/Views/GameView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
 
 ## State preservation across fold transitions · MANUAL (suggested)
 

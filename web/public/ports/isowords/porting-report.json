@@ -14,12 +14,11 @@
       "title" : "UIScene lifecycle"
     },
     {
-      "edits" : 0,
-      "files" : 0,
+      "edits" : 1,
+      "files" : 1,
       "id" : "screen-bounds",
       "newFiles" : 0,
       "notes" : [
-        "Sources\/GameOverFeature\/GameOverView.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
         "Sources\/CubeCore\/CubeSceneView.swift: 4 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
         "Sources\/Styleguide\/AdaptiveSize.swift: 1 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.",
         "UIScreen.main is deprecated in iOS 27; reads must come from the window scene \/ effective geometry."
@@ -28,18 +27,16 @@
       "title" : "Replace UIScreen.main.bounds"
     },
     {
-      "edits" : 2,
-      "files" : 2,
+      "edits" : 0,
+      "files" : 0,
       "id" : "adaptive-navigation",
       "newFiles" : 0,
       "notes" : [
-        "Sources\/AppFeature\/AppView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.",
-        "Sources\/AppFeature\/AppView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.",
-        "Sources\/GameCore\/Views\/GameView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.",
-        "Sources\/GameCore\/Views\/GameView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root."
+        "Sources\/AppFeature\/AppView.swift: body root is not a bare NavigationStack (TabView\/ZStack\/Group\/sheet) — left as-is.",
+        "Sources\/GameCore\/Views\/GameView.swift: body root is not a bare NavigationStack (TabView\/ZStack\/Group\/sheet) — left as-is."
       ],
       "tier" : "review",
-      "title" : "NavigationStack → NavigationSplitView"
+      "title" : "Root NavigationStack → NavigationSplitView"
     },
     {
       "edits" : 0,

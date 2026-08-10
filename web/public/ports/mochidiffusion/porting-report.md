@@ -10,9 +10,9 @@
 
 - UIScreen.main is deprecated in iOS 27; reads must come from the window scene / effective geometry.
 
-## NavigationStack → NavigationSplitView · REVIEW (check the diff)
+## Root NavigationStack → NavigationSplitView · REVIEW (check the diff)
 
-- No top-level NavigationStack without an existing NavigationSplitView found.
+- No root NavigationStack without an existing NavigationSplitView found.
 
 ## State preservation across fold transitions · MANUAL (suggested)
 

@@ -11,30 +11,47 @@
 - Packages/DesignSystem/Sources/DesignSystem/SceneDelegate.swift: 6 UIScreen.main.bounds read(s) remain — replace with the scene's effective geometry.
 - UIScreen.main is deprecated in iOS 27; reads must come from the window scene / effective geometry.
 
-## NavigationStack → NavigationSplitView · REVIEW (check the diff)
+## Root NavigationStack → NavigationSplitView · REVIEW (check the diff)
 
+- IceCubesApp/App/Tabs/Settings/SettingsTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/Settings/SettingsTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - IceCubesApp/App/Tabs/Settings/AddAccountsView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - IceCubesApp/App/Tabs/Settings/AddAccountsView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
+- IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
+- IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
+- IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
 - IceCubesApp/App/Tabs/NavigationSheet.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - IceCubesApp/App/Tabs/NavigationSheet.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/NotificationTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/NotificationTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/MessagesTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/MessagesTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/NavigationTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/NavigationTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/ExploreTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/ExploreTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/Timeline/TimelineTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/Timeline/TimelineTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- IceCubesApp/App/Tabs/ProfileTab.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
+- IceCubesApp/App/Tabs/ProfileTab.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - IceCubesApp/App/Report/ReportView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - IceCubesApp/App/Report/ReportView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - Packages/MediaUI/Sources/MediaUI/MediaUIView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/MediaUI/Sources/MediaUI/MediaUIView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
-- Packages/MediaUI/Sources/MediaUI/MediaUIAttachmentVideoView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
-- Packages/MediaUI/Sources/MediaUI/MediaUIAttachmentVideoView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- Packages/MediaUI/Sources/MediaUI/MediaUIView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
+- Packages/MediaUI/Sources/MediaUI/MediaUIAttachmentVideoView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
 - Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - Packages/Lists/Sources/Lists/Edit/ListEditView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/Lists/Sources/Lists/Edit/ListEditView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - Packages/Lists/Sources/Lists/Create/ListCreateView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/Lists/Sources/Lists/Create/ListCreateView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
-- Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
-- Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
 - Packages/Account/Sources/Account/Filters/FiltersListView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/Account/Sources/Account/Filters/FiltersListView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - Packages/Account/Sources/Account/Edit/EditRelationshipNoteView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
@@ -55,206 +72,237 @@
 - Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
-- Packages/StatusKit/Sources/StatusKit/Editor/MainView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
-- Packages/StatusKit/Sources/StatusKit/Editor/MainView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
+- Packages/StatusKit/Sources/StatusKit/Editor/MainView.swift: body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.
 - Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 - Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift: wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.
 - Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift: move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.
 
 ```diff
+--- a/IceCubesApp/App/Tabs/Settings/SettingsTab.swift
++++ b/IceCubesApp/App/Tabs/Settings/SettingsTab.swift
+@@ -36,1 +36,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -100,1 +100,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/IceCubesApp/App/Tabs/Settings/AddAccountsView.swift
 +++ b/IceCubesApp/App/Tabs/Settings/AddAccountsView.swift
 @@ -57,1 +57,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -159,1 +159,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -158,1 +158,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift
 +++ b/IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift
 @@ -25,1 +25,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -79,1 +79,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -78,1 +78,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/IceCubesApp/App/Tabs/NavigationSheet.swift
 +++ b/IceCubesApp/App/Tabs/NavigationSheet.swift
 @@ -17,1 +17,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -23,1 +23,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -22,1 +22,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/NotificationTab.swift
++++ b/IceCubesApp/App/Tabs/NotificationTab.swift
+@@ -28,1 +28,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -50,1 +50,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/MessagesTab.swift
++++ b/IceCubesApp/App/Tabs/MessagesTab.swift
+@@ -20,1 +20,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -31,1 +31,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/NavigationTab.swift
++++ b/IceCubesApp/App/Tabs/NavigationTab.swift
+@@ -26,1 +26,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -45,1 +45,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/ExploreTab.swift
++++ b/IceCubesApp/App/Tabs/ExploreTab.swift
+@@ -18,1 +18,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -28,1 +28,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift
 +++ b/IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift
 @@ -26,1 +26,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -88,1 +88,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -87,1 +87,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/Timeline/TimelineTab.swift
++++ b/IceCubesApp/App/Tabs/Timeline/TimelineTab.swift
+@@ -45,1 +45,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -61,1 +61,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/ProfileTab.swift
++++ b/IceCubesApp/App/Tabs/ProfileTab.swift
+@@ -19,1 +19,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -33,1 +33,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/IceCubesApp/App/Report/ReportView.swift
 +++ b/IceCubesApp/App/Report/ReportView.swift
 @@ -19,1 +19,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -69,1 +69,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -68,1 +68,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/MediaUI/Sources/MediaUI/MediaUIView.swift
 +++ b/Packages/MediaUI/Sources/MediaUI/MediaUIView.swift
 @@ -15,1 +15,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -57,1 +57,1 @@
-+  } } detail: { Color.clear }
--  }
---- a/Packages/MediaUI/Sources/MediaUI/MediaUIAttachmentVideoView.swift
-+++ b/Packages/MediaUI/Sources/MediaUI/MediaUIAttachmentVideoView.swift
-@@ -154,1 +154,1 @@
-+    NavigationSplitView { NavigationStack {
--    NavigationStack {
-@@ -195,1 +195,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -56,1 +56,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift
 +++ b/Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift
 @@ -21,1 +21,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -75,1 +75,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -67,1 +67,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Lists/Sources/Lists/Edit/ListEditView.swift
 +++ b/Packages/Lists/Sources/Lists/Edit/ListEditView.swift
 @@ -21,1 +21,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -111,1 +111,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -110,1 +110,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Lists/Sources/Lists/Create/ListCreateView.swift
 +++ b/Packages/Lists/Sources/Lists/Create/ListCreateView.swift
 @@ -23,1 +23,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -70,1 +70,1 @@
-+  } } detail: { Color.clear }
--  }
---- a/Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift
-+++ b/Packages/AppAccount/Sources/AppAccount/AppAccountsSelectorView.swift
-@@ -129,1 +129,1 @@
-+    NavigationSplitView { NavigationStack {
--    NavigationStack {
-@@ -181,1 +181,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -69,1 +69,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Account/Sources/Account/Filters/FiltersListView.swift
 +++ b/Packages/Account/Sources/Account/Filters/FiltersListView.swift
 @@ -21,1 +21,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -90,1 +90,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -89,1 +89,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Account/Sources/Account/Edit/EditRelationshipNoteView.swift
 +++ b/Packages/Account/Sources/Account/Edit/EditRelationshipNoteView.swift
 @@ -21,1 +21,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -53,1 +53,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -52,1 +52,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Account/Sources/Account/Edit/EditAccountView.swift
 +++ b/Packages/Account/Sources/Account/Edit/EditAccountView.swift
 @@ -20,1 +20,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -55,1 +55,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -54,1 +54,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Timeline/Sources/Timeline/View/TimelineContentFilterView.swift
 +++ b/Packages/Timeline/Sources/Timeline/View/TimelineContentFilterView.swift
 @@ -18,1 +18,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -65,1 +65,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -63,1 +63,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/Notifications/Sources/Notifications/List/NotificationsPolicyView.swift
 +++ b/Packages/Notifications/Sources/Notifications/List/NotificationsPolicyView.swift
 @@ -15,1 +15,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -125,1 +125,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -123,1 +123,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/StatusKit/Sources/StatusKit/History/StatusEditHistoryView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/History/StatusEditHistoryView.swift
 @@ -21,1 +21,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -64,1 +64,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -63,1 +63,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/StatusKit/Sources/StatusKit/Editor/Drafts/DraftsListView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/Editor/Drafts/DraftsListView.swift
 @@ -18,1 +18,1 @@
 +      NavigationSplitView { NavigationStack {
 -      NavigationStack {
-@@ -57,1 +57,1 @@
-+    } } detail: { Color.clear }
--    }
+@@ -56,1 +56,1 @@
++      } } detail: { Color.clear }
+-      }
 --- a/Packages/StatusKit/Sources/StatusKit/Editor/Components/MediaEditView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/Editor/Components/MediaEditView.swift
 @@ -30,1 +30,1 @@
 +      NavigationSplitView { NavigationStack {
 -      NavigationStack {
-@@ -127,1 +127,1 @@
-+    } } detail: { Color.clear }
--    }
+@@ -126,1 +126,1 @@
++      } } detail: { Color.clear }
+-      }
 --- a/Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift
 @@ -17,1 +17,1 @@
 +      NavigationSplitView { NavigationStack {
 -      NavigationStack {
-@@ -63,1 +63,1 @@
-+    } } detail: { Color.clear }
--    }
+@@ -61,1 +61,1 @@
++      } } detail: { Color.clear }
+-      }
 --- a/Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift
 @@ -18,1 +18,1 @@
 +      NavigationSplitView { NavigationStack {
 -      NavigationStack {
-@@ -42,1 +42,1 @@
-+    } } detail: { Color.clear }
--    }
---- a/Packages/StatusKit/Sources/StatusKit/Editor/MainView.swift
-+++ b/Packages/StatusKit/Sources/StatusKit/Editor/MainView.swift
-@@ -47,1 +47,1 @@
-+      NavigationSplitView { NavigationStack {
--      NavigationStack {
-@@ -55,1 +55,1 @@
-+    } } detail: { Color.clear }
--    }
+@@ -41,1 +41,1 @@
++      } } detail: { Color.clear }
+-      }
 --- a/Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift
 @@ -18,1 +18,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -56,1 +56,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -53,1 +53,1 @@
++    } } detail: { Color.clear }
+-    }
 --- a/Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift
 +++ b/Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift
 @@ -11,1 +11,1 @@
 +    NavigationSplitView { NavigationStack {
 -    NavigationStack {
-@@ -27,1 +27,1 @@
-+  } } detail: { Color.clear }
--  }
+@@ -25,1 +25,1 @@
++    } } detail: { Color.clear }
+-    }
 ```
 
 ## State preservation across fold transitions · MANUAL (suggested)

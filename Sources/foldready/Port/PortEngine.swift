@@ -28,18 +28,59 @@ enum PortEngine {
             .sorted { $0.tier < $1.tier }
 
         var appliedCount = 0
+        var skippedNotes: [String] = []
         if options.apply {
+            // Group edits by file so multiple transforms on the same file compose.
+            var editsByPath: [String: [FileEdit]] = [:]
             for patch in patches {
-                for edit in patch.edits where edit.before != edit.after {
-                    if applyEdit(root: root, edit: edit) { appliedCount += 1 }
+                for edit in patch.edits where edit.before != edit.after && !edit.path.contains("..") {
+                    editsByPath[edit.path, default: []].append(edit)
                 }
                 for (path, content) in patch.newFiles {
-                    if writeNewFile(root: root, path: path, content: content) { appliedCount += 1 }
+                    let full = (root as NSString).appendingPathComponent(path)
+                    if FileManager.default.fileExists(atPath: full) {
+                        skippedNotes.append("\(path): new file already exists, skipped.")
+                    } else if writeNewFile(root: root, path: path, content: content) {
+                        appliedCount += 1
+                    }
+                }
+            }
+            for (path, edits) in editsByPath.sorted(by: { $0.key < $1.key }) {
+                let full = (root as NSString).appendingPathComponent(path)
+                guard let data = FileManager.default.contents(atPath: full),
+                      var current = String(data: data, encoding: .utf8) else {
+                    skippedNotes.append("\(path): cannot read file, edits skipped.")
+                    continue
+                }
+                var appliedHere = 0
+                for edit in edits {
+                    if current == edit.before {
+                        current = edit.after
+                        appliedHere += 1
+                        continue
+                    }
+                    // The edit was computed against the pristine file; merge it into
+                    // the current content via ordered line operations so transforms
+                    // on the same file compose.
+                    let a = edit.before.components(separatedBy: .newlines)
+                    let b = edit.after.components(separatedBy: .newlines)
+                    if let merged = applyOps(current, Diff.operations(a, b)) {
+                        current = merged
+                        appliedHere += 1
+                    } else {
+                        skippedNotes.append("\(path): an edit could not be merged into the current content (conflict), skipped.")
+                    }
+                }
+                do {
+                    try current.write(toFile: full, atomically: true, encoding: .utf8)
+                    appliedCount += appliedHere
+                } catch {
+                    skippedNotes.append("\(path): write failed — \(error.localizedDescription)")
                 }
             }
         }
 
-        let plan = PortPlan(patches: patches, skippedNotes: [])
+        let plan = PortPlan(patches: patches, skippedNotes: skippedNotes)
         let reportPath = writeReport(root: root, appName: appName, plan: plan, applied: options.apply, outDir: options.outDir)
         return PortResult(appName: appName, plan: plan, applied: options.apply,
             appliedCount: appliedCount, reportPath: reportPath)
@@ -64,16 +105,6 @@ enum PortEngine {
         return result
     }
 
-    private static func applyEdit(root: String, edit: FileEdit) -> Bool {
-        let full = (root as NSString).appendingPathComponent(edit.path)
-        guard let data = FileManager.default.contents(atPath: full), let current = String(data: data, encoding: .utf8),
-              current == edit.before else { return false }
-        do {
-            try edit.after.write(toFile: full, atomically: true, encoding: .utf8)
-            return true
-        } catch { return false }
-    }
-
     private static func writeNewFile(root: String, path: String, content: String) -> Bool {
         let full = (root as NSString).appendingPathComponent(path)
         if FileManager.default.fileExists(atPath: full) { return false }
@@ -81,6 +112,33 @@ enum PortEngine {
             try content.write(toFile: full, atomically: true, encoding: .utf8)
             return true
         } catch { return false }
+    }
+
+    /// Replay ordered line ops onto the current content, preserving lines that other
+    /// transforms inserted (context lines skip forward). Returns nil on conflict.
+    private static func applyOps(_ current: String, _ ops: [Diff.Op]) -> String? {
+        let linesC = current.components(separatedBy: .newlines)
+        var out: [String] = []
+        var r = 0
+        for op in ops {
+            switch op {
+            case .context(let line):
+                while r < linesC.count && linesC[r] != line {
+                    out.append(linesC[r]) // keep lines inserted by other transforms
+                    r += 1
+                }
+                guard r < linesC.count else { return nil }
+                out.append(line)
+                r += 1
+            case .remove(let line):
+                guard r < linesC.count, linesC[r] == line else { return nil }
+                r += 1
+            case .insert(let line):
+                out.append(line)
+            }
+        }
+        while r < linesC.count { out.append(linesC[r]); r += 1 }
+        return out.joined(separator: "\n")
     }
 
     // MARK: - Report
@@ -102,6 +160,10 @@ enum PortEngine {
             if !patch.diff.isEmpty {
                 md += "```diff\n\(patch.diff)```\n\n"
             }
+        }
+        if !plan.skippedNotes.isEmpty {
+            md += "## Skips & conflicts\n\n"
+            md += plan.skippedNotes.map { "- \($0)" }.joined(separator: "\n") + "\n\n"
         }
         do {
             try md.write(toFile: path, atomically: true, encoding: .utf8)

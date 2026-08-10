@@ -3,8 +3,7 @@ import Foundation
 @testable import foldready
 
 private func makeFixture() -> String {
-    let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fr-port-test", isDirectory: true)
-    try? FileManager.default.removeItem(at: dir)
+    let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fr-port-test-\(UUID().uuidString)", isDirectory: true)
     try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
     let files: [String: String] = [

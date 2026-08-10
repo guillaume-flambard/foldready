@@ -21,7 +21,7 @@
       },
       {
         "id": "adaptive-navigation",
-        "title": "NavigationStack \u2192 NavigationSplitView",
+        "title": "Root NavigationStack \u2192 NavigationSplitView",
         "tier": "review",
         "files": 0,
         "edits": 0,
@@ -67,10 +67,10 @@
       },
       {
         "id": "adaptive-navigation",
-        "title": "NavigationStack \u2192 NavigationSplitView",
+        "title": "Root NavigationStack \u2192 NavigationSplitView",
         "tier": "review",
-        "files": 24,
-        "edits": 24,
+        "files": 28,
+        "edits": 28,
         "newFiles": 0
       },
       {
@@ -107,16 +107,16 @@
         "id": "screen-bounds",
         "title": "Replace UIScreen.main.bounds",
         "tier": "review",
-        "files": 0,
-        "edits": 0,
+        "files": 1,
+        "edits": 1,
         "newFiles": 0
       },
       {
         "id": "adaptive-navigation",
-        "title": "NavigationStack \u2192 NavigationSplitView",
+        "title": "Root NavigationStack \u2192 NavigationSplitView",
         "tier": "review",
-        "files": 2,
-        "edits": 2,
+        "files": 0,
+        "edits": 0,
         "newFiles": 0
       },
       {
@@ -159,7 +159,7 @@
       },
       {
         "id": "adaptive-navigation",
-        "title": "NavigationStack \u2192 NavigationSplitView",
+        "title": "Root NavigationStack \u2192 NavigationSplitView",
         "tier": "review",
         "files": 0,
         "edits": 0,
@@ -205,7 +205,7 @@
       },
       {
         "id": "adaptive-navigation",
-        "title": "NavigationStack \u2192 NavigationSplitView",
+        "title": "Root NavigationStack \u2192 NavigationSplitView",
         "tier": "review",
         "files": 0,
         "edits": 0,
@@ -251,7 +251,7 @@
       },
       {
         "id": "adaptive-navigation",
-        "title": "NavigationStack \u2192 NavigationSplitView",
+        "title": "Root NavigationStack \u2192 NavigationSplitView",
         "tier": "review",
         "files": 0,
         "edits": 0,

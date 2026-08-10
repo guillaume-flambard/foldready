@@ -28,34 +28,89 @@ enum Transforms {
         var edits: [FileEdit] = []
         var notes: [String] = []
         let subclass = try? NSRegularExpression(pattern: #"class\s+\w+\s*:\s*[^\{]*UITabBarController"#, options: [])
-        let superCall = "super.viewDidLoad()"
-        let override = "override func viewDidLoad()"
+        let deploy = deploymentTarget(input.root)
 
         for file in input.swiftFiles {
-            guard let subclass, subclass.firstMatch(in: file.content, range: NSRange(file.content.startIndex..., in: file.content)) != nil else { continue }
+            guard let subclass,
+                  subclass.firstMatch(in: file.content, range: NSRange(file.content.startIndex..., in: file.content)) != nil else { continue }
             if file.content.contains("tabSidebar") || file.content.contains("preferredPlacement") {
                 notes.append("\(file.path): sidebar already opted in.")
                 continue
             }
-            var lines = file.content.components(separatedBy: .newlines)
-            var insertAt: Int?
-            if let idx = lines.firstIndex(where: { $0.range(of: superCall) != nil }) {
-                insertAt = idx + 1
-            } else if let idx = lines.firstIndex(where: { $0.range(of: override) != nil }) {
-                insertAt = idx + 1
+            let lines = file.content.components(separatedBy: .newlines)
+            let classIndices = lines.enumerated().compactMap { idx, line in
+                subclass.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)) != nil ? idx : nil
             }
-            if let at = insertAt {
-                let indentation = lines[at - 1].prefix(while: { $0 == " " || $0 == "\t" })
-                lines.insert("\(indentation)mode = .tabSidebar", at: at)
-                lines.insert("\(indentation)sidebar.preferredPlacement = .sidebar", at: at + 1)
-                edits.append(FileEdit(path: file.path, before: file.content, after: lines.joined(separator: "\n")))
-                notes.append("\(file.path): tab bar becomes a sidebar on wide canvases (mode = .tabSidebar).")
-            } else {
-                notes.append("\(file.path): add a viewDidLoad override to set mode = .tabSidebar and sidebar.preferredPlacement = .sidebar.")
+            var inserts: [(at: Int, content: [String])] = []
+            for (ci, clsIdx) in classIndices.enumerated() {
+                let regionEnd = (ci + 1 < classIndices.count) ? classIndices[ci + 1] : lines.count
+                var at: Int?
+                for j in clsIdx..<regionEnd {
+                    if lines[j].contains("override func viewDidLoad()") || lines[j].contains("super.viewDidLoad()") {
+                        at = j + 1
+                        break
+                    }
+                }
+                if let at {
+                    let indent = lines[at - 1].prefix(while: { $0 == " " || $0 == "\t" })
+                    let content: [String]
+                    if needsAvailability(deploy) {
+                        content = [
+                            "\(indent)if #available(iOS 26.0, *) {",
+                            "\(indent)\tmode = .tabSidebar",
+                            "\(indent)\tsidebar.preferredPlacement = .sidebar",
+                            "\(indent)}",
+                        ]
+                    } else {
+                        content = [
+                            "\(indent)mode = .tabSidebar",
+                            "\(indent)sidebar.preferredPlacement = .sidebar",
+                        ]
+                    }
+                    inserts.append((at, content))
+                } else {
+                    notes.append("\(file.path): UITabBarController subclass without a viewDidLoad — add one to set mode = .tabSidebar.")
+                }
             }
+            if inserts.isEmpty { continue }
+            var out = lines
+            for ins in inserts.sorted(by: { $0.at > $1.at }) {
+                out.insert(contentsOf: ins.content, at: ins.at)
+            }
+            edits.append(FileEdit(path: file.path, before: file.content, after: out.joined(separator: "\n")))
+            notes.append("\(file.path): tab bar becomes a sidebar on wide canvases (mode = .tabSidebar).\(needsAvailability(deploy) ? " Guarded with #available(iOS 26.0, *)." : "")")
         }
         return Patch(transformId: "sidebar-optin", title: "UIKit tab bar → sidebar opt-in",
             tier: .safe, edits: edits, newFiles: [:], notes: notes)
+    }
+
+    private static func deploymentTarget(_ root: String) -> Double? {
+        let fm = FileManager.default
+        guard let files = try? fm.contentsOfDirectory(atPath: root) else { return nil }
+        for f in files where f.hasSuffix(".pbxproj") {
+            let full = (root as NSString).appendingPathComponent(f)
+            guard let data = fm.contents(atPath: full), let s = String(data: data, encoding: .utf8) else { continue }
+            guard let re = try? NSRegularExpression(pattern: #"IPHONEOS_DEPLOYMENT_TARGET\s*=\s*([\d.]+);"#, options: []),
+                  let m = re.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)),
+                  let r = Range(m.range(at: 1), in: s) else { continue }
+            return Double(s[r])
+        }
+        return nil
+    }
+
+    private static func needsAvailability(_ target: Double?) -> Bool {
+        guard let target else { return true } // unknown target → safe default
+        return target < 26.0
+    }
+
+    /// Pick the main app Info.plist: prefer a root-level "Info.plist", else one
+    /// carrying CFBundleExecutable, else the first non-Tests plist.
+    private static func bestPlist(_ plists: [FileContent]) -> FileContent? {
+        let candidates = plists.filter { !$0.path.contains("Tests") }
+        if let rootInfo = candidates.first(where: { ($0.path as NSString).lastPathComponent == "Info.plist"
+            && ($0.path as NSString).pathComponents.count <= 2 }) { return rootInfo }
+        if let executable = candidates.first(where: { $0.content.contains("CFBundleExecutable") }) { return executable }
+        return candidates.first
     }
 
     // MARK: - Review tier
@@ -114,7 +169,7 @@ enum Transforms {
 
         var edits: [FileEdit] = []
         var notes: [String] = []
-        if let plist = input.plists.first(where: { !$0.path.contains("Tests") }) {
+        if let plist = bestPlist(input.plists) {
             if !plist.content.contains("UIApplicationSceneManifest") {
                 let after = plist.content.replacingOccurrences(
                     of: #"</dict>\s*</plist>"#,
@@ -123,6 +178,8 @@ enum Transforms {
                 edits.append(FileEdit(path: plist.path, before: plist.content, after: after))
                 notes.append("Added UIApplicationSceneManifest to \(plist.path).")
             }
+        } else {
+            notes.append("No Info.plist found — add the UIApplicationSceneManifest manually (see TN3187).")
         }
         notes.append("UIScene lifecycle is REQUIRED from the iOS 27 SDK — apps without it fail to launch (TN3187).")
         notes.append("Set the real rootViewController in SceneDelegate (currently a placeholder).")
@@ -133,9 +190,9 @@ enum Transforms {
     static func screenBounds(_ input: TransformInput) -> Patch {
         var edits: [FileEdit] = []
         var notes: [String] = []
-        // Exact full-bleed patterns that are safe to replace.
-        let fullBoth = try? NSRegularExpression(pattern: #"\.frame\(width:\s*UIScreen\.main\.bounds\.width\s*,\s*height:\s*UIScreen\.main\.bounds\.height\s*\)"#, options: [])
-        let fullWidth = try? NSRegularExpression(pattern: #"\.frame\(width:\s*UIScreen\.main\.bounds\.width\s*\)"#, options: [])
+        // Exact full-bleed patterns that are safe to replace (incl. .size variants).
+        let fullBoth = try? NSRegularExpression(pattern: #"\.frame\(width:\s*UIScreen\.main\.bounds(?:\.size)?\.width\s*,\s*height:\s*UIScreen\.main\.bounds(?:\.size)?\.height\s*\)"#, options: [])
+        let fullWidth = try? NSRegularExpression(pattern: #"\.frame\(width:\s*UIScreen\.main\.bounds(?:\.size)?\.width\s*\)"#, options: [])
         let boundsRead = try? NSRegularExpression(pattern: #"UIScreen\.main\.bounds"#, options: [])
 
         for file in input.swiftFiles {
@@ -163,28 +220,52 @@ enum Transforms {
     static func adaptiveNavigation(_ input: TransformInput) -> Patch {
         var edits: [FileEdit] = []
         var notes: [String] = []
-        let stackOpen = "NavigationStack {"
+        let bodyView = "var body: some View {"
+        let bodyScene = "var body: some Scene {"
 
         for file in input.swiftFiles {
-            guard file.content.contains(stackOpen), !file.content.contains("NavigationSplitView") else { continue }
             let whole = file.content
-            guard let openIdx = whole.range(of: stackOpen)?.lowerBound else { continue }
-            guard let closeIdx = matchingCloseBrace(whole, openBrace: openIdx) else {
-                notes.append("\(file.path): could not brace-match the root NavigationStack; wrap manually.")
-                continue
+            guard whole.contains("NavigationStack"), !whole.contains("NavigationSplitView") else { continue }
+            var searchStart = whole.startIndex
+            var wrappedOne = false
+
+            while true {
+                let viewRange = whole.range(of: bodyView, options: [.literal], range: searchStart..<whole.endIndex)
+                let sceneRange = whole.range(of: bodyScene, options: [.literal], range: searchStart..<whole.endIndex)
+                guard let bodyRange = viewRange ?? sceneRange else { break }
+                let openBrace = whole.index(bodyRange.upperBound, offsetBy: -1)
+                guard whole[openBrace] == "{" else { break }
+                guard let bodyClose = Lex.matchingCloseBrace(whole, openBrace: openBrace) else { break }
+
+                let triviaEnd = Lex.skipTrivia(from: whole.index(after: openBrace), in: whole)
+                let bodyInnerEnd = bodyClose
+                guard triviaEnd < bodyInnerEnd, Lex.word("NavigationStack", at: triviaEnd, in: whole) else {
+                    notes.append("\(file.path): body root is not a bare NavigationStack (TabView/ZStack/Group/sheet) — left as-is.")
+                    searchStart = bodyClose
+                    continue
+                }
+                guard let stackOpen = whole[triviaEnd..<bodyInnerEnd].firstIndex(of: "{"),
+                      let stackClose = Lex.matchingCloseBrace(whole, openBrace: stackOpen) else { break }
+
+                if !wrappedOne {
+                    let prefix = String(whole[..<triviaEnd])
+                    let block = String(whole[triviaEnd...stackClose])
+                    let suffix = String(whole[whole.index(after: stackClose)...])
+                    let after = prefix + "NavigationSplitView { " + block + " } detail: { Color.clear }" + suffix
+                    edits.append(FileEdit(path: file.path, before: whole, after: after))
+                    wrappedOne = true
+                    notes.append("\(file.path): wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.")
+                    notes.append("\(file.path): move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.")
+                } else {
+                    notes.append("\(file.path): additional root NavigationStack in another body — one wrap per file, left as-is.")
+                }
+                searchStart = bodyClose
             }
-            let prefix = String(whole[..<openIdx])
-            let block = String(whole[openIdx...closeIdx])
-            let suffix = String(whole[whole.index(after: closeIdx)...])
-            let after = prefix + "NavigationSplitView { " + block + " } detail: { Color.clear }" + suffix
-            edits.append(FileEdit(path: file.path, before: whole, after: after))
-            notes.append("\(file.path): wrapped the root NavigationStack in a NavigationSplitView — the list becomes the sidebar, detail is a placeholder.")
-            notes.append("\(file.path): move selection-driven content into the detail column and add .adaptiveSidebar() at the scene root.")
         }
-        if edits.isEmpty {
-            notes.append("No top-level NavigationStack without an existing NavigationSplitView found.")
+        if edits.isEmpty && notes.isEmpty {
+            notes.append("No root NavigationStack without an existing NavigationSplitView found.")
         }
-        return Patch(transformId: "adaptive-navigation", title: "NavigationStack → NavigationSplitView",
+        return Patch(transformId: "adaptive-navigation", title: "Root NavigationStack → NavigationSplitView",
             tier: .review, edits: edits, newFiles: [:], notes: notes)
     }
 
@@ -222,30 +303,106 @@ enum Transforms {
             notes: notes.isEmpty ? ["No hardcoded frames detected."] : notes)
     }
 
-    // MARK: - Helpers
+    // MARK: - Swift lexer helpers (comment- and string-aware)
 
-    static func matchingCloseBrace(_ s: String, openBrace: String.Index) -> String.Index? {
-        var depth = 0
-        var inString = false
-        var escape = false
-        var i = s.index(after: openBrace)
-        while i < s.endIndex {
-            let c = s[i]
-            if inString {
-                if escape { escape = false }
-                else if c == "\\" { escape = true }
-                else if c == "\"" { inString = false }
-            } else {
-                if c == "\"" { inString = true }
-                else if c == "{" { depth += 1 }
-                else if c == "}" {
-                    if depth == 0 { return i }
-                    depth -= 1
+    enum Lex {
+        private enum State { case code, lineComment, blockComment, string, multiline, char }
+
+        /// Skip whitespace and comments (// and /* */) from `i`.
+        static func skipTrivia(from i: String.Index, in s: String) -> String.Index {
+            var i = i
+            let end = s.endIndex
+            while i < end {
+                let c = s[i]
+                if c == " " || c == "\t" || c == "\n" || c == "\r" { i = s.index(after: i); continue }
+                if c == "/", s.index(after: i) < end {
+                    let j = s.index(after: i)
+                    let c2 = s[j]
+                    if c2 == "/" {
+                        while i < end, s[i] != "\n" { i = s.index(after: i) }
+                        continue
+                    }
+                    if c2 == "*" {
+                        i = s.index(after: j)
+                        while i < end {
+                            if s[i] == "*", s.index(after: i) < end, s[s.index(after: i)] == "/" {
+                                i = s.index(after: s.index(after: i))
+                                break
+                            }
+                            i = s.index(after: i)
+                        }
+                        continue
+                    }
                 }
+                break
             }
-            i = s.index(after: i)
+            return i
         }
-        return nil
+
+        /// True if the identifier starting exactly at `i` equals `word` (word boundaries).
+        static func word(_ word: String, at i: String.Index, in s: String) -> Bool {
+            guard let r = s.range(of: word, options: [.literal], range: i..<s.endIndex), r.lowerBound == i else { return false }
+            let after = r.upperBound
+            if after < s.endIndex {
+                let c = s[after]
+                if c.isLetter || c.isNumber || c == "_" { return false }
+            }
+            return true
+        }
+
+        /// Match the `}` that closes the `{` at `openBrace`, ignoring braces inside
+        /// strings, character literals, multi-line strings and comments.
+        static func matchingCloseBrace(_ s: String, openBrace: String.Index) -> String.Index? {
+            var depth = 0
+            var i = s.index(after: openBrace)
+            let end = s.endIndex
+            var st: State = .code
+
+            while i < end {
+                let c = s[i]
+                switch st {
+                case .lineComment:
+                    if c == "\n" { st = .code }
+                case .blockComment:
+                    if c == "*", s.index(after: i) < end, s[s.index(after: i)] == "/" {
+                        st = .code
+                        i = s.index(after: i)
+                    }
+                case .string:
+                    if c == "\\" { i = s.index(after: i) }
+                    else if c == "\"" { st = .code }
+                case .char:
+                    if c == "\\" { i = s.index(after: i) }
+                    else if c == "'" { st = .code }
+                case .multiline:
+                    if c == "\"", s.index(after: i) < end, s[s.index(after: i)] == "\"" {
+                        let k = s.index(after: s.index(after: i))
+                        if k < end, s[k] == "\"" { st = .code; i = k }
+                    }
+                case .code:
+                    if c == "\"" {
+                        if s.index(after: i) < end, s[s.index(after: i)] == "\"" {
+                            let k = s.index(after: s.index(after: i))
+                            if k < end, s[k] == "\"" { st = .multiline; i = k }
+                            else { st = .string }
+                        } else { st = .string }
+                    } else if c == "'" {
+                        st = .char
+                    } else if c == "/", s.index(after: i) < end {
+                        let j = s.index(after: i)
+                        if s[j] == "/" { st = .lineComment; i = j }
+                        else if s[j] == "*" { st = .blockComment; i = j }
+                    } else if c == "{" {
+                        depth += 1
+                    } else if c == "}" {
+                        if depth == 0 { return i }
+                        depth -= 1
+                    }
+                }
+                i = s.index(after: i)
+            }
+            return nil
+        }
     }
 
     static func matches(_ regex: NSRegularExpression?, _ s: String) -> Bool {
