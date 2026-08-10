@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldReady - logo concepts</title>
+<style>
+  :root { --ink:#0F172A; --panel:#1E293B; --line:#334155; --txt:#E2E8F0; --dim:#94A3B8; --accent:#0EA5E9; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ink); color:var(--txt); font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  header { padding:40px 40px 8px; }
+  header h1 { margin:0; font-size:28px; letter-spacing:-0.02em; }
+  header p { color:var(--dim); margin:8px 0 0; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:24px; padding:32px 40px 64px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:20px; transition:transform .15s ease, border-color .15s ease; cursor:pointer; }
+  .card:hover { transform:translateY(-3px); border-color:var(--accent); }
+  .tile { display:grid; place-items:center; aspect-ratio:1/1; margin-bottom:14px; border-radius:12px; background:#0B1220; overflow:hidden; }
+  .tile img { width:88%; height:88%; object-fit:contain; }
+  .num { font-size:12px; font-weight:700; color:var(--accent); letter-spacing:.08em; text-transform:uppercase; }
+  .name { margin:4px 0 6px; font-size:16px; font-weight:600; }
+  .note { color:var(--dim); font-size:13px; line-height:1.45; }
+  footer { padding:0 40px 48px; color:var(--dim); font-size:13px; }
+  footer code { background:#0B1220; padding:2px 6px; border-radius:6px; }
+  .selected { border-color:#22C55E; }
+</style>
+</head>
+<body>
+<header>
+  <h1>FoldReady - logo concepts</h1>
+  <p>8 directions for the mark. Click a tile to toggle it as the working pick. Same palette everywhere: ink #0F172A, screen blue #0EA5E9, ready green #22C55E.</p>
+</header>
+<div class="grid" id="grid"></div>
+<footer>
+  Assets live in <code>~/projects/foldready/brand/</code> as standalone SVGs (512x512, work down to favicon size). Render them with a dark or light background: each mark sits on its own ink rounded-square base.
+</footer>
+<script>
+  const concepts = [
+    { f:"01-fold-panel.svg", name:"Fold Panel", note:"Book-style phone opening. Left panel closed, right panel tilted up on the hinge. The literal device." },
+    { f:"02-hinge-check.svg", name:"Hinge Check", note:"The 7.8 inch inner display split by the hinge, with a green ready check on the open half. Device + score in one mark." },
+    { f:"03-fold-letter-f.svg", name:"Folded F", note:"The letter F as folding panels: the top arm and the middle arm fold out of the vertical bar. Wordmark in a mark." },
+    { f:"04-accordion-fold.svg", name:"Accordion Fold", note:"Three panels fanning from a spine, like a folded brochure. Pure motion, no device, no letter. Abstract and soft." },
+    { f:"05-gauge-score.svg", name:"Gauge Score", note:"The score side: a 270 degree gauge at 80%, with a folded pair of panels as the base. Owns the Fold-Ready Score." },
+    { f:"06-panel-expand.svg", name:"Panel Expand", note:"Small folded phone on the left, wide unfolded canvas on the right, ready arrow between. The service promise: ready to expand." },
+    { f:"07-fold-check.svg", name:"Fold Check", note:"A screen panel split by the fold line, with a check and a corner fold. Minimal, audit-like, very legible small." },
+    { f:"08-origami-f.svg", name:"Origami Fold", note:"An origami diamond folded on a diagonal crease, an abstract F cut in. The most distinctive, least literal." }
+  ];
+  const grid = document.getElementById("grid");
+  concepts.forEach(c => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="tile"><img src="${c.f}" alt="${c.name}"></div>
+      <div class="num">${c.f.slice(0,2)}</div>
+      <div class="name">${c.name}</div>
+      <div class="note">${c.note}</div>`;
+    card.addEventListener("click", () => {
+      grid.querySelectorAll(".card").forEach(x => x.classList.remove("selected"));
+      card.classList.add("selected");
+    });
+    grid.appendChild(card);
+  });
+</script>
+</body>
+</html>

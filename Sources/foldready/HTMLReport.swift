@@ -1,0 +1,131 @@
+import Foundation
+
+enum HTMLReport {
+
+    static func render(_ result: AuditResult) -> String {
+        let outcomes = result.outcomes
+            .map { outcomeRow($0) }
+            .joined(separator: "\n")
+        let findings = result.findings.isEmpty
+            ? "<p class=\"ok\">No fold-blocking findings detected.</p>"
+            : "<table><thead><tr><th>Severity</th><th>Check</th><th>Finding</th><th>File</th></tr></thead><tbody>"
+                + result.findings.map { findingRow($0) }.joined(separator: "\n")
+                + "</tbody></table>"
+
+        let gradeColor: String
+        switch result.grade {
+        case "A": gradeColor = "#22C55E"
+        case "B": gradeColor = "#84CC16"
+        case "C": gradeColor = "#FACC15"
+        case "D": gradeColor = "#F97316"
+        default: gradeColor = "#EF4444"
+        }
+
+        let f = ISO8601DateFormatter()
+        return """
+        <!doctype html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>FoldReady - \(esc(result.appName))</title>
+        <style>
+          :root { --ink:#0F172A; --panel:#1E293B; --line:#334155; --txt:#E2E8F0; --dim:#94A3B8; --blue:#0EA5E9; --green:#22C55E; }
+          * { box-sizing:border-box; }
+          body { margin:0; background:var(--ink); color:var(--txt); font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+          .wrap { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+          header { display:flex; align-items:center; gap:20px; border-bottom:1px solid var(--line); padding-bottom:24px; }
+          header img { width:64px; height:64px; border-radius:14px; }
+          h1 { margin:0; font-size:26px; letter-spacing:-0.02em; }
+          .sub { color:var(--dim); margin-top:4px; font-size:14px; }
+          .scorebox { margin-left:auto; text-align:center; }
+          .score { font-size:44px; font-weight:800; line-height:1; }
+          .grade { display:inline-block; margin-top:6px; padding:2px 10px; border-radius:8px; font-weight:800; color:#052E16; background:\(gradeColor); }
+          h2 { margin:36px 0 12px; font-size:18px; }
+          .bars { display:grid; gap:10px; }
+          .bar { display:grid; grid-template-columns:220px 1fr 64px; align-items:center; gap:12px; }
+          .bar .name { color:var(--txt); font-size:14px; }
+          .bar .track { background:var(--panel); border:1px solid var(--line); border-radius:99px; height:14px; overflow:hidden; }
+          .bar .fill { height:100%; border-radius:99px; background:var(--blue); }
+          .bar .val { text-align:right; font-variant-numeric:tabular-nums; color:var(--dim); font-size:13px; }
+          table { width:100%; border-collapse:collapse; font-size:13px; }
+          th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+          th { color:var(--dim); font-weight:600; }
+          .sev { font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:.05em; }
+          .critical { color:#EF4444; } .major { color:#F97316; } .minor { color:#FACC15; } .info { color:#94A3B8; }
+          code { background:#0B1220; padding:1px 5px; border-radius:6px; font-size:12px; }
+          .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+          .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+          .card .k { color:var(--dim); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+          .card .v { font-size:22px; font-weight:700; margin-top:4px; }
+          .ok { color:var(--green); }
+          footer { margin-top:48px; color:var(--dim); font-size:12px; }
+        </style>
+        </head>
+        <body>
+        <div class="wrap">
+          <header>
+            <img src="data:image/svg+xml;base64,\(logoBase64())" alt="FoldReady mark">
+            <div>
+              <h1>\(esc(result.appName))</h1>
+              <div class="sub">Fold-Ready audit · \(f.string(from: result.generatedAt)) · \(esc(result.root))</div>
+            </div>
+            <div class="scorebox">
+              <div class="score">\(Int(result.totalScore))</div>
+              <div class="grade">\(result.grade)</div>
+            </div>
+          </header>
+
+          <h2>Summary</h2>
+          <div class="cards">
+            <div class="card"><div class="k">Risk</div><div class="v">\(result.risk)</div></div>
+            <div class="card"><div class="k">Est. porting effort</div><div class="v">\(result.hoursEstimate) h</div></div>
+            <div class="card"><div class="k">Swift files</div><div class="v">\(result.stats.swiftFiles)</div></div>
+          </div>
+
+          <h2>Score breakdown</h2>
+          <div class="bars">
+            \(outcomes)
+          </div>
+
+          <h2>Findings</h2>
+          \(findings)
+
+          <footer>Generated by FoldReady. Parallel View keeps every app running on the iPhone Fold; this score measures how good it looks, not whether it crashes.</footer>
+        </div>
+        </body>
+        </html>
+        """
+    }
+
+    private static func outcomeRow(_ o: CheckOutcome) -> String {
+        let pct = Int((o.score * 100).rounded())
+        return """
+        <div class="bar">
+          <div class="name">\(esc(o.title))</div>
+          <div class="track"><div class="fill" style="width:\(pct)%"></div></div>
+          <div class="val">\(pct)%</div>
+        </div>
+        """
+    }
+
+    private static func findingRow(_ f: Finding) -> String {
+        let file = f.file.map { esc($0) } ?? "—"
+        let line = f.line.map { ":\($0)" } ?? ""
+        return "<tr><td class=\"sev \(f.severity.rawValue)\">\(f.severity.rawValue)</td><td>\(esc(f.check))</td><td>\(esc(f.message))</td><td><code>\(file)\(line)</code></td></tr>"
+    }
+
+    private static func logoBase64() -> String {
+        let svg = """
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0F172A"/><rect x="104" y="96" width="304" height="320" rx="40" fill="#1E293B"/><rect x="120" y="112" width="272" height="288" rx="28" fill="#334155"/><rect x="120" y="112" width="136" height="288" rx="28" fill="#0F172A"/><rect x="128" y="120" width="120" height="272" rx="20" fill="#475569"/><rect x="264" y="112" width="128" height="288" rx="28" fill="#334155"/><rect x="272" y="120" width="112" height="272" rx="20" fill="#0EA5E9"/><rect x="248" y="96" width="16" height="320" fill="#0F172A"/><circle cx="392" cy="400" r="40" fill="#22C55E"/><path d="M376 400 L388 412 L410 388" fill="none" stroke="#052E16" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        """
+        return Data(svg.utf8).base64EncodedString()
+    }
+
+    private static func esc(_ s: String) -> String {
+        s.replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+    }
+}
