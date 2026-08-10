@@ -5,6 +5,7 @@
     {
       "edits" : 1,
       "files" : 2,
+      "hasPatch" : true,
       "id" : "scene-lifecycle",
       "newFiles" : 1,
       "notes" : [
@@ -18,6 +19,7 @@
     {
       "edits" : 0,
       "files" : 0,
+      "hasPatch" : false,
       "id" : "screen-bounds",
       "newFiles" : 0,
       "notes" : [
@@ -31,6 +33,7 @@
     {
       "edits" : 0,
       "files" : 0,
+      "hasPatch" : false,
       "id" : "adaptive-navigation",
       "newFiles" : 0,
       "notes" : [
@@ -42,6 +45,7 @@
     {
       "edits" : 0,
       "files" : 0,
+      "hasPatch" : false,
       "id" : "state-preservation",
       "newFiles" : 0,
       "notes" : [
@@ -83,6 +87,7 @@
     {
       "edits" : 0,
       "files" : 0,
+      "hasPatch" : false,
       "id" : "dehardcode-frames",
       "newFiles" : 0,
       "notes" : [

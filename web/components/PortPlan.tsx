@@ -1,10 +1,21 @@
 import portsData from "@/lib/ports-data.json";
+import { CopyButton } from "@/components/CopyButton";
 
 const TIER_LABEL: Record<string, string> = { safe: "SAFE", review: "REVIEW", manual: "MANUAL" };
+const TIER_LETTER: Record<string, string> = { safe: "s", review: "r", manual: "m" };
 
-export function PortPlan({ slug }: { slug: string }) {
-  const entry = (portsData as Record<string, { hasPatch: boolean; transforms: { id: string; title: string; tier: string; files: number }[] }>)[slug];
+type Transform = { id: string; title: string; tier: string; files: number; hasPatch?: boolean };
+
+export function PortPlan({ slug, repoPath = "" }: { slug: string; repoPath?: string }) {
+  const entry = (portsData as Record<string, { hasPatch: boolean; transforms: Transform[] }>)[slug];
   if (!entry || entry.transforms.length === 0) return null;
+
+  const patchedTiers = [...new Set(entry.transforms.filter((t) => t.hasPatch).map((t) => t.tier))];
+  const tierLetters = patchedTiers.length ? patchedTiers.map((t) => TIER_LETTER[t] ?? "s").join("") : "srm";
+  const isGithub = repoPath.includes("/");
+  const applyCmd = isGithub
+    ? `git clone https://github.com/${repoPath} && foldready port ${repoPath.split("/").pop()} --apply --tiers ${tierLetters}`
+    : `foldready port ${repoPath || "<path-to-your-clone>"} --apply --tiers ${tierLetters}`;
 
   return (
     <section className="block" data-reveal style={{ borderBottom: 0 }}>
@@ -14,26 +25,47 @@ export function PortPlan({ slug }: { slug: string }) {
       </div>
       <p style={{ color: "var(--dim)", fontSize: 14, maxWidth: "60ch", marginBottom: 20 }}>
         Ready-to-review changes that move this app toward the foldable contract: scene
-        lifecycle, Parallel View opt-in, sidebar navigation. Review the diff, then apply
-        with <code>foldready port --apply</code>.
+        lifecycle, Parallel View opt-in, sidebar navigation. Review each diff, download a
+        patch, or apply them locally with the CLI.
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
         {entry.transforms.map((t) => (
           <div key={t.id} className="frow" style={{ gridTemplateColumns: "84px 1fr auto" }}>
             <span className={`tier ${t.tier}`}>{TIER_LABEL[t.tier] ?? t.tier}</span>
-            <span className="chk">{t.title} <span style={{ color: "var(--dim)" }}>· {t.files} file{t.files === 1 ? "" : "s"}</span></span>
-            <span />
+            <span className="chk">
+              {t.title} <span style={{ color: "var(--dim)" }}>· {t.files} file{t.files === 1 ? "" : "s"}</span>
+            </span>
+            {t.hasPatch ? (
+              <a href={`/ports/${slug}/patches/${t.id}.patch`} download style={{ color: "var(--blue)", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
+                Patch ↓
+              </a>
+            ) : (
+              <span style={{ color: "var(--dim)", fontSize: 12, whiteSpace: "nowrap" }}>guidance</span>
+            )}
           </div>
         ))}
       </div>
       <div className="band-acts" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
         {entry.hasPatch ? (
-          <a className="btn btn-pri" href={`/ports/${slug}/port.patch`} download>Download port patch</a>
+          <a className="btn btn-pri" href={`/ports/${slug}/port.patch`} download>Download all patches</a>
         ) : (
           <span className="chip ready">guidance only — no patch edits to apply</span>
         )}
         <a className="btn btn-sec" href={`/ports/${slug}/porting-report.md`} download>Full porting report</a>
       </div>
+      {entry.hasPatch && (
+        <div className="copybox" style={{ marginTop: 18, maxWidth: 640 }}>
+          <code>{applyCmd}</code>
+          <CopyButton text={applyCmd} label="Copy apply" />
+        </div>
+      )}
+      {entry.hasPatch && (
+        <p className="spec" style={{ marginTop: 8 }}>
+          {isGithub
+            ? "Clones the repo and runs the safe + review transforms, then re-scores."
+            : "Runs the safe + review transforms on your tree and re-scores (replace the path with your repo)."}
+        </p>
+      )}
     </section>
   );
 }

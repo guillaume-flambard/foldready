@@ -157,6 +157,15 @@ func main() {
                 let patchPath = (dir as NSString).appendingPathComponent("port.patch")
                 try? patch.write(toFile: patchPath, atomically: true, encoding: .utf8)
             }
+            // Per-transform patches (downloadable/applyable individually).
+            if !result.plan.patches.isEmpty {
+                let patchesDir = (dir as NSString).appendingPathComponent("patches")
+                try? FileManager.default.createDirectory(atPath: patchesDir, withIntermediateDirectories: true)
+                for p in result.plan.patches where !p.diff.isEmpty {
+                    let path = (patchesDir as NSString).appendingPathComponent("\(p.transformId).patch")
+                    try? p.diff.write(toFile: path, atomically: true, encoding: .utf8)
+                }
+            }
             if opts.json {
                 let jsonPath = (dir as NSString).appendingPathComponent("porting-report.json")
                 let patches = result.plan.patches.map { p -> [String: Any] in
@@ -167,6 +176,7 @@ func main() {
                         "files": p.edits.count + p.newFiles.count,
                         "edits": p.edits.count,
                         "newFiles": p.newFiles.count,
+                        "hasPatch": !p.diff.isEmpty,
                         "notes": p.notes,
                     ]
                 }

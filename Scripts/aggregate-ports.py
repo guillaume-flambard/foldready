@@ -18,7 +18,8 @@ for pdir in sorted(PUB.iterdir()):
         "hasPatch": (pdir / "port.patch").exists(),
         "transforms": [
             {"id": t["id"], "title": t["title"], "tier": t["tier"],
-             "files": t["files"], "edits": t["edits"], "newFiles": t["newFiles"]}
+             "files": t["files"], "edits": t["edits"], "newFiles": t["newFiles"],
+             "hasPatch": (pdir / "patches" / f"{t['id']}.patch").exists()}
             for t in rep.get("patches", [])
         ],
     }

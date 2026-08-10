@@ -27,6 +27,9 @@ for spec in "$@"; do
     [[ -f "$staging/porting-report.md" ]] && cp "$staging/porting-report.md" "$PUB/$slug/"
     cp "$staging/porting-report.json" "$PUB/$slug/"
     [[ -f "$staging/port.patch" ]] && cp "$staging/port.patch" "$PUB/$slug/"
+    if [[ -d "$staging/patches" && -n "$(ls -A "$staging/patches" 2>/dev/null)" ]]; then
+      cp -R "$staging/patches" "$PUB/$slug/"
+    fi
     echo "exported $slug ($name)"
   else
     echo "no port plan for $repo"

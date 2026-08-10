@@ -173,7 +173,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         ))}
       </section>
 
-      <PortPlan slug={app.slug} />
+      <PortPlan slug={app.slug} repoPath={app.repo} />
 
       <section className="block" style={{ borderBottom: 0 }}>
         <div className="band">

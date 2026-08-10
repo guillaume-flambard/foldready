@@ -1,0 +1,224 @@
+--- a/IceCubesApp/App/Tabs/Settings/SettingsTab.swift
++++ b/IceCubesApp/App/Tabs/Settings/SettingsTab.swift
+@@ -36,1 +36,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -100,1 +100,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/Settings/AddAccountsView.swift
++++ b/IceCubesApp/App/Tabs/Settings/AddAccountsView.swift
+@@ -57,1 +57,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -158,1 +158,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift
++++ b/IceCubesApp/App/Tabs/TagGroup/EditTagGroupView.swift
+@@ -25,1 +25,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -78,1 +78,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/NavigationSheet.swift
++++ b/IceCubesApp/App/Tabs/NavigationSheet.swift
+@@ -17,1 +17,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -22,1 +22,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/NotificationTab.swift
++++ b/IceCubesApp/App/Tabs/NotificationTab.swift
+@@ -28,1 +28,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -50,1 +50,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/MessagesTab.swift
++++ b/IceCubesApp/App/Tabs/MessagesTab.swift
+@@ -20,1 +20,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -31,1 +31,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/NavigationTab.swift
++++ b/IceCubesApp/App/Tabs/NavigationTab.swift
+@@ -26,1 +26,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -45,1 +45,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/ExploreTab.swift
++++ b/IceCubesApp/App/Tabs/ExploreTab.swift
+@@ -18,1 +18,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -28,1 +28,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift
++++ b/IceCubesApp/App/Tabs/Timeline/AddRemoteTimelineView.swift
+@@ -26,1 +26,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -87,1 +87,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/Timeline/TimelineTab.swift
++++ b/IceCubesApp/App/Tabs/Timeline/TimelineTab.swift
+@@ -45,1 +45,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -61,1 +61,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Tabs/ProfileTab.swift
++++ b/IceCubesApp/App/Tabs/ProfileTab.swift
+@@ -19,1 +19,1 @@
++    NavigationSplitView { NavigationStack(path: $routerPath.path) {
+-    NavigationStack(path: $routerPath.path) {
+@@ -33,1 +33,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/IceCubesApp/App/Report/ReportView.swift
++++ b/IceCubesApp/App/Report/ReportView.swift
+@@ -19,1 +19,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -68,1 +68,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/MediaUI/Sources/MediaUI/MediaUIView.swift
++++ b/Packages/MediaUI/Sources/MediaUI/MediaUIView.swift
+@@ -15,1 +15,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -56,1 +56,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift
++++ b/Packages/Lists/Sources/Lists/AddAccounts/ListAddAccountView.swift
+@@ -21,1 +21,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -67,1 +67,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Lists/Sources/Lists/Edit/ListEditView.swift
++++ b/Packages/Lists/Sources/Lists/Edit/ListEditView.swift
+@@ -21,1 +21,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -110,1 +110,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Lists/Sources/Lists/Create/ListCreateView.swift
++++ b/Packages/Lists/Sources/Lists/Create/ListCreateView.swift
+@@ -23,1 +23,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -69,1 +69,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Account/Sources/Account/Filters/FiltersListView.swift
++++ b/Packages/Account/Sources/Account/Filters/FiltersListView.swift
+@@ -21,1 +21,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -89,1 +89,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Account/Sources/Account/Edit/EditRelationshipNoteView.swift
++++ b/Packages/Account/Sources/Account/Edit/EditRelationshipNoteView.swift
+@@ -21,1 +21,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -52,1 +52,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Account/Sources/Account/Edit/EditAccountView.swift
++++ b/Packages/Account/Sources/Account/Edit/EditAccountView.swift
+@@ -20,1 +20,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -54,1 +54,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Timeline/Sources/Timeline/View/TimelineContentFilterView.swift
++++ b/Packages/Timeline/Sources/Timeline/View/TimelineContentFilterView.swift
+@@ -18,1 +18,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -63,1 +63,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/Notifications/Sources/Notifications/List/NotificationsPolicyView.swift
++++ b/Packages/Notifications/Sources/Notifications/List/NotificationsPolicyView.swift
+@@ -15,1 +15,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -123,1 +123,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/StatusKit/Sources/StatusKit/History/StatusEditHistoryView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/History/StatusEditHistoryView.swift
+@@ -21,1 +21,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -63,1 +63,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/StatusKit/Sources/StatusKit/Editor/Drafts/DraftsListView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/Editor/Drafts/DraftsListView.swift
+@@ -18,1 +18,1 @@
++      NavigationSplitView { NavigationStack {
+-      NavigationStack {
+@@ -56,1 +56,1 @@
++      } } detail: { Color.clear }
+-      }
+--- a/Packages/StatusKit/Sources/StatusKit/Editor/Components/MediaEditView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/Editor/Components/MediaEditView.swift
+@@ -30,1 +30,1 @@
++      NavigationSplitView { NavigationStack {
+-      NavigationStack {
+@@ -126,1 +126,1 @@
++      } } detail: { Color.clear }
+-      }
+--- a/Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/Editor/Components/CustomEmojisView.swift
+@@ -17,1 +17,1 @@
++      NavigationSplitView { NavigationStack {
+-      NavigationStack {
+@@ -61,1 +61,1 @@
++      } } detail: { Color.clear }
+-      }
+--- a/Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/Editor/Components/LanguageSheetView.swift
+@@ -18,1 +18,1 @@
++      NavigationSplitView { NavigationStack {
+-      NavigationStack {
+@@ -41,1 +41,1 @@
++      } } detail: { Color.clear }
+-      }
+--- a/Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/Share/StatusRowShareAsImageView.swift
+@@ -18,1 +18,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -53,1 +53,1 @@
++    } } detail: { Color.clear }
+-    }
+--- a/Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift
++++ b/Packages/StatusKit/Sources/StatusKit/Share/StatusRowSelectableTextView.swift
+@@ -11,1 +11,1 @@
++    NavigationSplitView { NavigationStack {
+-    NavigationStack {
+@@ -25,1 +25,1 @@
++    } } detail: { Color.clear }
+-    }
