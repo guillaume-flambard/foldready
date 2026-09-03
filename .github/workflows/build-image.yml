@@ -5,7 +5,7 @@
 #
 # Genere depuis lab-infra/ci/build-dockerfile.yml — ne pas editer a la main,
 # relancer ./scripts/install-ci.sh <app>.
-name: build
+name: build foldready
 
 on:
   push:
@@ -13,7 +13,9 @@ on:
   workflow_dispatch: {}
 
 concurrency:
-  group: build-${{ github.ref }}
+  # le nom du workflow porte l'app (le depot weave en heberge deux, api et web) :
+  # avec un groupe commun elles s'annulaient l'une l'autre
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
