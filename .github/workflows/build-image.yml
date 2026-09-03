@@ -41,9 +41,14 @@ jobs:
           context: .
           file: Dockerfile
           push: true
+          # :sha part toujours. :latest UNIQUEMENT depuis main, sinon un
+          # workflow_dispatch lance depuis une branche de travail publierait
+          # l'image que l'agent du VPS deploie dans les deux minutes.
           tags: |
-            ghcr.io/guillaume-flambard/foldready:latest
             ghcr.io/guillaume-flambard/foldready:${{ github.sha }}
-          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            ${{ github.ref == 'refs/heads/main' && 'ghcr.io/guillaume-flambard/foldready:latest' || '' }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
