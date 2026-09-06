@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { APPS, GRADE_COLOR, type AppScore } from "@/lib/data";
+import { APPS, BLOCKED_APPS, GRADE_COLOR, type AppScore } from "@/lib/data";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { href } from "@/lib/href";
 
@@ -9,12 +9,13 @@ export default function LandingPage() {
     <main className="wrap">
       <header className="hero">
         <div>
-          <span className="kicker">Launching Sept 2026 · iOS 27</span>
-          <h1>Your iOS app, ready for the iPhone Fold.</h1>
+          <span className="kicker">iPhone Fold · 9 September 2026 · iOS 27</span>
+          <h1>Your iOS app, ready for a screen that changes size.</h1>
           <p className="lede">
-            A static + pixel audit that scores your app 0–100 against the foldable
-            requirements, estimates the port in hours, and ships it featured-ready on
-            the 7.8in inner display.
+            A static audit of your source tree. It reports the blocking facts first — an app
+            built against the iOS 27 SDK without the UIScene lifecycle does not launch —
+            then scores 0–100 how well the app uses a wide, resizable scene, and estimates
+            the work in hours.
           </p>
           <div className="ctas">
             <a className="btn btn-pri" href={href("/get-scored")}>Score my app free</a>
@@ -22,11 +23,11 @@ export default function LandingPage() {
           </div>
           <p className="proof-note">
             <span className="row">
-              <span className="mono" style={{ color: "var(--gA)" }}>91</span>
-              <span className="mono" style={{ color: "var(--gB)" }}>78</span>
-              <span className="mono" style={{ color: "var(--gC)" }}>59</span>
+              <span className="mono" style={{ color: "var(--gF)" }}>{BLOCKED_APPS.length}</span>
+              <span className="mono" style={{ color: "var(--dim)" }}>/</span>
+              <span className="mono">{APPS.length}</span>
             </span>
-            Open-source apps already indexed
+            Indexed open-source apps that do not launch on the iOS 27 SDK
           </p>
         </div>
         <div>
@@ -58,7 +59,7 @@ export default function LandingPage() {
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 16a7 7 0 1 1 14 0"/><path d="M12 16l4-5.5"/><circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>
             </span>
             <h3>Static audit</h3>
-            <p>Seven checks against the iOS 27 foldable requirements. You get a 0–100 Fold-Ready Score, a grade, and a port estimate in hours — in minutes, not weeks.</p>
+            <p>Blocking facts first, then four weighted checks against the iOS 27 adaptivity requirements. You get a 0–100 score, a grade whose meaning does not move, and an estimate in hours — in minutes, not weeks. Every check cites its Apple source.</p>
             <span className="tag">self-serve · free</span>
           </div>
           <div className="ocard">
