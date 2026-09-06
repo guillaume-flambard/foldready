@@ -1,20 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { APPS, type Grade } from "@/lib/data";
+import { APPS, BLOCKED_APPS, GRADE_MEANING, type Grade } from "@/lib/data";
 import { ScoreCard } from "@/components/ScoreCard";
 import { href } from "@/lib/href";
 
 type SortKey = "score" | "hours" | "name";
 type Filter = "all" | Grade;
 
-const GRADES: { g: Grade; label: string }[] = [
-  { g: "A", label: "ready · featured-grade" },
-  { g: "B", label: "good · some polish needed" },
-  { g: "C", label: "functional · not at home" },
-  { g: "D", label: "visibly squeezed" },
-  { g: "F", label: "needs a real port" },
-];
+const GRADES: Grade[] = ["A", "B", "C", "D", "F"];
 
 export function RankingClient() {
   const [sort, setSort] = useState<SortKey>("score");
@@ -35,19 +29,25 @@ export function RankingClient() {
         <span className="kicker">Independent index · 7.8in inner display</span>
         <h1>Fold-Ready Index</h1>
         <p className="lede">
-          These scores measure how well an app uses a wide, resizable scene: sidebar
-          navigation, layout that reflows, state that survives a resize. The index audits
-          well-known open-source apps so you can see the difference a few hours of work
-          makes. Every check cites the Apple source it is derived from.
+          Twenty well-known open-source iOS apps, audited with the FoldReady CLI. The score
+          measures what an app does with a wide, resizable scene: sidebar navigation, layout
+          that reflows, size classes instead of device checks, state that survives a resize.
+          Every check cites the Apple source it is derived from, and the grade bands mean the
+          same thing whenever the audit ran.
+        </p>
+        <p className="lede" style={{ marginTop: 12 }}>
+          <b>{BLOCKED_APPS.length} of {APPS.length} do not launch at all</b> when built against
+          the iOS 27 SDK: they have no UIScene lifecycle. That is reported before any score,
+          because it is not a matter of degree.
         </p>
         <div className="legend">
-          {GRADES.map(({ g }) => (
-            <span key={g}><b className="g" style={{ color: `var(--g${g})` }}>{g}</b> {g === "A" ? "ready · featured-grade" : g === "B" ? "good · some polish needed" : g === "C" ? "functional · not at home" : g === "D" ? "visibly squeezed" : "needs a real port"}</span>
+          {GRADES.map((g) => (
+            <span key={g}><b className="g" style={{ color: `var(--g${g})` }}>{g}</b> {GRADE_MEANING[g]}</span>
           ))}
         </div>
         <p className="meta">
           <span>{list.length} app{list.length === 1 ? "" : "s"} audited</span>
-          <span>static + captured-layout · updated with the FoldReady CLI</span>
+          <span>result contract v2 · regenerate with Scripts/generate-index.py</span>
         </p>
       </div>
 
@@ -60,7 +60,7 @@ export function RankingClient() {
         </select>
         <div className="fchips" role="group" aria-label="Filter by grade">
           <button type="button" className="fc" aria-pressed={filter === "all"} onClick={() => setFilter("all")}>All</button>
-          {(["A", "B", "C"] as Grade[]).map((g) => (
+          {(["A", "B", "C", "D", "F"] as Grade[]).map((g) => (
             <button key={g} type="button" className="fc" aria-pressed={filter === g} onClick={() => setFilter(g)}>
               <span className="g" style={{ color: `var(--g${g})` }}>{g}</span>
             </button>
@@ -79,8 +79,8 @@ export function RankingClient() {
         <div>
           <h2>Get your app scored</h2>
           <p>
-            A static + pixel audit of your iOS source tree: 7 checks against the iOS 27
-            foldable requirements, a captured-layout pass, and an hours estimate for the port.
+            A static audit of your iOS source tree: the blocking facts first, then four
+            weighted checks against the iOS 27 adaptivity requirements, with an hours estimate.
           </p>
         </div>
         <a className="btn btn-pri" href={href("/get-scored")}>Get your app scored</a>

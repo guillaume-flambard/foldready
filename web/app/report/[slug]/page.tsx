@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { APPS, CHECK_LABELS, CHECK_WEIGHTS, GRADE_COLOR, appBySlug, reportDetail, type Checks } from "@/lib/data";
+import { APPS, CHECK_LABELS, CHECK_MEANING, CHECK_WEIGHTS, GRADE_COLOR, appBySlug, reportDetail, type Checks } from "@/lib/data";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { SeverityChip, SegBar } from "@/components/ScoreCard";
 import { PageMotion } from "@/components/Motion";
@@ -45,8 +45,8 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
     return { ...s, cum: cumulative };
   });
 
-  const majorCount = detail.findings.filter((f) => f.severity === "Major").length;
-  const minorCount = detail.findings.filter((f) => f.severity === "Minor").length;
+  const majorCount = app.findings.filter((f) => f.severity === "critical" || f.severity === "major").length;
+  const minorCount = app.findings.filter((f) => f.severity === "minor").length;
   const weakest = checkKeys.reduce<{ k: keyof Checks; v: number }>((acc, k) =>
     app.checks[k] < acc.v ? { k, v: app.checks[k] } : acc, { k: checkKeys[0], v: 100 });
 
@@ -77,9 +77,28 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
           </div>
         </div>
         <p className="gen">
-          Generated 2026-08-10T10:25 UTC · CLI v0.4 · static + captured-layout pass · {app.swiftFiles} Swift files
+          FoldReady CLI · result contract v2 · {app.uiFiles} UI files audited, {app.excludedFiles} excluded (tests, previews, vendored)
         </p>
       </header>
+
+      {app.blockers.length > 0 && (
+        <section className="block" data-reveal>
+          <div className="sec-head">
+            <h2>Before the score</h2>
+            <span className="id">binary · not weighted</span>
+          </div>
+          <div className="blockers">
+            {app.blockers.map((b) => (
+              <div key={b.id} className={"blocker" + (b.stopsLaunch ? "" : " optout")}>
+                <span className="tag">{b.stopsLaunch ? "BLOCKER" : "OPT-OUT"}</span>
+                <h3>{b.title}{b.file ? <code> {b.file}</code> : null}</h3>
+                <p>{b.consequence}</p>
+                <a className="src" href={b.reference} rel="noopener noreferrer" target="_blank">Apple source</a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="hero-grid">
         <ScoreGauge score={app.score} grade={app.grade} size={260} />
@@ -94,7 +113,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
           <div className="hero-side">
             <div className="stat"><span className="l">Risk</span><span className="v" style={{ color: app.risk === "low" ? "var(--green)" : app.risk === "medium" ? "var(--gC)" : "var(--gF)" }}>{app.risk}</span></div>
             <div className="stat"><span className="l">Est. port</span><span className="v">{app.hours}<span className="u">h</span></span></div>
-            <div className="stat"><span className="l">Findings</span><span className="v">{app.findings}</span></div>
+            <div className="stat"><span className="l">Findings</span><span className="v">{app.findingCount}</span></div>
           </div>
         </div>
       </section>
@@ -102,7 +121,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
       <section className="block" data-reveal>
         <div className="sec-head">
           <h2>Check breakdown</h2>
-          <span className="id">7 checks · weighted</span>
+          <span className="id">4 checks · weighted</span>
         </div>
         <div>
           {checkKeys.map((k) => {
@@ -121,7 +140,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
                   <SegBar score={s} color={ok ? "var(--green)" : s >= 40 ? "var(--gD)" : "var(--gF)"} />
                   <span className="score" style={{ color: ok ? "var(--green)" : s >= 40 ? "var(--gD)" : "var(--gF)" }}>{s}</span>
                 </div>
-                <p className="dt" style={{ gridColumn: "1/3" }}>{detail.breakdownNotes[k]}</p>
+                <p className="dt" style={{ gridColumn: "1/3" }}>{app.details[k]} — {CHECK_MEANING[k]}</p>
               </div>
             );
           })}
@@ -131,7 +150,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
       <section className="block" data-reveal>
         <div className="sec-head">
           <h2>Findings</h2>
-          <span className="id">sample · {detail.findings.length} of {app.findings} rows</span>
+          <span className="id">sample · {app.findings.length} of {app.findingCount} rows</span>
         </div>
         <div className="fstats">
           <span className="fs"><i style={{ background: "var(--sevMajor)" }} />Blocking<b className="mono" style={{ color: "var(--sevMajor)" }}>{majorCount}</b></span>
@@ -143,7 +162,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
             <tr><th style={{ width: 96 }}>Severity</th><th style={{ width: 170 }}>Check</th><th>Finding</th><th style={{ width: 230 }}>Location</th></tr>
           </thead>
           <tbody>
-            {detail.findings.map((f, i) => (
+            {app.findings.map((f, i) => (
               <tr key={i}>
                 <td><SeverityChip severity={f.severity} /></td>
                 <td className="chk">{f.check}</td>

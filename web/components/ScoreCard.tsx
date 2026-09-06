@@ -38,8 +38,9 @@ export function GradeChip({ grade }: { grade: Grade }) {
   return <span className={`gchip ${grade.toLowerCase()}`}>{grade}</span>;
 }
 
-export function SeverityChip({ severity }: { severity: "Blocker" | "Major" | "Minor" }) {
-  const cls = severity === "Blocker" ? "sev-b" : severity === "Major" ? "sev-m" : "sev-n";
+export function SeverityChip({ severity }: { severity: string }) {
+  const key = severity.toLowerCase();
+  const cls = key === "critical" ? "sev-b" : key === "major" ? "sev-m" : "sev-n";
   return (
     <span className={`chip ${cls}`}>
       <span className="dot" />
@@ -67,6 +68,7 @@ export function WeakChips({ app }: { app: AppScore }) {
 
 export function ScoreCard({ app, rank }: { app: AppScore; rank: number }) {
   const color = GRADE_COLOR[app.grade];
+  const blocking = app.blockers.filter((b) => b.stopsLaunch);
   return (
     <article className="scard">
       <span className="rank">{String(rank).padStart(2, "0")}</span>
@@ -74,7 +76,7 @@ export function ScoreCard({ app, rank }: { app: AppScore; rank: number }) {
         <span className="num" style={{ color }}>{app.score}</span>
         <div>
           <h3>{app.name}</h3>
-          <p className="sub">{app.swiftFiles} Swift files · {app.findings} findings</p>
+          <p className="sub">{app.uiFiles} UI files · {app.findingCount} findings</p>
         </div>
       </div>
       <div className="stats">
@@ -82,6 +84,9 @@ export function ScoreCard({ app, rank }: { app: AppScore; rank: number }) {
         <span>Port<b>{app.hours}h</b></span>
         <span style={{ marginLeft: "auto" }}><GradeChip grade={app.grade} /></span>
       </div>
+      {blocking.length > 0 && (
+        <p className="blockline">Does not launch on the iOS 27 SDK: {blocking.map((b) => b.title.toLowerCase()).join(", ")}</p>
+      )}
       <div className="checks"><WeakChips app={app} /></div>
       <a className="go" href={`/report/${app.slug}`}>Full Fold-Ready report</a>
     </article>

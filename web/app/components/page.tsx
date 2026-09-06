@@ -120,9 +120,10 @@ export default function ComponentsPage() {
         <div className="frame" style={{ marginBottom: 16 }}>
           <div className="comphead"><span className="no">03</span><h3>Check bar</h3><span className="spec">10-step segmented bar · one per foldable check</span></div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 560 }}>
-            <CheckBar label="Adaptive layout" score={93} weight="w 0.20" color="var(--blue)" />
-            <CheckBar label="Resizable presentation opt-in" score={100} weight="w 0.10" color="var(--green)" />
-            <CheckBar label="Adaptive navigation" score={40} weight="w 0.20" color="var(--gD)" />
+            <CheckBar label="Adaptive layout" score={73} weight="w 0.35" color="var(--blue)" />
+            <CheckBar label="Adaptive geometry" score={55} weight="w 0.35" color="var(--gD)" />
+            <CheckBar label="Sidebar navigation" score={100} weight="w 0.20" color="var(--green)" />
+            <CheckBar label="State preservation" score={5} weight="w 0.10" color="var(--gF)" />
           </div>
         </div>
 
@@ -189,7 +190,7 @@ export default function ComponentsPage() {
                   <td className="r mono">{a.score}</td>
                   <td>{a.risk}</td>
                   <td className="r mono">{a.hours}h</td>
-                  <td className="r mono">{a.findings}</td>
+                  <td className="r mono">{a.findingCount}</td>
                 </tr>
               ))}
             </tbody>
@@ -213,7 +214,7 @@ export default function ComponentsPage() {
               </div>
               <div className="checklist" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <CheckBar label="Adaptive layout" score={93} color="var(--blue)" />
-                <CheckBar label="Resizable presentation" score={100} color="var(--green)" />
+                <CheckBar label="Sidebar navigation" score={100} color="var(--green)" />
                 <CheckBar label="Navigation" score={40} color="var(--gD)" />
                 <CheckBar label="SwiftUI / UIKit" score={91} color="var(--blue)" />
               </div>
