@@ -72,24 +72,44 @@ private func makeFixture() -> String {
 @Suite("PortEngine")
 struct PortEngineTests {
 
-    @Test("dry run produces patches for every triggered transform")
-    func dryRunDetectsTransforms() {
+    @Test("a dry run patches only what is provably safe")
+    func dryRunPatchesOnlyProvable() {
         let root = makeFixture()
-        let result = PortEngine.run(root: root, appName: "PortMe", options: PortOptions(tiers: [.safe, .review, .manual], apply: false, outDir: nil))
+        let result = PortEngine.run(root: root, appName: "PortMe",
+            options: PortOptions(apply: false, outDir: nil))
         let ids = result.plan.patches.map(\.transformId)
         #expect(ids.contains("remove-fullscreen"))
         #expect(ids.contains("sidebar-optin"))
-        #expect(ids.contains("adaptive-navigation"))
-        #expect(ids.contains("screen-bounds"))
-        #expect(ids.contains("scene-lifecycle"))
+        // Structural migrations are work orders now, never regex-generated patches.
+        #expect(!ids.contains("adaptive-navigation"))
+        #expect(!ids.contains("screen-bounds"))
+        #expect(!ids.contains("scene-lifecycle"))
         #expect(result.appliedCount == 0)
         #expect(result.reportPath != nil)
     }
 
-    @Test("apply writes edits and new files to the tree")
+    @Test("the judgement-level work is handed over as a work order")
+    func workOrderCoversTheRest() {
+        let root = makeFixture()
+        let result = PortEngine.run(root: root, appName: "PortMe",
+            options: PortOptions(apply: false, outDir: nil))
+        let ids = Set(result.workOrder.entries.map(\.id))
+        #expect(ids.contains("scene-lifecycle"))
+        #expect(ids.contains("adaptive-navigation"))
+        for entry in result.workOrder.entries {
+            #expect(entry.reference.hasPrefix("https://developer.apple.com/"))
+            #expect(!entry.requiredEndState.isEmpty)
+        }
+        let markdown = result.workOrder.markdown()
+        #expect(markdown.contains("xcrun agent skills export"))
+        #expect(markdown.contains("Done when"))
+    }
+
+    @Test("apply writes the safe edits and touches nothing else")
     func applyWrites() throws {
         let root = makeFixture()
-        let result = PortEngine.run(root: root, appName: "PortMe", options: PortOptions(tiers: [.safe, .review], apply: true, outDir: nil))
+        let result = PortEngine.run(root: root, appName: "PortMe",
+            options: PortOptions(apply: true, outDir: nil))
         #expect(result.appliedCount > 0)
 
         let plist = try String(contentsOfFile: (root as NSString).appendingPathComponent("Info.plist"), encoding: .utf8)
@@ -98,18 +118,17 @@ struct PortEngineTests {
         let rootFile = try String(contentsOfFile: (root as NSString).appendingPathComponent("Root.swift"), encoding: .utf8)
         #expect(rootFile.contains("mode = .tabSidebar"))
 
+        // No speculative rewrite of the SwiftUI navigation, and no placeholder delegate.
         let feed = try String(contentsOfFile: (root as NSString).appendingPathComponent("Feed.swift"), encoding: .utf8)
-        #expect(feed.contains("NavigationSplitView"))
-
-        let sceneExists = FileManager.default.fileExists(atPath: (root as NSString).appendingPathComponent("SceneDelegate.swift"))
-        #expect(sceneExists)
+        #expect(!feed.contains("NavigationSplitView"))
+        #expect(!FileManager.default.fileExists(atPath: (root as NSString).appendingPathComponent("SceneDelegate.swift")))
     }
 
-    @Test("re-audit score improves after applying safe+review ports")
+    @Test("the score improves after applying the safe edits")
     func scoreImproves() throws {
         let root = makeFixture()
         let before = AuditEngine.run(root: root, appName: "PortMe")
-        _ = PortEngine.run(root: root, appName: "PortMe", options: PortOptions(tiers: [.safe, .review], apply: true, outDir: nil))
+        _ = PortEngine.run(root: root, appName: "PortMe", options: PortOptions(apply: true, outDir: nil))
         let after = AuditEngine.run(root: root, appName: "PortMe")
         #expect(after.totalScore > before.totalScore)
     }

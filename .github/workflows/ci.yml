@@ -15,6 +15,31 @@ jobs:
         run: swift build
       - name: Swift test
         run: swift test
+      - name: Sourcing (every check cites Apple)
+        run: python3 Scripts/sourcing-check.py
+      - name: Result contract (golden)
+        run: python3 Scripts/contract-golden.py
+
+  dogfood:
+    name: Dogfood the action on the contract fixture
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: FoldReady
+        id: foldready
+        uses: ./
+        with:
+          path: Tests/Fixtures/ContractApp
+          name: ContractApp
+          # The fixture is deliberately unready: report, never fail this repo's own CI.
+          fail-on-breach: "false"
+          comment-on-pr: "false"
+      - name: The action reports a score
+        run: |
+          echo "score=${{ steps.foldready.outputs.score }} grade=${{ steps.foldready.outputs.grade }}"
+          test -n "${{ steps.foldready.outputs.score }}"
 
   web:
     name: Web build (Next.js export)

@@ -1,0 +1,105 @@
+name: FoldReady
+description: >-
+  Score how ready an iOS app is for a resizable canvas, and fail the build when it
+  regresses. Runs the FoldReady audit, evaluates the repository's readiness policy, and
+  reports the score delta on pull requests.
+author: FoldReady
+
+branding:
+  icon: smartphone
+  color: blue
+
+inputs:
+  path:
+    description: Path to the iOS source tree to audit, relative to the workspace.
+    required: false
+    default: "."
+  name:
+    description: App name used in the report. Defaults to the folder name.
+    required: false
+  config:
+    description: >-
+      Policy file. Defaults to .foldready.json at the audited path. When no policy file
+      exists the action reports the score and does not fail the build.
+    required: false
+  baseline:
+    description: >-
+      Baseline result to compare against. Defaults to .foldready-baseline.json at the
+      audited path. Absent baseline means regression rules are skipped, not failed.
+    required: false
+  fail-on-breach:
+    description: Fail the job when the policy is breached. Set to "false" to report only.
+    required: false
+    default: "true"
+  comment-on-pr:
+    description: >-
+      Post the score delta as a pull request comment. Requires pull-requests write
+      permission; falls back to the job summary when the token cannot write.
+    required: false
+    default: "true"
+  upload-report:
+    description: Upload the generated HTML report as a job artifact.
+    required: false
+    default: "true"
+
+outputs:
+  score:
+    description: Total Fold-Ready score, 0-100.
+    value: ${{ steps.gate.outputs.score }}
+  grade:
+    description: Letter grade, A to F.
+    value: ${{ steps.gate.outputs.grade }}
+  passed:
+    description: '"true" when every configured policy rule passed.'
+    value: ${{ steps.gate.outputs.passed }}
+  report-path:
+    description: Path to the generated HTML report.
+    value: ${{ steps.gate.outputs.report-path }}
+  base-score:
+    description: Score on the pull request base, when it could be measured.
+    value: ${{ steps.gate.outputs.base-score }}
+  delta:
+    description: Head score minus base score, when both are known.
+    value: ${{ steps.gate.outputs.delta }}
+
+# macOS runner required: the audit binary builds against Apple frameworks (ImageIO,
+# CoreGraphics) for the captured-layout check.
+runs:
+  using: composite
+  steps:
+    - name: Cache the FoldReady binary
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.action_path }}/.build/release/foldready
+        key: foldready-${{ runner.os }}-${{ runner.arch }}-${{ github.action_ref || 'local' }}
+
+    - name: Build FoldReady
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      # Builds the action's own pinned source with the runner's preinstalled Swift.
+      # Nothing is fetched at run time: the code that produces the score is the code at
+      # the ref the workflow pinned.
+      run: swift build -c release --package-path "$GITHUB_ACTION_PATH"
+
+    - name: Audit and gate
+      id: gate
+      shell: bash
+      env:
+        FOLDREADY_BIN: ${{ github.action_path }}/.build/release/foldready
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_NAME: ${{ inputs.name }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_BASELINE: ${{ inputs.baseline }}
+        INPUT_FAIL_ON_BREACH: ${{ inputs.fail-on-breach }}
+        INPUT_COMMENT_ON_PR: ${{ inputs.comment-on-pr }}
+        GH_TOKEN: ${{ github.token }}
+      run: "$GITHUB_ACTION_PATH/Scripts/action-gate.sh"
+
+    - name: Upload the report
+      if: inputs.upload-report == 'true' && steps.gate.outputs.report-path != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: foldready-report
+        path: ${{ steps.gate.outputs.report-path }}
+        if-no-files-found: warn

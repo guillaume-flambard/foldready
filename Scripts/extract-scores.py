@@ -30,7 +30,9 @@ KEYMAP = {
 
 for slug, repo in REPOS.items():
     d = json.load(open(repo + "/foldready-report/result.json"))
+    if d.get("schema_version") != 1:
+        raise SystemExit(f"{repo}: unsupported result contract v{d.get('schema_version')}, expected 1")
     c = {k["key"]: int(k["score"]) for k in d["checks"]}
     checks = ", ".join(f"{k}: {c.get(KEYMAP[k], 0)}" for k in KEYMAP)
     findings = len([f for f in d["findings"] if f["severity"] in ("critical", "major")])
-    print(f'{NAMES[slug]}|{slug}|{d["score"]}|{d["grade"]}|{d["risk"]}|{d["estimatedPortingHours"]}|{d["stats"]["swiftFiles"]}|{findings}|{checks}')
+    print(f'{NAMES[slug]}|{slug}|{d["score"]}|{d["grade"]}|{d["risk"]}|{d["estimated_porting_hours"]}|{d["stats"]["swift_files"]}|{findings}|{checks}')
