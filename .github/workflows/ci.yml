@@ -36,10 +36,16 @@ jobs:
           # The fixture is deliberately unready: report, never fail this repo's own CI.
           fail-on-breach: "false"
           comment-on-pr: "false"
-      - name: The action reports a score
+      - name: The action reports a score and, on a pull request, a delta
         run: |
           echo "score=${{ steps.foldready.outputs.score }} grade=${{ steps.foldready.outputs.grade }}"
+          echo "base=${{ steps.foldready.outputs.base-score }} delta=${{ steps.foldready.outputs.delta }}"
           test -n "${{ steps.foldready.outputs.score }}"
+          # The delta only exists on a pull request whose base carries the audited path.
+          # Dogfooding is worth nothing if the job cannot say whether it was measured.
+          if [ "${{ github.event_name }}" = "pull_request" ] && [ -z "${{ steps.foldready.outputs.base-score }}" ]; then
+            echo "::warning::no base score was measured for this pull request"
+          fi
 
   web:
     name: Web build (Next.js export)
