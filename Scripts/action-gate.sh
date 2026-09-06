@@ -71,6 +71,10 @@ if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
       if "$BIN" "${base_args[@]}" >/dev/null 2>&1 && [[ -f "$BASE_OUT/result.json" ]]; then
         BASE_SCORE="$(python3 -c "import json;print(json.load(open('$BASE_OUT/result.json'))['score'])")"
         DELTA="$(python3 -c "print(round($SCORE - $BASE_SCORE, 1))")"
+      elif [[ ! -d "$BASE_TREE/$TARGET" ]]; then
+        echo "note: '$TARGET' does not exist on the base commit — no delta to report."
+      else
+        echo "note: the base commit could not be audited — reporting the head score only."
       fi
       git -C "$GITHUB_WORKSPACE" worktree remove --force "$BASE_TREE" >/dev/null 2>&1
     else
