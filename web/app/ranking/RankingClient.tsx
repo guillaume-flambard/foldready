@@ -35,9 +35,10 @@ export function RankingClient() {
         <span className="kicker">Independent index · 7.8in inner display</span>
         <h1>Fold-Ready Index</h1>
         <p className="lede">
-          Parallel View keeps every iOS app running on the iPhone Fold — these scores
-          measure how good it will look. The index audits well-known open-source apps so
-          you can see the difference a few hours of porting makes.
+          These scores measure how well an app uses a wide, resizable scene: sidebar
+          navigation, layout that reflows, state that survives a resize. The index audits
+          well-known open-source apps so you can see the difference a few hours of work
+          makes. Every check cites the Apple source it is derived from.
         </p>
         <div className="legend">
           {GRADES.map(({ g }) => (
