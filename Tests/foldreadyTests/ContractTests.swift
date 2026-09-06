@@ -131,7 +131,7 @@ struct ContractTests {
     func weightSerialisation() {
         let root = writeFixture(in: tempParent())
         let rendered = JSONReport.render(AuditEngine.run(root: root, appName: "DemoApp"))
-        #expect(!rendered.contains("0.080000000000000002"))
-        #expect(rendered.contains("\"weight\" : 0.08"))
+        #expect(!rendered.contains("0.3500000000000000"))
+        #expect(rendered.contains("\"weight\" : 0.35"))
     }
 }

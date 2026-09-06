@@ -1,122 +1,121 @@
 {
   "app": "ContractApp",
+  "blockers": [
+    {
+      "consequence": "An app built against the iOS 27 SDK without the scene lifecycle does not launch. Apps already shipped, and apps still built against the iOS 26 SDK, keep working.",
+      "id": "scene-lifecycle-missing",
+      "reference": "https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle",
+      "stops_launch": true,
+      "title": "No UIScene lifecycle"
+    },
+    {
+      "consequence": "UIRequiresFullScreen=true opts the app out of a resizable scene, so the layout this score measures never gets the canvas.",
+      "file": "Info.plist",
+      "id": "full-screen-opt-out",
+      "reference": "https://developer.apple.com/documentation/bundleresources/information-property-list/uirequiresfullscreen",
+      "stops_launch": false,
+      "title": "Opted out of resizable presentation"
+    }
+  ],
   "checks": [
     {
-      "detail": "1 hardcoded frames, 1 UIScreen.main.bounds, 0 other UIScreen.main reads across 2 files",
-      "key": "adaptive-layout",
-      "reference": "https://developer.apple.com/videos/play/wwdc2026/278/",
-      "score": 0,
-      "title": "Adaptive layout",
-      "weight": 0.22
-    },
-    {
-      "detail": "UIRequiresFullScreen=true found",
-      "key": "full-screen",
-      "reference": "https://developer.apple.com/documentation/bundleresources/information-property-list/uirequiresfullscreen",
-      "score": 0,
-      "title": "Resizable presentation opt-in",
-      "weight": 0.08
-    },
-    {
-      "detail": "0 NavigationSplitView, 0 sidebar opt-ins, 1 stacks",
+      "detail": "no sidebar-capable container across 1 navigation site(s)",
       "key": "navigation",
       "reference": "https://developer.apple.com/documentation/uikit/uitabbarcontroller/sidebar",
-      "score": 40,
+      "score": 0,
+      "signals": {
+        "adopted": 0,
+        "containers": 1
+      },
       "title": "Adaptive navigation / sidebar",
-      "weight": 0.25
+      "weight": 0.2
     },
     {
-      "detail": "scene lifecycle missing",
-      "key": "scene",
-      "reference": "https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle",
-      "score": 20,
-      "title": "UIScene lifecycle",
-      "weight": 0.15
+      "detail": "2 of 2 UI file(s) use fixed geometry",
+      "key": "adaptive-layout",
+      "reference": "https://developer.apple.com/videos/play/wwdc2026/278/",
+      "score": 3,
+      "signals": {
+        "icon_frames": 0,
+        "offending": 2,
+        "ui_files": 2
+      },
+      "title": "Adaptive layout",
+      "weight": 0.35
     },
     {
-      "detail": "0 effectiveGeometry, 0 size classes, 0 GeometryReader, 0 internal strings",
-      "key": "fold-state",
+      "detail": "0 of 2 UI file(s) read size classes or effective geometry, 1 branch on device or orientation",
+      "key": "adaptive-geometry",
       "reference": "https://developer.apple.com/documentation/uikit/uitraitcollection/horizontalsizeclass",
-      "score": 15,
-      "title": "Adaptive geometry (fold-aware)",
-      "weight": 0.12
+      "score": 0,
+      "signals": {
+        "aware": 0,
+        "device_branching": 1,
+        "ui_files": 2
+      },
+      "title": "Adaptive geometry",
+      "weight": 0.35
     },
     {
-      "detail": "0 @SceneStorage, 0 restoration, 0 view models",
+      "detail": "0 of 1 stateful view file(s) preserve state",
       "key": "state",
       "reference": "https://developer.apple.com/documentation/swiftui/scenestorage",
-      "score": 30,
+      "score": 0,
+      "signals": {
+        "preserved": 0,
+        "stateful": 1
+      },
       "title": "State preservation",
-      "weight": 0.08
-    },
-    {
-      "detail": "1 SwiftUI files, 1 UIKit files",
-      "key": "framework",
-      "reference": "https://developer.apple.com/documentation/swiftui/navigationsplitview",
-      "score": 50,
-      "title": "SwiftUI vs UIKit",
       "weight": 0.1
     }
   ],
-  "estimated_porting_hours": 12.5,
+  "estimated_porting_hours": 53.5,
   "findings": [
-    {
-      "check": "full-screen",
-      "file": "Info.plist",
-      "message": "UIRequiresFullScreen=true opts the app out of resizable presentation. Remove it so the system can give the app the full inner-display canvas.",
-      "severity": "critical"
-    },
     {
       "check": "adaptive-layout",
       "file": "Legacy.swift",
       "line": 5,
-      "message": "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
+      "message": "UIScreen.main.bounds is a fixed geometry read; use the view's own bounds or the window scene.",
       "severity": "major"
     },
     {
       "check": "navigation",
       "file": "Feed.swift",
-      "message": "NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.",
+      "message": "Root navigation that cannot become a sidebar: the panes will not split when the scene is wide.",
       "severity": "major"
     },
     {
-      "check": "scene",
-      "message": "No UIScene lifecycle detected. The scene lifecycle is mandatory on iOS 27; apps without it fail to adapt to fold transitions.",
-      "severity": "major"
+      "check": "adaptive-geometry",
+      "file": "Legacy.swift",
+      "line": 7,
+      "message": "Layout branching on device idiom or interface orientation; a resizable scene is described by its size class.",
+      "severity": "minor"
     },
     {
       "check": "adaptive-layout",
       "file": "Feed.swift",
       "line": 9,
-      "message": "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
-      "severity": "minor"
-    },
-    {
-      "check": "fold-state",
-      "message": "No adaptive geometry handling (didUpdateEffectiveGeometry, size classes, GeometryReader). The app has no opinion about wider canvases.",
-      "severity": "minor"
-    },
-    {
-      "check": "fold-state",
-      "file": "Legacy.swift",
-      "line": 7,
-      "message": "userInterfaceIdiom/interfaceOrientation are not meaningful for layout in resizable environments; use size classes.",
+      "message": "Hardcoded frame larger than a control: it will not reflow when the scene changes width.",
       "severity": "minor"
     },
     {
       "check": "state",
-      "message": "No explicit scroll/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
+      "file": "Feed.swift",
+      "message": "Scroll or selection state is not preserved; a scene resize can rebuild the hierarchy and lose it.",
       "severity": "minor"
     }
   ],
   "grade": "F",
   "risk": "high",
-  "schema_version": 1,
-  "score": 22,
+  "schema_version": 2,
+  "score": 1,
+  "score_is_provisional": true,
   "stats": {
+    "excluded_files": 0,
     "info_plists": 1,
     "swift_files": 2,
     "swiftui_files": 1,
+    "ui_files": 2,
     "uikit_files": 1,
     "xib_or_storyboard": 0
   }

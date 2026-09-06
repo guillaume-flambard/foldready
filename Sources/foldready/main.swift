@@ -130,6 +130,18 @@ func color(_ s: String, _ code: String) -> String {
     return "\u{001B}\(code)m\(s)\u{001B}0m"
 }
 
+
+/// Prints the blockers before any score. A binary consequence must not arrive after a
+/// grade that reads like a school mark.
+func printBlockers(_ result: AuditResult) {
+    for blocker in result.blockers {
+        let tag = blocker.stopsLaunch ? color("BLOCKER", "31") : color("OPT-OUT", "33")
+        let where_ = blocker.file.map { " (\($0))" } ?? ""
+        print("  \(tag)  \(blocker.title)\(where_)")
+        print("           \(blocker.consequence)")
+    }
+}
+
 /// Runs the audit, evaluates the policy, prints the verdict, and returns the exit code.
 /// Kept separate from `main` so the gate's reporting is readable in one place.
 func runGate(root: String, appName: String, opts: CliOptions, screenshots: [String]) -> GateExit {
@@ -178,6 +190,7 @@ func runGate(root: String, appName: String, opts: CliOptions, screenshots: [Stri
         atomically: true, encoding: .utf8)
 
     print(color("FoldReady gate", "36") + " - \(appName)")
+    printBlockers(result)
     print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)")
     if let description = outcome.baselineDescription {
         print("  baseline: \(description)")
@@ -333,6 +346,7 @@ func main() {
     if opts.verify {
         let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
         print(color("FoldReady verify", "36") + " - \(appName)")
+        printBlockers(result)
         print("  score after port: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)")
         for o in result.outcomes where o.key == "captured-layout" {
             print("  captured layout: \(color(String(format: "%.0f%%", o.score * 100), o.score >= 0.6 ? "32" : "33"))  (\(o.detail))")
@@ -399,9 +413,11 @@ func main() {
     }
 
     print(color("FoldReady", "36") + " - \(appName)")
-    print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)")
+    printBlockers(result)
+    let provisional = result.scoreIsProvisional ? " (provisional: the app opted out of a resizable scene)" : ""
+    print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)\(provisional)")
     print("  est. porting effort: \(color("\(result.hoursEstimate) h", "32"))")
-    print("  \(result.stats.swiftFiles) Swift files (\(result.stats.swiftuiFiles) SwiftUI, \(result.stats.uikitFiles) UIKit)")
+    print("  \(result.stats.uiFiles) UI files of \(result.stats.swiftFiles) Swift files (\(result.stats.excludedFiles) excluded: tests, previews, vendored)")
     for o in result.outcomes {
         let pct = Int((o.score * 100).rounded())
         print("    \(color(String(format: "%3d", pct) + "%", pct >= 60 ? "32" : (pct >= 35 ? "33" : "31")))  \(o.title)")

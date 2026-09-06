@@ -6,14 +6,48 @@ struct CheckOutcome: Sendable {
     let weight: Double
     let score: Double
     let detail: String
+    /// Raw counts behind the score: numerator, denominator, and whatever else the check
+    /// weighed. Emitted in the JSON so a rebalance can be calibrated from stored results
+    /// rather than by re-auditing a corpus from scratch.
+    let signals: [String: Double]
     /// Apple-authoritative source the requirement is derived from. Every scored check
     /// must have one; `Scripts/check.sh` fails the build when it is empty.
     let reference: String
     let findings: [Finding]
 }
 
+/// A check before its weight is known. A check that does not apply to an app (no lists to
+/// preserve state in, no root navigation to adapt) drops out and its weight is spread over
+/// the others, rather than being scored as a failure — that fallback scoring is what made
+/// `state` return 70 for seventeen of the twenty corpus apps.
+private struct CheckResult {
+    let key: String
+    let title: String
+    /// Nil when the check does not apply to this app.
+    let score: Double?
+    let detail: String
+    let reference: String
+    let findings: [Finding]
+    let baseWeight: Double
+    let signals: [String: Double]
+
+    init(key: String, title: String, score: Double?, detail: String, reference: String,
+         findings: [Finding], baseWeight: Double, signals: [String: Double] = [:]) {
+        self.key = key
+        self.title = title
+        self.score = score
+        self.detail = detail
+        self.reference = reference
+        self.findings = findings
+        self.baseWeight = baseWeight
+        self.signals = signals
+    }
+}
+
 struct AuditStats: Sendable {
     let swiftFiles: Int
+    let uiFiles: Int
+    let excludedFiles: Int
     let swiftuiFiles: Int
     let uikitFiles: Int
     let xibOrStoryboard: Int
@@ -27,21 +61,33 @@ struct AuditResult: Sendable {
     let totalScore: Double
     let outcomes: [CheckOutcome]
     let findings: [Finding]
+    let blockers: [Blocker]
     let stats: AuditStats
     let hoursEstimate: Double
+
+    /// True when the app has declined the resizable canvas, which makes the quality score
+    /// a statement about code that never gets the room it is measured against.
+    var scoreIsProvisional: Bool {
+        blockers.contains { $0.id == Blockers.fullScreenOptOut }
+    }
+
     var risk: String {
+        if blockers.contains(where: \.stopsLaunch) { return "high" }
         switch totalScore {
-        case ..<30: return "high"
-        case 30..<61: return "medium"
+        case ..<45: return "high"
+        case 45..<70: return "medium"
         default: return "low"
         }
     }
+
+    /// Bands calibrated on the twenty-app corpus (see docs/result-contract.md). Each band
+    /// states a behaviour, not a rank.
     var grade: String {
         switch totalScore {
-        case ..<30: return "F"
-        case 30..<45: return "D"
-        case 45..<60: return "C"
-        case 60..<75: return "B"
+        case ..<25: return "F"
+        case 25..<45: return "D"
+        case 45..<65: return "C"
+        case 65..<85: return "B"
         default: return "A"
         }
     }
@@ -50,53 +96,57 @@ struct AuditResult: Sendable {
 enum AuditEngine {
 
     static func run(root: String, appName: String, screenshots: [String] = []) -> AuditResult {
-        let swift = walk(extension: "swift", at: root)
+        let allSwift = walk(extension: "swift", at: root)
         let plists = walk(extension: "plist", at: root)
 
-        let stats = makeStats(root: root, swift: swift, plists: plists)
+        // Everything scored is measured over shipping UI files. Tests, snapshots,
+        // generated code and vendored dependencies are counted and reported, not scored.
+        let uiFiles = allSwift.filter { Exclusions.isUIFile($0) }
+        let stats = makeStats(root: root, allSwift: allSwift, uiFiles: uiFiles, plists: plists)
 
-        var outcomes: [CheckOutcome] = []
-        var findings: [Finding] = []
+        let blockers = [
+            Blockers.sceneLifecycle(swiftFiles: allSwift),
+            Blockers.fullScreen(plists: plists)
+        ].compactMap { $0 }
 
-        func add(_ pair: (outcome: CheckOutcome, findings: [Finding])) {
-            outcomes.append(pair.outcome)
-            findings.append(contentsOf: pair.outcome.findings)
-        }
-
-        add(adaptiveLayout(swiftFiles: swift))
-        add(requiresFullScreen(plists: plists))
-        add(navigation(swiftFiles: swift))
-        add(sceneLifecycle(swiftFiles: swift))
-        add(foldState(swiftFiles: swift))
-        add(statePreservation(swiftFiles: swift))
-        add(frameworkRatio(stats: stats))
-
-        // Optional visual check: screenshots captured on the widest simulator.
+        var results = [
+            navigation(uiFiles: uiFiles),
+            adaptiveLayout(uiFiles: uiFiles),
+            adaptiveGeometry(uiFiles: uiFiles),
+            statePreservation(uiFiles: uiFiles)
+        ]
         if !screenshots.isEmpty {
-            let captured = capturedLayout(screenshots: screenshots)
-            add(captured)
-            let scale = 1.0 - captured.outcome.weight
-            outcomes = outcomes.map { o in
-                o.key == captured.outcome.key ? o : CheckOutcome(key: o.key, title: o.title,
-                    weight: o.weight * scale, score: o.score, detail: o.detail,
-                    reference: o.reference, findings: o.findings)
-            }
+            results.append(capturedLayout(screenshots: screenshots))
         }
 
-        let weighted = outcomes.reduce(0.0) { $0 + $1.score * $1.weight }
-        let total = weighted * 100.0
-        let hours = estimateHours(stats: stats, outcomes: outcomes)
+        let outcomes = weighted(results)
+        let findings = outcomes.flatMap(\.findings)
+        let total = (outcomes.reduce(0.0) { $0 + $1.score * $1.weight } * 100).rounded()
 
         return AuditResult(
             root: root,
             appName: appName,
             generatedAt: Date(),
-            totalScore: total.rounded(),
+            totalScore: total,
             outcomes: outcomes,
             findings: Finding.deterministicOrder(findings),
+            blockers: blockers,
             stats: stats,
-            hoursEstimate: hours
+            hoursEstimate: estimateHours(stats: stats, outcomes: outcomes, blockers: blockers)
         )
+    }
+
+    /// Applicable checks keep their share; the weight of the rest is spread proportionally,
+    /// so the weights always sum to 1.
+    private static func weighted(_ results: [CheckResult]) -> [CheckOutcome] {
+        let applicable = results.filter { $0.score != nil }
+        let base = applicable.reduce(0.0) { $0 + $1.baseWeight }
+        guard base > 0 else { return [] }
+        return applicable.map { r in
+            CheckOutcome(key: r.key, title: r.title, weight: r.baseWeight / base,
+                score: r.score ?? 0, detail: r.detail, signals: r.signals,
+                reference: r.reference, findings: r.findings)
+        }
     }
 
     // MARK: - Walking
@@ -120,258 +170,272 @@ enum AuditEngine {
         return result
     }
 
-    private static func makeStats(root: String, swift: [FileContent], plists: [FileContent]) -> AuditStats {
+    private static func makeStats(root: String, allSwift: [FileContent],
+                                  uiFiles: [FileContent], plists: [FileContent]) -> AuditStats {
         var swiftui = 0, uikit = 0
-        for file in swift {
+        for file in uiFiles {
             if file.content.contains("import SwiftUI") { swiftui += 1 }
             if file.content.contains("import UIKit") { uikit += 1 }
         }
         let xibs = walk(extension: "xib", at: root).count
         let storyboards = walk(extension: "storyboard", at: root).count
         return AuditStats(
-            swiftFiles: swift.count,
+            swiftFiles: allSwift.count,
+            uiFiles: uiFiles.count,
+            excludedFiles: allSwift.count - uiFiles.count,
             swiftuiFiles: swiftui,
             uikitFiles: uikit,
             xibOrStoryboard: xibs + storyboards,
-            infoPlists: plists.count
-        )
+            infoPlists: plists.count)
     }
 
     // MARK: - Checks
 
-    private static func adaptiveLayout(swiftFiles: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
+    /// Whether the app has adopted a navigation container that can become a sidebar.
+    ///
+    /// Measured, not assumed: across the corpus, `adopted` is 0 for eighteen apps and 1
+    /// for two. No formula can grade a signal that reality has not yet spread out, and
+    /// the file-level denominator counted every file mentioning a stack, not the roots.
+    /// So this is reported as the binary capability it is, at a weight that says it
+    /// matters: it is the adaptation a wide canvas is for.
+    private static func navigation(uiFiles: [FileContent]) -> CheckResult {
         var findings: [Finding] = []
-        var fixedFrames = 0
-        var screenMain = 0
-        var screenMainOther = 0
+        var adopted = 0
+        var notAdopted: [String] = []
 
-        for file in swiftFiles {
-            let lines = file.content.components(separatedBy: .newlines)
-            for (idx, line) in lines.enumerated() {
-                if line.contains("UIScreen.main.bounds") {
-                    screenMain += 1
-                    findings.append(Finding(check: "adaptive-layout", severity: .major,
-                        message: "UIScreen.main.bounds is a fixed geometry read; use the scene coordinate space.",
-                        file: file.path, line: idx + 1))
-                } else if line.range(of: #"UIScreen\.main\b"#, options: .regularExpression) != nil {
-                    screenMainOther += 1
-                    findings.append(Finding(check: "adaptive-layout", severity: .minor,
-                        message: "UIScreen.main is deprecated in iOS 27; derive scale and geometry from the window scene and trait collection.",
-                        file: file.path, line: idx + 1))
-                }
-                if line.range(of: #"\.frame\(width:\s*\d+\.?\d*[a-zA-Z]*\s*,\s*height:\s*\d+\.?\d*[a-zA-Z]*"#, options: .regularExpression) != nil {
-                    fixedFrames += 1
-                    findings.append(Finding(check: "adaptive-layout", severity: .minor,
-                        message: "Hardcoded frame (width and height literals) will not reflow on the 7.8 inch inner display.",
-                        file: file.path, line: idx + 1))
-                }
+        for file in uiFiles {
+            let sidebarCapable = file.content.contains("NavigationSplitView")
+                || file.content.contains(".adaptiveSidebar()")
+                || file.content.contains("tabBarController.sidebar")
+                || file.content.contains("sidebar.preferredPlacement")
+                || file.content.contains("preferredPlacement = .sidebar")
+                || file.content.contains(".tabViewStyle(.sidebarAdaptable)")
+            let hasRoot = file.content.contains("NavigationStack")
+                || file.content.contains("NavigationView")
+                || file.content.contains(": UITabBarController")
+                || file.content.contains("UITabBarController {")
+
+            if sidebarCapable {
+                adopted += 1
+            } else if hasRoot {
+                notAdopted.append(file.path)
             }
         }
 
-        let total = max(1, swiftFiles.count)
-        let load = Double(fixedFrames) * 0.5 + Double(screenMain) * 2.0 + Double(screenMainOther) * 0.6
-        let score = max(0.0, 1.0 - min(1.0, load / Double(total)))
-        let detail = "\(fixedFrames) hardcoded frames, \(screenMain) UIScreen.main.bounds, \(screenMainOther) other UIScreen.main reads across \(swiftFiles.count) files"
-        let outcome = CheckOutcome(key: "adaptive-layout", title: "Adaptive layout",
-            weight: 0.22, score: score, detail: detail,
-            reference: Reference.modernizeUIKit, findings: findings)
-        return (outcome, findings)
-    }
-
-    private static func requiresFullScreen(plists: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
-        var findings: [Finding] = []
-        var blocked = false
-        var scanned = 0
-        for plist in plists {
-            scanned += 1
-            let s = plist.content
-            if s.range(of: #"UIRequiresFullScreen"#, options: .regularExpression) != nil,
-               s.range(of: #"<true/>"#, options: .regularExpression) != nil {
-                blocked = true
-                findings.append(Finding(check: "full-screen", severity: .critical,
-                    message: "UIRequiresFullScreen=true opts the app out of resizable presentation. Remove it so the system can give the app the full inner-display canvas.",
-                    file: plist.path, line: nil))
-            }
-        }
-        let score: Double
-        if blocked { score = 0 }
-        else if scanned == 0 { score = 0.5 }
-        else { score = 1 }
-        let detail = blocked ? "UIRequiresFullScreen=true found" : (scanned == 0 ? "no Info.plist scanned, verify build settings" : "resizable presentation not blocked")
-        let outcome = CheckOutcome(key: "full-screen", title: "Resizable presentation opt-in",
-            weight: 0.08, score: score, detail: detail,
-            reference: Reference.requiresFullScreen, findings: findings)
-        return (outcome, findings)
-    }
-
-    private static func navigation(swiftFiles: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
-        var findings: [Finding] = []
-        var split = 0, sidebar = 0, stack = 0, stacksWithoutSplit: [String] = []
-
-        for file in swiftFiles {
-            if file.content.contains("NavigationSplitView") { split += 1 }
-            if file.content.contains(".adaptiveSidebar()") || file.content.contains("tabBarController.sidebar")
-                || file.content.contains("preferredPlacement = .sidebar") { sidebar += 1 }
-            if file.content.contains("NavigationStack") || file.content.contains("NavigationView") {
-                stack += 1
-                if !file.content.contains("NavigationSplitView") && !file.content.contains(".adaptiveSidebar()") {
-                    stacksWithoutSplit.append(file.path)
-                }
-            }
+        let total = adopted + notAdopted.count
+        guard total > 0 else {
+            return CheckResult(key: "navigation", title: "Adaptive navigation / sidebar",
+                score: nil, detail: "no root navigation container found",
+                reference: Reference.tabBarSidebar, findings: [], baseWeight: 0.20,
+                signals: ["adopted": 0, "containers": 0])
         }
 
-        for path in stacksWithoutSplit {
+        for path in notAdopted.sorted() {
             findings.append(Finding(check: "navigation", severity: .major,
-                message: "NavigationStack without NavigationSplitView: the list/detail panes will not gain a sidebar on the inner display.",
+                message: "Root navigation that cannot become a sidebar: the panes will not split when the scene is wide.",
                 file: path, line: nil))
         }
 
-        let score: Double
-        if split > 0 || sidebar > 0 { score = 1.0 }
-        else if stacksWithoutSplit.isEmpty && stack > 0 { score = 0.7 }
-        else if stack > 0 { score = 0.4 }
-        else { score = 0.5 }
-
-        let detail = "\(split) NavigationSplitView, \(sidebar) sidebar opt-ins, \(stack) stacks"
-        let outcome = CheckOutcome(key: "navigation", title: "Adaptive navigation / sidebar",
-            weight: 0.25, score: score, detail: detail,
-            reference: Reference.tabBarSidebar, findings: findings)
-        return (outcome, findings)
+        return CheckResult(
+            key: "navigation", title: "Adaptive navigation / sidebar",
+            score: adopted > 0 ? 1.0 : 0.0,
+            detail: adopted > 0
+                ? "\(adopted) sidebar-capable container(s) across \(total) navigation site(s)"
+                : "no sidebar-capable container across \(total) navigation site(s)",
+            reference: Reference.tabBarSidebar, findings: findings, baseWeight: 0.20,
+            signals: ["adopted": Double(adopted), "containers": Double(total)])
     }
 
-    private static func sceneLifecycle(swiftFiles: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
+    /// Share of UI files free of fixed-geometry layout.
+    ///
+    /// Counting occurrences over every Swift file let a large codebase dilute real
+    /// problems to nothing: Signal scored 100 with 22 offending files, WordPress 98 with
+    /// 119. Offending files over UI files is a density, bounded in [0, 1], that two apps
+    /// of very different sizes share when their code is equally affected.
+    private static func adaptiveLayout(uiFiles: [FileContent]) -> CheckResult {
         var findings: [Finding] = []
-        var swiftuiApp = false
-        var sceneDelegate = false
-        var sceneManifest = false
+        var offending = Set<String>()
+        var iconFrames = 0
 
-        for file in swiftFiles {
-            if file.content.contains("@main") && file.content.contains("App:") { swiftuiApp = true }
-            if file.content.contains("UIWindowSceneDelegate") || file.content.contains("UISceneDelegate") { sceneDelegate = true }
-            if file.content.contains("UIApplicationSceneManifest") || file.content.contains("UISceneConfiguration") { sceneManifest = true }
-        }
-
-        if !swiftuiApp && !sceneDelegate && !sceneManifest {
-            findings.append(Finding(check: "scene", severity: .major,
-                message: "No UIScene lifecycle detected. The scene lifecycle is mandatory on iOS 27; apps without it fail to adapt to fold transitions.",
-                file: nil, line: nil))
-        }
-
-        let score: Double
-        if swiftuiApp { score = 1.0 }
-        else if sceneDelegate || sceneManifest { score = 0.8 }
-        else { score = 0.2 }
-
-        let detail = swiftuiApp ? "SwiftUI @main App scene" : (sceneDelegate ? "UIKit scene delegate" : "scene lifecycle missing")
-        let outcome = CheckOutcome(key: "scene", title: "UIScene lifecycle",
-            weight: 0.15, score: score, detail: detail,
-            reference: Reference.sceneLifecycle, findings: findings)
-        return (outcome, findings)
-    }
-
-    private static func foldState(swiftFiles: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
-        var findings: [Finding] = []
-        var effectiveGeometry = 0
-        var sizeClasses = 0
-        var geometryReader = 0
-        var internalStrings = 0
-        var idiomOrientation = 0
-
-        for file in swiftFiles {
+        for file in uiFiles {
+            let previews = Exclusions.previewLines(in: file.content)
             let lines = file.content.components(separatedBy: .newlines)
-            if file.content.contains("didUpdateEffectiveGeometry") { effectiveGeometry += 1 }
-            if file.content.contains("horizontalSizeClass") || file.content.contains("verticalSizeClass") { sizeClasses += 1 }
-            if file.content.contains("GeometryReader") { geometryReader += 1 }
-            for (idx, line) in lines.enumerated() {
-                if line.contains("foldState") || line.contains("angleDegrees") || line.contains("mechanicalAngleDegrees") {
-                    internalStrings += 1
-                    findings.append(Finding(check: "fold-state", severity: .info,
-                        message: "foldState/angleDegrees are internal framework strings, not public API. Rely on size classes and effective geometry instead.",
-                        file: file.path, line: idx + 1))
+            for (index, line) in lines.enumerated() {
+                guard !previews.contains(index) else { continue }
+
+                if Exclusions.matches(Exclusions.screenMainBounds, line) {
+                    offending.insert(file.path)
+                    findings.append(Finding(check: "adaptive-layout", severity: .major,
+                        message: "UIScreen.main.bounds is a fixed geometry read; use the view's own bounds or the window scene.",
+                        file: file.path, line: index + 1))
+                } else if Exclusions.matches(Exclusions.screenMain, line) {
+                    offending.insert(file.path)
+                    findings.append(Finding(check: "adaptive-layout", severity: .minor,
+                        message: "UIScreen.main is deprecated in iOS 27; derive scale and geometry from the window scene and trait collection.",
+                        file: file.path, line: index + 1))
+                }
+
+                switch Exclusions.isScorableFrame(line: line) {
+                case .some(true):
+                    offending.insert(file.path)
+                    findings.append(Finding(check: "adaptive-layout", severity: .minor,
+                        message: "Hardcoded frame larger than a control: it will not reflow when the scene changes width.",
+                        file: file.path, line: index + 1))
+                case .some(false):
+                    // Icon-sized: reported as information, never scored. 92% of the frame
+                    // findings on the corpus were this.
+                    iconFrames += 1
+                case .none:
+                    break
+                }
+            }
+        }
+
+        guard !uiFiles.isEmpty else {
+            return CheckResult(key: "adaptive-layout", title: "Adaptive layout",
+                score: nil, detail: "no UI files found", reference: Reference.modernizeUIKit,
+                findings: [], baseWeight: 0.35, signals: ["offending": 0, "ui_files": 0])
+        }
+
+        // Density with a soft decay rather than a linear share. A plain share made the
+        // check near-constant on the corpus (stdev 3.2 across twenty apps), because a
+        // large codebase dilutes a real problem; a hard threshold instead produced a
+        // cliff, where 5.05% scored zero and 4.9% scored two. `1 / (1 + density/k)` falls
+        // steeply where it matters and never reaches an implausible zero.
+        // k = 0.03: 3% of UI files reading fixed geometry halves the check.
+        let density = Double(offending.count) / Double(uiFiles.count)
+        let score = 1.0 / (1.0 + density / Exclusions.layoutDensityHalfPoint)
+        return CheckResult(
+            key: "adaptive-layout", title: "Adaptive layout",
+            score: score,
+            detail: "\(offending.count) of \(uiFiles.count) UI file(s) use fixed geometry"
+                + (iconFrames > 0 ? " · \(iconFrames) icon-sized frame(s) not scored" : ""),
+            reference: Reference.modernizeUIKit, findings: findings, baseWeight: 0.35,
+            signals: ["offending": Double(offending.count), "ui_files": Double(uiFiles.count),
+                      "icon_frames": Double(iconFrames)])
+    }
+
+    /// Two halves: how widely the app reads size classes or effective geometry, and how
+    /// much of its branching is on device idiom or interface orientation instead.
+    private static func adaptiveGeometry(uiFiles: [FileContent]) -> CheckResult {
+        var findings: [Finding] = []
+        var aware = 0
+        var deviceBranching = 0
+        var internalStrings = 0
+
+        for file in uiFiles {
+            let previews = Exclusions.previewLines(in: file.content)
+            var fileIsAware = false
+            var fileBranchesOnDevice = false
+
+            let lines = file.content.components(separatedBy: .newlines)
+            for (index, line) in lines.enumerated() {
+                guard !previews.contains(index) else { continue }
+                if line.contains("horizontalSizeClass") || line.contains("verticalSizeClass")
+                    || line.contains("didUpdateEffectiveGeometry") {
+                    fileIsAware = true
                 }
                 if line.contains("userInterfaceIdiom") || line.contains("interfaceOrientation") {
-                    idiomOrientation += 1
-                    findings.append(Finding(check: "fold-state", severity: .minor,
-                        message: "userInterfaceIdiom/interfaceOrientation are not meaningful for layout in resizable environments; use size classes.",
-                        file: file.path, line: idx + 1))
+                    fileBranchesOnDevice = true
+                    findings.append(Finding(check: "adaptive-geometry", severity: .minor,
+                        message: "Layout branching on device idiom or interface orientation; a resizable scene is described by its size class.",
+                        file: file.path, line: index + 1))
+                }
+                if line.contains("foldState") || line.contains("angleDegrees")
+                    || line.contains("mechanicalAngleDegrees") {
+                    internalStrings += 1
+                    findings.append(Finding(check: "adaptive-geometry", severity: .info,
+                        message: "foldState/angleDegrees are internal framework strings, not public API. Rely on size classes and effective geometry.",
+                        file: file.path, line: index + 1))
                 }
             }
+            if fileIsAware { aware += 1 }
+            if fileBranchesOnDevice { deviceBranching += 1 }
         }
 
-        if effectiveGeometry == 0 && sizeClasses == 0 && geometryReader == 0 {
-            findings.append(Finding(check: "fold-state", severity: .minor,
-                message: "No adaptive geometry handling (didUpdateEffectiveGeometry, size classes, GeometryReader). The app has no opinion about wider canvases.",
-                file: nil, line: nil))
+        guard !uiFiles.isEmpty else {
+            return CheckResult(key: "adaptive-geometry", title: "Adaptive geometry",
+                score: nil, detail: "no UI files found", reference: Reference.sizeClasses,
+                findings: [], baseWeight: 0.35, signals: ["aware": 0, "device_branching": 0, "ui_files": 0])
         }
 
+        // Coverage anchor, calibrated on the twenty-app corpus (2026-09-06): an app is
+        // credited with full coverage once one UI file in fifty reads the scene geometry.
+        // Recorded in docs/result-contract.md with its corpus and date, not hidden here.
+        let target = max(1.0, Double(uiFiles.count) * Exclusions.geometryCoverageAnchor)
+        let coverage = min(1.0, Double(aware) / target)
+        // An app that branches on nothing has no purity problem. Scoring it zero punished
+        // three corpus apps for an absence rather than for a mistake.
         let score: Double
-        if effectiveGeometry > 0 || sizeClasses > 0 { score = 1.0 }
-        else if geometryReader > 0 { score = 0.7 }
-        else { score = 0.2 }
-        // small penalty for layout decided by idiom/orientation
-        let penalized = max(0.0, score - Double(idiomOrientation) * 0.05)
+        if aware + deviceBranching == 0 {
+            score = coverage
+        } else {
+            let purity = Double(aware) / Double(aware + deviceBranching)
+            score = 0.5 * coverage + 0.5 * purity
+        }
 
-        let detail = "\(effectiveGeometry) effectiveGeometry, \(sizeClasses) size classes, \(geometryReader) GeometryReader, \(internalStrings) internal strings"
-        let outcome = CheckOutcome(key: "fold-state", title: "Adaptive geometry (fold-aware)",
-            weight: 0.12, score: penalized, detail: detail,
-            reference: Reference.sizeClasses, findings: findings)
-        return (outcome, findings)
+        return CheckResult(
+            key: "adaptive-geometry", title: "Adaptive geometry",
+            score: score,
+            detail: "\(aware) of \(uiFiles.count) UI file(s) read size classes or effective geometry, "
+                + "\(deviceBranching) branch on device or orientation"
+                + (internalStrings > 0 ? " · \(internalStrings) internal fold string(s)" : ""),
+            reference: Reference.sizeClasses, findings: findings, baseWeight: 0.35,
+            signals: ["aware": Double(aware), "device_branching": Double(deviceBranching),
+                      "ui_files": Double(uiFiles.count)])
     }
 
-    private static func statePreservation(swiftFiles: [FileContent]) -> (outcome: CheckOutcome, findings: [Finding]) {
+    /// Share of stateful views that preserve their state.
+    ///
+    /// The laddered version returned 70 whenever the app had view models, which was
+    /// seventeen of the twenty corpus apps.
+    private static func statePreservation(uiFiles: [FileContent]) -> CheckResult {
         var findings: [Finding] = []
-        var sceneStorage = 0, restoration = 0, viewModels = 0
-        var any = false
+        var stateful = 0
+        var preserved = 0
 
-        for file in swiftFiles {
-            if file.content.contains("@SceneStorage") { sceneStorage += 1; any = true }
-            if file.content.contains("restorationIdentifier") || file.content.contains("preservesSelectionInNavigationStack")
-                || file.content.contains("PreservedState") { restoration += 1; any = true }
-            if file.content.contains("@Observable") || file.content.contains("@StateObject") || file.content.contains("@ObservableObject") {
-                viewModels += 1
+        for file in uiFiles {
+            let holdsState = file.content.contains("List(")
+                || file.content.contains("List {")
+                || file.content.contains("ScrollView")
+                || file.content.contains("UITableView")
+                || file.content.contains("UICollectionView")
+                || file.content.contains("Table(")
+            guard holdsState else { continue }
+            stateful += 1
+
+            let preserves = file.content.contains("@SceneStorage")
+                || file.content.contains("restorationIdentifier")
+                || file.content.contains("preservesSelectionInNavigationStack")
+                || file.content.contains("scrollPosition(")
+                || file.content.contains("NSUserActivity")
+            if preserves {
+                preserved += 1
+            } else {
+                findings.append(Finding(check: "state", severity: .minor,
+                    message: "Scroll or selection state is not preserved; a scene resize can rebuild the hierarchy and lose it.",
+                    file: file.path, line: nil))
             }
         }
 
-        if !any {
-            findings.append(Finding(check: "state", severity: .minor,
-                message: "No explicit scroll/selection state preservation. A fold transition can rebuild the view hierarchy; state held only in views is lost.",
-                file: nil, line: nil))
+        guard stateful > 0 else {
+            return CheckResult(key: "state", title: "State preservation",
+                score: nil, detail: "no list or scroll views to preserve state in",
+                reference: Reference.sceneStorage, findings: [], baseWeight: 0.10,
+                signals: ["preserved": 0, "stateful": 0])
         }
 
-        let score: Double
-        if sceneStorage > 0 || restoration > 0 { score = 1.0 }
-        else if viewModels > 0 { score = 0.7 }
-        else { score = 0.3 }
-
-        let detail = "\(sceneStorage) @SceneStorage, \(restoration) restoration, \(viewModels) view models"
-        let outcome = CheckOutcome(key: "state", title: "State preservation",
-            weight: 0.08, score: score, detail: detail,
-            reference: Reference.sceneStorage, findings: findings)
-        return (outcome, findings)
-    }
-
-    private static func frameworkRatio(stats: AuditStats) -> (outcome: CheckOutcome, findings: [Finding]) {
-        var findings: [Finding] = []
-        let total = stats.swiftuiFiles + stats.uikitFiles
-        let score: Double
-        if total == 0 {
-            score = 0.5
-            findings.append(Finding(check: "framework", severity: .info,
-                message: "No SwiftUI or UIKit imports detected; framework ratio unknown.",
-                file: nil, line: nil))
-        } else {
-            score = Double(stats.swiftuiFiles) / Double(total)
-        }
-        let detail = "\(stats.swiftuiFiles) SwiftUI files, \(stats.uikitFiles) UIKit files"
-        let outcome = CheckOutcome(key: "framework", title: "SwiftUI vs UIKit",
-            weight: 0.10, score: score, detail: detail,
-            reference: Reference.navigationSplitView, findings: findings)
-        return (outcome, findings)
+        return CheckResult(
+            key: "state", title: "State preservation",
+            score: Double(preserved) / Double(stateful),
+            detail: "\(preserved) of \(stateful) stateful view file(s) preserve state",
+            reference: Reference.sceneStorage, findings: findings, baseWeight: 0.10,
+            signals: ["preserved": Double(preserved), "stateful": Double(stateful)])
     }
 
     // MARK: - Visual check
 
-    private static func capturedLayout(screenshots: [String]) -> (outcome: CheckOutcome, findings: [Finding]) {
+    private static func capturedLayout(screenshots: [String]) -> CheckResult {
         var findings: [Finding] = []
         var scores: [Double] = []
         var analyzed = 0
@@ -389,38 +453,39 @@ enum AuditEngine {
             }
         }
 
-        let score = analyzed == 0 ? 0.5 : scores.reduce(0, +) / Double(analyzed)
+        guard analyzed > 0 else {
+            return CheckResult(key: "captured-layout", title: "Captured layout (simulator)",
+                score: nil, detail: "no screenshot could be decoded",
+                reference: Reference.modernizeUIKit, findings: [], baseWeight: 0.20,
+                signals: ["analyzed": 0])
+        }
 
-        let detail = analyzed == 0
-            ? "no screenshot could be decoded"
-            : "\(analyzed) screenshot(s) analyzed, avg layout score \(Int((score * 100).rounded()))%"
-        let outcome = CheckOutcome(key: "captured-layout", title: "Captured layout (simulator)",
-            weight: 0.10, score: score, detail: detail,
-            reference: Reference.modernizeUIKit, findings: findings)
-        return (outcome, findings)
+        let score = scores.reduce(0, +) / Double(analyzed)
+        return CheckResult(
+            key: "captured-layout", title: "Captured layout (simulator)",
+            score: score,
+            detail: "\(analyzed) screenshot(s) analyzed, avg layout score \(Int((score * 100).rounded()))%",
+            reference: Reference.modernizeUIKit, findings: findings, baseWeight: 0.20,
+            signals: ["analyzed": Double(analyzed)])
     }
 
     // MARK: - Effort estimate
 
-    private static func estimateHours(stats: AuditStats, outcomes: [CheckOutcome]) -> Double {
-        var hours = Double(stats.swiftFiles) * 0.35
+    private static func estimateHours(stats: AuditStats, outcomes: [CheckOutcome],
+                                      blockers: [Blocker]) -> Double {
+        var hours = Double(stats.uiFiles) * 0.2
 
-        for outcome in outcomes {
+        for blocker in blockers {
+            hours += blocker.stopsLaunch ? 8 : 0.5
+        }
+        for outcome in outcomes where outcome.score < 1 {
+            let gap = 1 - outcome.score
             switch outcome.key {
-            case "adaptive-layout":
-                hours += Double(outcome.findings.count) * 0.3
-            case "full-screen":
-                if outcome.score == 0 { hours += 0.5 }
-            case "navigation":
-                if outcome.score < 1 { hours += Double(outcome.findings.count) * 1.5 + 2 }
-            case "fold-state":
-                if outcome.score < 1 { hours += 3 }
-            case "state":
-                if outcome.score < 1 { hours += 2 }
-            case "scene":
-                if outcome.score < 0.8 { hours += 2 }
-            default:
-                break
+            case "adaptive-layout": hours += Double(outcome.findings.count) * 0.3
+            case "navigation": hours += gap * 24
+            case "adaptive-geometry": hours += gap * 12
+            case "state": hours += gap * 8
+            default: break
             }
         }
         return (hours * 2).rounded() / 2

@@ -9,6 +9,8 @@ enum Acceptance: Sendable, Equatable {
     case findingResolved(check: String, file: String?)
     /// The check scores at least `score` out of 100.
     case checkAtLeast(key: String, score: Double)
+    /// The named blocker is gone.
+    case noBlocker(id: String)
 
     var described: String {
         switch self {
@@ -16,6 +18,8 @@ enum Acceptance: Sendable, Equatable {
             return "no '\(check)' finding remains in \(file ?? "the project")"
         case .checkAtLeast(let key, let score):
             return "check '\(key)' scores at least \(Int(score))/100"
+        case .noBlocker(let id):
+            return "the '\(id)' blocker is gone"
         }
     }
 
@@ -26,6 +30,8 @@ enum Acceptance: Sendable, Equatable {
         case .checkAtLeast(let key, let score):
             guard let outcome = result.outcomes.first(where: { $0.key == key }) else { return false }
             return (outcome.score * 100).rounded() >= score
+        case .noBlocker(let id):
+            return !result.blockers.contains { $0.id == id }
         }
     }
 
@@ -37,6 +43,8 @@ enum Acceptance: Sendable, Equatable {
             return d
         case .checkAtLeast(let key, let score):
             return ["type": "check_at_least", "check": key, "score": score]
+        case .noBlocker(let id):
+            return ["type": "no_blocker", "blocker": id]
         }
     }
 
@@ -45,6 +53,9 @@ enum Acceptance: Sendable, Equatable {
         case "finding_resolved":
             guard let check = d["check"] as? String else { return nil }
             return .findingResolved(check: check, file: d["file"] as? String)
+        case "no_blocker":
+            guard let id = d["blocker"] as? String else { return nil }
+            return .noBlocker(id: id)
         case "check_at_least":
             guard let key = d["check"] as? String else { return nil }
             let score = (d["score"] as? Double) ?? (d["score"] as? Int).map(Double.init) ?? 100
@@ -109,31 +120,41 @@ enum WorkOrderBuilder {
     static func build(from result: AuditResult) -> WorkOrder {
         var entries: [WorkOrderEntry] = []
 
+        // Blockers first: an entry that decides whether the app launches outranks every
+        // entry about how well it looks.
+        for blocker in result.blockers where blocker.id == Blockers.sceneLifecycleMissing {
+            entries.append(WorkOrderEntry(
+                id: "scene-lifecycle",
+                title: "Adopt the UIScene lifecycle",
+                checkKey: "scene",
+                file: nil, line: nil,
+                requiredEndState: blocker.consequence + " The app must declare a scene "
+                    + "manifest and a scene delegate (or a SwiftUI App scene), and create "
+                    + "its window from the window scene.",
+                reference: blocker.reference,
+                acceptance: .noBlocker(id: blocker.id),
+                metWhenWritten: false))
+        }
+        for blocker in result.blockers where blocker.id == Blockers.fullScreenOptOut {
+            entries.append(WorkOrderEntry(
+                id: "full-screen-opt-out",
+                title: "Remove the resizable-presentation opt-out",
+                checkKey: "full-screen",
+                file: blocker.file, line: nil,
+                requiredEndState: blocker.consequence
+                    + " Remove UIRequiresFullScreen so the system can give the app the "
+                    + "full canvas.",
+                reference: blocker.reference,
+                acceptance: .noBlocker(id: blocker.id),
+                metWhenWritten: false))
+        }
+
         func reference(_ key: String) -> String {
             result.outcomes.first { $0.key == key }?.reference ?? Reference.modernizeUIKit
         }
         func score(_ key: String) -> Double {
             guard let o = result.outcomes.first(where: { $0.key == key }) else { return 0 }
             return (o.score * 100).rounded()
-        }
-
-        // Scene lifecycle: the one that stops the app launching at all.
-        if score("scene") < 80 {
-            let acceptance = Acceptance.checkAtLeast(key: "scene", score: 80)
-            entries.append(WorkOrderEntry(
-                id: "scene-lifecycle",
-                title: "Adopt the UIScene lifecycle",
-                checkKey: "scene",
-                file: nil, line: nil,
-                requiredEndState: """
-                    The app declares a scene manifest and a scene delegate (or a SwiftUI \
-                    App scene), and creates its window from the window scene rather than \
-                    in the application delegate. An app built against the iOS 27 SDK \
-                    without the scene lifecycle does not launch.
-                    """,
-                reference: reference("scene"),
-                acceptance: acceptance,
-                metWhenWritten: acceptance.isMet(by: result)))
         }
 
         // Fixed geometry reads, one entry per file.
@@ -191,19 +212,19 @@ enum WorkOrderBuilder {
                 metWhenWritten: acceptance.isMet(by: result)))
         }
 
-        if score("fold-state") < 70 {
-            let acceptance = Acceptance.checkAtLeast(key: "fold-state", score: 70)
+        if score("adaptive-geometry") < 70 {
+            let acceptance = Acceptance.checkAtLeast(key: "adaptive-geometry", score: 70)
             entries.append(WorkOrderEntry(
                 id: "adaptive-geometry",
                 title: "Branch layout on size classes, not on device or orientation",
-                checkKey: "fold-state",
+                checkKey: "adaptive-geometry",
                 file: nil, line: nil,
                 requiredEndState: """
                     Layout decisions read the horizontal size class or the scene's \
                     effective geometry. Device idiom and interface orientation do not \
                     describe a resizable scene and must not drive layout.
                     """,
-                reference: reference("fold-state"),
+                reference: reference("adaptive-geometry"),
                 acceptance: acceptance,
                 metWhenWritten: acceptance.isMet(by: result)))
         }

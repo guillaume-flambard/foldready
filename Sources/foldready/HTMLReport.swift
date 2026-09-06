@@ -21,6 +21,17 @@ enum HTMLReport {
         default: gradeColor = "#EF4444"
         }
 
+        // The verdict comes before the score: a blocker is a consequence, not a mark.
+        let blockers = result.blockers.isEmpty ? "" : """
+        <h2>Blockers</h2>
+        <div class="blockers">
+        \(result.blockers.map { blockerRow($0) }.joined(separator: "\n"))
+        </div>
+        """
+        let provisional = result.scoreIsProvisional
+            ? "<p class=\"prov\">This score is provisional: the app opts out of a resizable scene, so the layout it measures never gets the canvas.</p>"
+            : ""
+
         let f = ISO8601DateFormatter()
         return """
         <!doctype html>
@@ -59,6 +70,14 @@ enum HTMLReport {
           .card .k { color:var(--dim); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
           .card .v { font-size:22px; font-weight:700; margin-top:4px; }
           .ok { color:var(--green); }
+          .blockers { display:grid; gap:10px; }
+          .blocker { border:1px solid #7F1D1D; background:#1F1113; border-radius:12px; padding:14px 16px; }
+          .blocker.optout { border-color:#78350F; background:#1E1710; }
+          .blocker .tag { font-size:11px; font-weight:800; letter-spacing:.08em; color:#FCA5A5; }
+          .blocker.optout .tag { color:#FCD34D; }
+          .blocker .ttl { font-weight:700; margin-top:4px; }
+          .blocker .csq { color:var(--dim); font-size:13px; margin-top:6px; }
+          .prov { color:#FCD34D; font-size:13px; }
           footer { margin-top:48px; color:var(--dim); font-size:12px; }
           .ref { color:var(--dim); font-size:11px; text-decoration:none; border-bottom:1px dotted var(--line); }
           .ref:hover { color:var(--blue); }
@@ -77,6 +96,9 @@ enum HTMLReport {
               <div class="grade">\(result.grade)</div>
             </div>
           </header>
+
+          \(blockers)
+          \(provisional)
 
           <h2>Summary</h2>
           <div class="cards">
@@ -97,6 +119,17 @@ enum HTMLReport {
         </div>
         </body>
         </html>
+        """
+    }
+
+    private static func blockerRow(_ b: Blocker) -> String {
+        let file = b.file.map { " · <code>\(esc($0))</code>" } ?? ""
+        return """
+        <div class="blocker\(b.stopsLaunch ? "" : " optout")">
+          <div class="tag">\(b.stopsLaunch ? "BLOCKER" : "OPT-OUT")</div>
+          <div class="ttl">\(esc(b.title))\(file)</div>
+          <div class="csq">\(esc(b.consequence)) <a class="ref" href="\(esc(b.reference))">\(esc(sourceLabel(b.reference)))</a></div>
+        </div>
         """
     }
 
