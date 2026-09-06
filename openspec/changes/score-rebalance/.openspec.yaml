@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-06
+goal: Make the score discriminate, and make the blocking facts impossible to
+  bury in an average.

@@ -110,7 +110,7 @@ struct WorkOrderTests {
             id: "scene-lifecycle", title: "Adopt the UIScene lifecycle", checkKey: "scene",
             file: nil, line: nil, requiredEndState: "scene lifecycle adopted",
             reference: Reference.sceneLifecycle,
-            acceptance: .checkAtLeast(key: "scene", score: 80),
+            acceptance: .noBlocker(id: Blockers.sceneLifecycleMissing),
             metWhenWritten: true)
         let order = WorkOrder(app: "Ready", generatedAt: Date(), score: ready.totalScore,
             entries: [entry])

@@ -39,8 +39,22 @@ enum JSONReport {
             "grade": result.grade,
             "risk": result.risk,
             "estimated_porting_hours": result.hoursEstimate,
+            "score_is_provisional": result.scoreIsProvisional,
+            "blockers": result.blockers.map { b -> [String: Any] in
+                var d: [String: Any] = [
+                    "id": b.id,
+                    "title": b.title,
+                    "consequence": b.consequence,
+                    "reference": b.reference,
+                    "stops_launch": b.stopsLaunch
+                ]
+                if let file = b.file { d["file"] = file }
+                return d
+            },
             "stats": [
                 "swift_files": result.stats.swiftFiles,
+                "ui_files": result.stats.uiFiles,
+                "excluded_files": result.stats.excludedFiles,
                 "swiftui_files": result.stats.swiftuiFiles,
                 "uikit_files": result.stats.uikitFiles,
                 "xib_or_storyboard": result.stats.xibOrStoryboard,
@@ -56,7 +70,8 @@ enum JSONReport {
                     "weight": decimal(o.weight, places: 4),
                     "score": (o.score * 100).rounded(),
                     "reference": o.reference,
-                    "detail": o.detail
+                    "detail": o.detail,
+                    "signals": o.signals.mapValues { decimal($0, places: 3) }
                 ] as [String: Any]
             },
             "findings": result.findings.map { f in

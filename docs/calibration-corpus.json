@@ -1,0 +1,1015 @@
+{
+  "apps": [
+    {
+      "app": "bitwarden",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 84,
+          "signals": {
+            "aware": 7,
+            "device_branching": 2,
+            "ui_files": 389
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 74,
+          "signals": {
+            "icon_frames": 22,
+            "offending": 4,
+            "ui_files": 389
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 68
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 54
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "C",
+      "score_v1": 73,
+      "score_v2": 55,
+      "stats": {
+        "excluded_files": 2372,
+        "swift_files": 2761,
+        "swiftui_files": 308,
+        "ui_files": 389,
+        "uikit_files": 101
+      }
+    },
+    {
+      "app": "deltachat",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 0,
+          "signals": {
+            "aware": 0,
+            "device_branching": 6,
+            "ui_files": 173
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 63,
+          "signals": {
+            "icon_frames": 3,
+            "offending": 3,
+            "ui_files": 173
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 2
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 60
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "F",
+      "score_v1": 62,
+      "score_v2": 22,
+      "stats": {
+        "excluded_files": 43,
+        "swift_files": 216,
+        "swiftui_files": 14,
+        "ui_files": 173,
+        "uikit_files": 161
+      }
+    },
+    {
+      "app": "dime",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 0,
+          "signals": {
+            "aware": 0,
+            "device_branching": 0,
+            "ui_files": 80
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 17,
+          "signals": {
+            "icon_frames": 82,
+            "offending": 12,
+            "ui_files": 80
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 2
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 19
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "F",
+      "score_v1": 56,
+      "score_v2": 6,
+      "stats": {
+        "excluded_files": 14,
+        "swift_files": 94,
+        "swiftui_files": 77,
+        "ui_files": 80,
+        "uikit_files": 9
+      }
+    },
+    {
+      "app": "duckduckgo",
+      "blockers": [
+        "scene-lifecycle-missing"
+      ],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 75,
+          "signals": {
+            "aware": 26,
+            "device_branching": 25,
+            "ui_files": 465
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 48,
+          "signals": {
+            "icon_frames": 37,
+            "offending": 15,
+            "ui_files": 465
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 12
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 130
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 53,
+      "score_v2": 43,
+      "stats": {
+        "excluded_files": 737,
+        "swift_files": 1202,
+        "swiftui_files": 259,
+        "ui_files": 465,
+        "uikit_files": 255
+      }
+    },
+    {
+      "app": "eigen",
+      "blockers": [
+        "scene-lifecycle-missing"
+      ],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 93,
+          "signals": {
+            "aware": 6,
+            "device_branching": 1,
+            "ui_files": 60
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 31,
+          "signals": {
+            "icon_frames": 2,
+            "offending": 4,
+            "ui_files": 60
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 4
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 15
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 56,
+      "score_v2": 43,
+      "stats": {
+        "excluded_files": 80,
+        "swift_files": 140,
+        "swiftui_files": 10,
+        "ui_files": 60,
+        "uikit_files": 50
+      }
+    },
+    {
+      "app": "element",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 38,
+          "signals": {
+            "aware": 4,
+            "device_branching": 4,
+            "ui_files": 790
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 72,
+          "signals": {
+            "icon_frames": 32,
+            "offending": 9,
+            "ui_files": 790
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 16
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 1,
+          "signals": {
+            "preserved": 1,
+            "stateful": 139
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 71,
+      "score_v2": 39,
+      "stats": {
+        "excluded_files": 1219,
+        "swift_files": 2009,
+        "swiftui_files": 403,
+        "ui_files": 790,
+        "uikit_files": 404
+      }
+    },
+    {
+      "app": "firefox",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 68,
+          "signals": {
+            "aware": 26,
+            "device_branching": 45,
+            "ui_files": 746
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 49,
+          "signals": {
+            "icon_frames": 10,
+            "offending": 23,
+            "ui_files": 746
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 15
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 1,
+          "signals": {
+            "preserved": 1,
+            "stateful": 199
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 59,
+      "score_v2": 41,
+      "stats": {
+        "excluded_files": 2429,
+        "swift_files": 3175,
+        "swiftui_files": 155,
+        "ui_files": 746,
+        "uikit_files": 620
+      }
+    },
+    {
+      "app": "homeassistant",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 56,
+          "signals": {
+            "aware": 9,
+            "device_branching": 8,
+            "ui_files": 762
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 72,
+          "signals": {
+            "icon_frames": 56,
+            "offending": 9,
+            "ui_files": 762
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 141
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 1,
+          "signals": {
+            "preserved": 1,
+            "stateful": 196
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "C",
+      "score_v1": 74,
+      "score_v2": 45,
+      "stats": {
+        "excluded_files": 1252,
+        "swift_files": 2014,
+        "swiftui_files": 638,
+        "ui_files": 762,
+        "uikit_files": 198
+      }
+    },
+    {
+      "app": "icecubesapp",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 55,
+          "signals": {
+            "aware": 4,
+            "device_branching": 7,
+            "ui_files": 274
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 73,
+          "signals": {
+            "icon_frames": 33,
+            "offending": 3,
+            "ui_files": 274
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 100,
+          "signals": {
+            "adopted": 1,
+            "containers": 32
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 5,
+          "signals": {
+            "preserved": 3,
+            "stateful": 61
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "B",
+      "score_v1": 72,
+      "score_v2": 65,
+      "stats": {
+        "excluded_files": 154,
+        "swift_files": 428,
+        "swiftui_files": 265,
+        "ui_files": 274,
+        "uikit_files": 22
+      }
+    },
+    {
+      "app": "isowords",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 0,
+          "signals": {
+            "aware": 0,
+            "device_branching": 1,
+            "ui_files": 99
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 37,
+          "signals": {
+            "icon_frames": 9,
+            "offending": 5,
+            "ui_files": 99
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 24
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 15
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "F",
+      "score_v1": 76,
+      "score_v2": 13,
+      "stats": {
+        "excluded_files": 289,
+        "swift_files": 388,
+        "swiftui_files": 89,
+        "ui_files": 99,
+        "uikit_files": 12
+      }
+    },
+    {
+      "app": "kickstarter",
+      "blockers": [
+        "scene-lifecycle-missing"
+      ],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 34,
+          "signals": {
+            "aware": 5,
+            "device_branching": 22,
+            "ui_files": 502
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 72,
+          "signals": {
+            "icon_frames": 2,
+            "offending": 6,
+            "ui_files": 502
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 3
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 1,
+            "stateful": 217
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 50,
+      "score_v2": 37,
+      "stats": {
+        "excluded_files": 1577,
+        "swift_files": 2079,
+        "swiftui_files": 93,
+        "ui_files": 502,
+        "uikit_files": 430
+      }
+    },
+    {
+      "app": "mochidiffusion",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 0,
+          "signals": {
+            "aware": 0,
+            "device_branching": 0,
+            "ui_files": 37
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 53,
+          "signals": {
+            "icon_frames": 5,
+            "offending": 1,
+            "ui_files": 37
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 100,
+          "signals": {
+            "adopted": 1,
+            "containers": 1
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 5
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 92,
+      "score_v2": 38,
+      "stats": {
+        "excluded_files": 21,
+        "swift_files": 58,
+        "swiftui_files": 37,
+        "ui_files": 37,
+        "uikit_files": 0
+      }
+    },
+    {
+      "app": "movieswiftui",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 0,
+          "signals": {
+            "aware": 0,
+            "device_branching": 0,
+            "ui_files": 91
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 35,
+          "signals": {
+            "icon_frames": 19,
+            "offending": 5,
+            "ui_files": 91
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 15
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 38
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "F",
+      "score_v1": 63,
+      "score_v2": 12,
+      "stats": {
+        "excluded_files": 14,
+        "swift_files": 105,
+        "swiftui_files": 91,
+        "ui_files": 91,
+        "uikit_files": 3
+      }
+    },
+    {
+      "app": "netnewswire",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 23,
+          "signals": {
+            "aware": 1,
+            "device_branching": 14,
+            "ui_files": 124
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 100,
+          "signals": {
+            "icon_frames": 9,
+            "offending": 0,
+            "ui_files": 124
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 6
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 46
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 60,
+      "score_v2": 43,
+      "stats": {
+        "excluded_files": 577,
+        "swift_files": 701,
+        "swiftui_files": 29,
+        "ui_files": 124,
+        "uikit_files": 101
+      }
+    },
+    {
+      "app": "nextcloud",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 38,
+          "signals": {
+            "aware": 4,
+            "device_branching": 16,
+            "ui_files": 357
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 40,
+          "signals": {
+            "icon_frames": 56,
+            "offending": 16,
+            "ui_files": 357
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 17
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 81
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 49,
+      "score_v2": 27,
+      "stats": {
+        "excluded_files": 88,
+        "swift_files": 445,
+        "swiftui_files": 123,
+        "ui_files": 357,
+        "uikit_files": 294
+      }
+    },
+    {
+      "app": "openfind",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 62,
+          "signals": {
+            "aware": 9,
+            "device_branching": 5,
+            "ui_files": 750
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 46,
+          "signals": {
+            "icon_frames": 23,
+            "offending": 26,
+            "ui_files": 750
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 9
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 148
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 68,
+      "score_v2": 38,
+      "stats": {
+        "excluded_files": 83,
+        "swift_files": 833,
+        "swiftui_files": 195,
+        "ui_files": 750,
+        "uikit_files": 560
+      }
+    },
+    {
+      "app": "openfoodfacts",
+      "blockers": [
+        "scene-lifecycle-missing"
+      ],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 0,
+          "signals": {
+            "aware": 0,
+            "device_branching": 0,
+            "ui_files": 102
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 60,
+          "signals": {
+            "icon_frames": 0,
+            "offending": 2,
+            "ui_files": 102
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 3
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 33
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "F",
+      "score_v1": 50,
+      "score_v2": 21,
+      "stats": {
+        "excluded_files": 116,
+        "swift_files": 218,
+        "swiftui_files": 0,
+        "ui_files": 102,
+        "uikit_files": 102
+      }
+    },
+    {
+      "app": "signal",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 72,
+          "signals": {
+            "aware": 6,
+            "device_branching": 5,
+            "ui_files": 333
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 83,
+          "signals": {
+            "icon_frames": 18,
+            "offending": 2,
+            "ui_files": 333
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 3
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 72
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "C",
+      "score_v1": 62,
+      "score_v2": 54,
+      "stats": {
+        "excluded_files": 2306,
+        "swift_files": 2639,
+        "swiftui_files": 51,
+        "ui_files": 333,
+        "uikit_files": 286
+      }
+    },
+    {
+      "app": "wikipedia",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 81,
+          "signals": {
+            "aware": 36,
+            "device_branching": 23,
+            "ui_files": 478
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 38,
+          "signals": {
+            "icon_frames": 46,
+            "offending": 23,
+            "ui_files": 478
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 8
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 5,
+          "signals": {
+            "preserved": 6,
+            "stateful": 115
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "D",
+      "score_v1": 53,
+      "score_v2": 42,
+      "stats": {
+        "excluded_files": 909,
+        "swift_files": 1387,
+        "swiftui_files": 246,
+        "ui_files": 478,
+        "uikit_files": 288
+      }
+    },
+    {
+      "app": "wordpress",
+      "blockers": [],
+      "checks": {
+        "adaptive-geometry": {
+          "score": 83,
+          "signals": {
+            "aware": 50,
+            "device_branching": 26,
+            "ui_files": 1290
+          },
+          "weight": 0.35
+        },
+        "adaptive-layout": {
+          "score": 69,
+          "signals": {
+            "icon_frames": 80,
+            "offending": 17,
+            "ui_files": 1290
+          },
+          "weight": 0.35
+        },
+        "navigation": {
+          "score": 0,
+          "signals": {
+            "adopted": 0,
+            "containers": 67
+          },
+          "weight": 0.2
+        },
+        "state": {
+          "score": 0,
+          "signals": {
+            "preserved": 0,
+            "stateful": 395
+          },
+          "weight": 0.1
+        }
+      },
+      "grade_v2": "C",
+      "score_v1": 56,
+      "score_v2": 53,
+      "stats": {
+        "excluded_files": 2000,
+        "swift_files": 3290,
+        "swiftui_files": 527,
+        "ui_files": 1290,
+        "uikit_files": 897
+      }
+    }
+  ],
+  "corpus": "twenty well-known open-source iOS apps, shallow clones",
+  "measured": "2026-09-06",
+  "note": "Calibration record for docs/result-contract.md. Signals are the raw counts, so a future rebalance can be simulated from this file without re-cloning the corpus."
+}

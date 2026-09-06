@@ -26,6 +26,9 @@ struct GatePolicy: Decodable, Sendable {
     var noRegressionChecks: [String]?
     /// Fail when any finding is at or above this severity.
     var maxSeverity: Severity?
+    /// Fail when the app has any blocker, independently of the score. A team can enforce
+    /// "must launch" without also enforcing a quality bar.
+    var forbidBlockers: Bool?
     /// Path to the baseline file, relative to the audited repository.
     var baseline: String?
     /// Act only on findings at or above this confidence. Reserved for `audit-fidelity`,
@@ -38,6 +41,7 @@ struct GatePolicy: Decodable, Sendable {
     var isEmpty: Bool {
         minScore == nil && maxTotalRegression == nil
             && (noRegressionChecks?.isEmpty ?? true) && maxSeverity == nil
+            && forbidBlockers != true
     }
 
     /// Default config file name, looked up at the root of the audited repository.
@@ -163,6 +167,29 @@ enum GateEngine {
     static func evaluate(result: AuditResult, baseline: Baseline?, policy: GatePolicy) -> GateOutcome {
         var rules: [RuleResult] = []
 
+        // A baseline from a different scoring version would report a regression that is an
+        // artefact of the rebalance, not a change in the app.
+        let comparable: Baseline?
+        if let baseline, baseline.schemaVersion != resultSchemaVersion {
+            comparable = nil
+        } else {
+            comparable = baseline
+        }
+        let staleBaseline = baseline != nil && comparable == nil
+        let staleReason: String? = staleBaseline
+            ? "baseline was written by contract v\(baseline?.schemaVersion ?? 0); this engine "
+                + "emits v\(resultSchemaVersion). Rewrite it with --write-baseline."
+            : nil
+
+        if policy.forbidBlockers == true {
+            rules.append(RuleResult(
+                name: "no blockers",
+                expected: "none",
+                actual: result.blockers.isEmpty ? "none"
+                    : result.blockers.map(\.title).joined(separator: ", "),
+                passed: result.blockers.isEmpty))
+        }
+
         if let floor = policy.minScore {
             let worst = result.outcomes
                 .filter { $0.score < 1.0 }
@@ -178,7 +205,7 @@ enum GateEngine {
         }
 
         if let tolerance = policy.maxTotalRegression {
-            if let baseline {
+            if let baseline = comparable {
                 let drop = baseline.score - result.totalScore
                 rules.append(RuleResult(
                     name: "total regression",
@@ -190,9 +217,9 @@ enum GateEngine {
                 rules.append(RuleResult(
                     name: "total regression",
                     expected: "drop <= \(fmt(tolerance))",
-                    actual: "no baseline",
+                    actual: staleBaseline ? "baseline from another scoring version" : "no baseline",
                     passed: true,
-                    skippedReason: "no baseline file yet"))
+                    skippedReason: staleReason ?? "no baseline file yet"))
             }
         }
 
@@ -207,13 +234,13 @@ enum GateEngine {
                 continue
             }
             let current = (outcome.score * 100).rounded()
-            guard let baseline, let was = baseline.checkScores[key] else {
+            guard let baseline = comparable, let was = baseline.checkScores[key] else {
                 rules.append(RuleResult(
                     name: "check '\(key)' no regression",
                     expected: "no drop",
                     actual: "no baseline",
                     passed: true,
-                    skippedReason: "no baseline value for '\(key)'"))
+                    skippedReason: staleReason ?? "no baseline value for '\(key)'"))
                 continue
             }
             rules.append(RuleResult(
