@@ -14,6 +14,9 @@ for rdir in sorted(REPORTS.iterdir()):
     if not rj.exists():
         continue
     data = json.loads(rj.read_text())
+    # docs/result-contract.md: consumers check the version rather than guessing.
+    if data.get("schema_version") != 1:
+        sys.exit(f"{rj}: unsupported result contract v{data.get('schema_version')}, expected 1")
     checks = {c["key"]: c["score"] for c in data["checks"]}
     top = [f for f in data["findings"] if f["severity"] in ("critical", "major")]
     apps.append({
@@ -21,8 +24,8 @@ for rdir in sorted(REPORTS.iterdir()):
         "score": data["score"],
         "grade": data["grade"],
         "risk": data["risk"],
-        "hours": data["estimatedPortingHours"],
-        "swiftFiles": data["stats"]["swiftFiles"],
+        "hours": data["estimated_porting_hours"],
+        "swiftFiles": data["stats"]["swift_files"],
         "checks": checks,
         "findings": len(top),
         "report": f"reports/{data['app']}/foldready-report.html",

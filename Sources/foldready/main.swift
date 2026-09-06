@@ -6,8 +6,6 @@ import Darwin
 import Glibc
 #endif
 
-let version = "0.1.0"
-
 struct CliOptions {
     var path: String
     var appName: String?
@@ -18,20 +16,25 @@ struct CliOptions {
     var screenshotsDir: String?
     var port: Bool = false
     var verify: Bool = false
+    var gate: Bool = false
     var apply: Bool = false
     var build: Bool = false
-    var tiers: [TransformTier] = [.safe, .review, .manual]
+    var baseline: String?
+    var config: String?
+    var writeBaseline: Bool = false
+    var workOrderPath: String?
 }
 
 func usage() -> Never {
     print("""
-    foldready v\(version) - Fold-Ready audit of an iOS app source tree.
+    foldready v\(foldreadyVersion) - Fold-Ready audit of an iOS app source tree.
 
     USAGE
       foldready <path> [options]          Audit an iOS source tree
       foldready visual <dir> [--open]     Analyze screenshots only (captured layout)
       foldready port <path> [options]     Generate porting patches (or apply with --apply)
       foldready verify <path> [options]   Re-audit after a port (score delta)
+      foldready gate <path> [options]     Audit and enforce a readiness policy (for CI)
 
     OPTIONS
       --name <name>           App name used in the report (default: folder name)
@@ -39,26 +42,21 @@ func usage() -> Never {
       --with-screenshots <dir> Add a "Captured layout" check from PNG screenshots in <dir>
       --json                  Also write result.json (machine readable)
       --open                  Open the HTML report in the default browser
-      --apply                 (port) write patches to the working tree
-      --tiers <t|r|m>         (port) transform tiers: safe/review/manual, or sr/m (default srm)
+      --apply                 (port) write the provably safe edits to the working tree
+      --work-order <file>     (verify) re-check a work order written by `port`
       --build                 (verify) build + capture the app on the widest simulator, add the visual check
+      --config <file>         (gate) policy file (default: <path>/\(GatePolicy.defaultFileName))
+      --baseline <file>       (gate) baseline result (default: <path>/\(GatePolicy.defaultBaselineName))
+      --write-baseline        (gate) write the current result to the baseline path and exit
       --version               Print version
       -h, --help              Show this help
+
+    GATE EXIT CODES
+      0  policy satisfied, or no policy configured
+      1  the run itself failed (unreadable tree, malformed config or baseline)
+      2  policy breach: the audit ran and a rule was violated
     """)
     exit(0)
-}
-
-func parseTiers(_ raw: String) -> [TransformTier] {
-    var tiers: [TransformTier] = []
-    for c in raw.lowercased() {
-        switch c {
-        case "s": if !tiers.contains(.safe) { tiers.append(.safe) }
-        case "r": if !tiers.contains(.review) { tiers.append(.review) }
-        case "m": if !tiers.contains(.manual) { tiers.append(.manual) }
-        default: break
-        }
-    }
-    return tiers
 }
 
 func parseArgs(_ args: [String]) -> CliOptions {
@@ -69,7 +67,7 @@ func parseArgs(_ args: [String]) -> CliOptions {
         switch a {
         case "-h", "--help": usage()
         case "--version":
-            print("foldready \(version)")
+            print("foldready \(foldreadyVersion)")
             exit(0)
         case "visual":
             opts.visual = true
@@ -77,13 +75,23 @@ func parseArgs(_ args: [String]) -> CliOptions {
             opts.port = true
         case "verify":
             opts.verify = true
+        case "gate":
+            opts.gate = true
         case "--apply":
             opts.apply = true
+        case "--write-baseline":
+            opts.writeBaseline = true
+        case "--baseline":
+            i += 1
+            if i < args.count { opts.baseline = args[i] }
+        case "--config":
+            i += 1
+            if i < args.count { opts.config = args[i] }
         case "--build":
             opts.build = true
-        case "--tiers":
+        case "--work-order":
             i += 1
-            if i < args.count { opts.tiers = parseTiers(args[i]) }
+            if i < args.count { opts.workOrderPath = args[i] }
         case "--name":
             i += 1
             if i < args.count { opts.appName = args[i] }
@@ -122,6 +130,115 @@ func color(_ s: String, _ code: String) -> String {
     return "\u{001B}\(code)m\(s)\u{001B}0m"
 }
 
+/// Runs the audit, evaluates the policy, prints the verdict, and returns the exit code.
+/// Kept separate from `main` so the gate's reporting is readable in one place.
+func runGate(root: String, appName: String, opts: CliOptions, screenshots: [String]) -> GateExit {
+    let configPath = opts.config ?? (root as NSString).appendingPathComponent(GatePolicy.defaultFileName)
+    let baselinePath = opts.baseline ?? (root as NSString).appendingPathComponent(GatePolicy.defaultBaselineName)
+
+    let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
+
+    if opts.writeBaseline {
+        do {
+            try Baseline.serialise(result).write(toFile: baselinePath, atomically: true, encoding: .utf8)
+        } catch {
+            FileHandle.standardError.write(Data("error: cannot write baseline '\(baselinePath)': \(error)\n".utf8))
+            return .error
+        }
+        print(color("FoldReady gate", "36") + " - \(appName)")
+        print("  baseline written: \(baselinePath)  (score \(Int(result.totalScore)))")
+        print("  commit it, so an accepted regression is a reviewable diff.")
+        return .pass
+    }
+
+    let policy: GatePolicy
+    let baseline: Baseline?
+    do {
+        policy = try GatePolicy.load(path: configPath) ?? .empty
+        // An explicit --baseline wins over the policy file's own baseline path.
+        let resolved = opts.baseline ?? policy.baseline.map {
+            (root as NSString).appendingPathComponent($0)
+        } ?? baselinePath
+        baseline = try Baseline.load(path: resolved)
+    } catch {
+        FileHandle.standardError.write(Data("error: \(error)\n".utf8))
+        return .error
+    }
+
+    let outcome = GateEngine.evaluate(result: result, baseline: baseline, policy: policy)
+
+    // The gate writes the same artefacts as an audit, so a CI job can fail the build and
+    // still publish the report a reviewer needs.
+    let outDir = opts.outDir ?? (root as NSString).appendingPathComponent("foldready-report")
+    try? FileManager.default.createDirectory(atPath: outDir, withIntermediateDirectories: true)
+    let htmlPath = (outDir as NSString).appendingPathComponent("foldready-report.html")
+    try? HTMLReport.render(result).write(toFile: htmlPath, atomically: true, encoding: .utf8)
+    try? JSONReport.render(result).write(
+        toFile: (outDir as NSString).appendingPathComponent("result.json"),
+        atomically: true, encoding: .utf8)
+
+    print(color("FoldReady gate", "36") + " - \(appName)")
+    print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)")
+    if let description = outcome.baselineDescription {
+        print("  baseline: \(description)")
+    }
+
+    print("  report: \(htmlPath)")
+
+    if !outcome.policyConfigured {
+        print("  no policy configured (\(configPath) absent or empty) — reporting only.")
+        print("  write a baseline with: foldready gate \(root) --write-baseline")
+        if opts.json { printGateJSON(result: result, outcome: outcome) }
+        return .pass
+    }
+
+    for rule in outcome.rules {
+        if let reason = rule.skippedReason, rule.passed {
+            print("  \(color("skip", "33")) \(rule.name): \(reason)")
+            continue
+        }
+        let mark = rule.passed ? color("pass", "32") : color("FAIL", "31")
+        print("  \(mark) \(rule.name): expected \(rule.expected), actual \(rule.actual)")
+        if !rule.passed {
+            for finding in rule.findings.prefix(5) {
+                let location = finding.file.map { "\($0)\(finding.line.map { ":\($0)" } ?? "")" } ?? "(project)"
+                print("        \(finding.severity.rawValue)  \(location)  \(finding.message)")
+            }
+            if rule.findings.count > 5 {
+                print("        … \(rule.findings.count - 5) more")
+            }
+        }
+    }
+
+    if opts.json { printGateJSON(result: result, outcome: outcome) }
+
+    return outcome.exitCode
+}
+
+/// Emits the full audit result plus the verdict, so one CI step can both fail the build
+/// and publish the numbers.
+func printGateJSON(result: AuditResult, outcome: GateOutcome) {
+    var payload = JSONReport.payload(result)
+    payload["gate"] = [
+        "passed": outcome.breaches.isEmpty,
+        "policy_configured": outcome.policyConfigured,
+        "rules": outcome.rules.map { rule -> [String: Any] in
+            var d: [String: Any] = [
+                "name": rule.name,
+                "expected": rule.expected,
+                "actual": rule.actual,
+                "passed": rule.passed
+            ]
+            if let reason = rule.skippedReason { d["skipped_reason"] = reason }
+            return d
+        }
+    ]
+    if let data = try? JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted, .sortedKeys]),
+       let text = String(data: data, encoding: .utf8) {
+        print(text)
+    }
+}
+
 func main() {
     let opts = parseArgs(Array(CommandLine.arguments.dropFirst()))
 
@@ -136,19 +253,22 @@ func main() {
     let appName = opts.appName ?? (root as NSString).lastPathComponent
 
     if opts.port {
-        let options = PortOptions(tiers: opts.tiers, apply: opts.apply, outDir: opts.outDir)
+        let options = PortOptions(apply: opts.apply, outDir: opts.outDir)
         let result = PortEngine.run(root: root, appName: appName, options: options)
         print(color("FoldReady port", "36") + " - \(appName)")
         let mode = options.apply ? "applied" : "dry run"
-        print("  mode: \(color(mode, options.apply ? "32" : "33"))  tiers: \(options.tiers.map(\.rawValue).joined(separator: ","))")
+        print("  mode: \(color(mode, options.apply ? "32" : "33"))")
         if options.apply { print("  \(color("\(result.appliedCount) edits written", "32")) to the working tree") }
         for patch in result.plan.patches {
             let n = patch.edits.count + patch.newFiles.count
-            let label = patch.tier == .safe ? "SAFE" : (patch.tier == .review ? "REVIEW" : "MANUAL")
-            print("  \(color("[\(label)]", patch.tier == .safe ? "32" : "33"))  \(patch.title)  (\(n) file\(n == 1 ? "" : "s"))")
+            print("  \(color("[SAFE]", "32"))  \(patch.title)  (\(n) file\(n == 1 ? "" : "s"))")
             for note in patch.notes.prefix(2) { print("      - \(note)") }
         }
-        if result.plan.patches.isEmpty { print("  nothing to port — the app is already fold-ready on these checks.") }
+        if result.plan.patches.isEmpty { print("  no mechanically safe edit to make.") }
+        let entries = result.workOrder.entries
+        print("  \(color("work order", "36")): \(entries.count) item(s) needing judgement")
+        for entry in entries.prefix(5) { print("      - \(entry.title)  (\(entry.location))") }
+        if entries.count > 5 { print("      … \(entries.count - 5) more") }
         if let report = result.reportPath {
             print("  report: \(report)")
             let dir = (report as NSString).deletingLastPathComponent
@@ -172,7 +292,6 @@ func main() {
                     [
                         "id": p.transformId,
                         "title": p.title,
-                        "tier": p.tier.rawValue,
                         "files": p.edits.count + p.newFiles.count,
                         "edits": p.edits.count,
                         "newFiles": p.newFiles.count,
@@ -207,6 +326,10 @@ func main() {
         }
     }
 
+    if opts.gate {
+        exit(runGate(root: root, appName: appName, opts: opts, screenshots: screenshots).rawValue)
+    }
+
     if opts.verify {
         let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
         print(color("FoldReady verify", "36") + " - \(appName)")
@@ -214,7 +337,27 @@ func main() {
         for o in result.outcomes where o.key == "captured-layout" {
             print("  captured layout: \(color(String(format: "%.0f%%", o.score * 100), o.score >= 0.6 ? "32" : "33"))  (\(o.detail))")
         }
-        print("  compare with the pre-port score from your audit report.")
+
+        // A work order closes the loop: per-entry status, not just a new total.
+        let workOrderPath = opts.workOrderPath
+            ?? (root as NSString).appendingPathComponent("foldready-port/work-order.json")
+        if let workOrder = WorkOrder.load(path: workOrderPath) {
+            var counts: [WorkOrder.Status: Int] = [:]
+            print("  work order: \(workOrder.entries.count) item(s) from a score of \(Int(workOrder.score))")
+            for entry in workOrder.entries {
+                let status = workOrder.status(of: entry, after: result)
+                counts[status, default: 0] += 1
+                let code = status == .fixed ? "32" : (status == .regressed ? "31" : "33")
+                print("    \(color(status.rawValue.padding(toLength: 9, withPad: " ", startingAt: 0), code)) \(entry.title)  (\(entry.location))")
+            }
+            let delta = result.totalScore - workOrder.score
+            let sign = delta >= 0 ? "+" : ""
+            print("  \(counts[.fixed] ?? 0) fixed, \(counts[.unchanged] ?? 0) unchanged, \(counts[.regressed] ?? 0) regressed  ·  score \(sign)\(Int(delta))")
+        } else if opts.workOrderPath != nil {
+            print("  no work order could be read at \(workOrderPath)")
+        } else {
+            print("  no work order found — run `foldready port \(root)` first for per-item status.")
+        }
         print("  full audit: foldready \(root) --name \"\(appName)\"")
         exit(0)
     }

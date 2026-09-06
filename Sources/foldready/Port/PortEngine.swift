@@ -1,7 +1,6 @@
 import Foundation
 
 struct PortOptions {
-    var tiers: [TransformTier] = [.safe, .review, .manual]
     var apply: Bool = false
     var outDir: String?
 }
@@ -13,19 +12,18 @@ enum PortEngine {
         let plists = walk(extension: "plist", at: root)
         let input = TransformInput(root: root, swiftFiles: swift, plists: plists)
 
-        let all = [
+        // Only the provable transforms remain. Everything that needs judgement is
+        // handed over as a work order, which Apple's app modernization skill (or any
+        // other coding agent) executes and `verify` then re-scores.
+        let patches = [
             Transforms.removeFullScreen(input),
             Transforms.sidebarOptIn(input),
-            Transforms.sceneLifecycle(input),
-            Transforms.screenBounds(input),
-            Transforms.adaptiveNavigation(input),
-            Transforms.statePreservation(input),
-            Transforms.dehardcodeFrames(input),
         ]
+            .filter { !$0.isNoop }
+            .sorted { $0.transformId < $1.transformId }
 
-        let patches = all
-            .filter { !$0.isNoop && options.tiers.contains($0.tier) }
-            .sorted { $0.tier < $1.tier }
+        let workOrder = WorkOrderBuilder.build(
+            from: AuditEngine.run(root: root, appName: appName))
 
         var appliedCount = 0
         var skippedNotes: [String] = []
@@ -81,9 +79,10 @@ enum PortEngine {
         }
 
         let plan = PortPlan(patches: patches, skippedNotes: skippedNotes)
-        let reportPath = writeReport(root: root, appName: appName, plan: plan, applied: options.apply, outDir: options.outDir)
-        return PortResult(appName: appName, plan: plan, applied: options.apply,
-            appliedCount: appliedCount, reportPath: reportPath)
+        let reportPath = writeReport(root: root, appName: appName, plan: plan,
+            workOrder: workOrder, applied: options.apply, outDir: options.outDir)
+        return PortResult(appName: appName, plan: plan, workOrder: workOrder,
+            applied: options.apply, appliedCount: appliedCount, reportPath: reportPath)
     }
 
     // MARK: - File IO
@@ -143,17 +142,28 @@ enum PortEngine {
 
     // MARK: - Report
 
-    private static func writeReport(root: String, appName: String, plan: PortPlan, applied: Bool, outDir: String?) -> String? {
+    private static func writeReport(root: String, appName: String, plan: PortPlan,
+                                    workOrder: WorkOrder, applied: Bool, outDir: String?) -> String? {
         let dir = outDir ?? (root as NSString).appendingPathComponent("foldready-port")
         try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
         let path = (dir as NSString).appendingPathComponent("porting-report.md")
 
-        let tierLabel: [TransformTier: String] = [.safe: "SAFE (auto-apply)", .review: "REVIEW (check the diff)", .manual: "MANUAL (suggested)"]
+        // The handoff artefacts: one for a human, one for `verify`.
+        try? workOrder.markdown().write(
+            toFile: (dir as NSString).appendingPathComponent("work-order.md"),
+            atomically: true, encoding: .utf8)
+        try? workOrder.json().write(
+            toFile: (dir as NSString).appendingPathComponent("work-order.json"),
+            atomically: true, encoding: .utf8)
+
         var md = "# FoldReady — porting report: \(appName)\n\n"
         md += applied ? "**Applied \(plan.patches.map(\.edits.count).reduce(0, +)) edits to the working tree.**\n\n" : "**Dry run — review the patches, then re-run with `--apply`.**\n\n"
+        md += "FoldReady only writes edits it can prove are safe. The remaining "
+        md += "\(workOrder.entries.count) item(s) need judgement and are in `work-order.md`, "
+        md += "written for Apple's app modernization agent skill or any other coding agent.\n\n"
 
         for patch in plan.patches {
-            md += "## \(patch.title) · \(tierLabel[patch.tier] ?? patch.tier.rawValue)\n\n"
+            md += "## \(patch.title)\n\n"
             if !patch.notes.isEmpty {
                 md += patch.notes.map { "- \($0)" }.joined(separator: "\n") + "\n\n"
             }

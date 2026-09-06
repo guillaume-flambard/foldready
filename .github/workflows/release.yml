@@ -1,0 +1,64 @@
+name: release
+
+# Marketplace consumers pin either exactly (v1.2.3) or follow patches (v1). Pushing the
+# immutable tag moves the major tag to the same commit, so `uses: .../foldready@v1` picks
+# up a patch without anyone editing their workflow, while `@v1.2.3` never changes.
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    name: Verify the tagged commit
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift build
+        run: swift build -c release
+      - name: Swift test
+        run: swift test
+      - name: Sourcing (every check cites Apple)
+        run: python3 Scripts/sourcing-check.py
+      - name: Result contract (golden)
+        run: python3 Scripts/contract-golden.py
+      - name: The tag matches the version in the binary
+        run: |
+          tagged="${GITHUB_REF_NAME#v}"
+          built="$(.build/release/foldready --version | awk '{print $2}')"
+          if [[ "$tagged" != "$built" ]]; then
+            echo "tag $GITHUB_REF_NAME does not match foldreadyVersion $built" >&2
+            echo "update Sources/foldready/Version.swift before tagging" >&2
+            exit 1
+          fi
+
+  tag:
+    name: Move the major tag
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Point vN at this commit
+        run: |
+          major="${GITHUB_REF_NAME%%.*}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$major" "$GITHUB_SHA"
+          git push --force origin "refs/tags/$major"
+          echo "moved $major to $GITHUB_SHA"
+
+  publish:
+    name: Publish the release
+    needs: tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag

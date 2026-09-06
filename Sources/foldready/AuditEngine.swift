@@ -6,6 +6,9 @@ struct CheckOutcome: Sendable {
     let weight: Double
     let score: Double
     let detail: String
+    /// Apple-authoritative source the requirement is derived from. Every scored check
+    /// must have one; `Scripts/check.sh` fails the build when it is empty.
+    let reference: String
     let findings: [Finding]
 }
 
@@ -74,8 +77,9 @@ enum AuditEngine {
             add(captured)
             let scale = 1.0 - captured.outcome.weight
             outcomes = outcomes.map { o in
-                CheckOutcome(key: o.key, title: o.title, weight: o.weight * scale,
-                    score: o.score, detail: o.detail, findings: o.findings)
+                o.key == captured.outcome.key ? o : CheckOutcome(key: o.key, title: o.title,
+                    weight: o.weight * scale, score: o.score, detail: o.detail,
+                    reference: o.reference, findings: o.findings)
             }
         }
 
@@ -89,7 +93,7 @@ enum AuditEngine {
             generatedAt: Date(),
             totalScore: total.rounded(),
             outcomes: outcomes,
-            findings: findings.sorted { $0.severity < $1.severity },
+            findings: Finding.deterministicOrder(findings),
             stats: stats,
             hoursEstimate: hours
         )
@@ -169,7 +173,8 @@ enum AuditEngine {
         let score = max(0.0, 1.0 - min(1.0, load / Double(total)))
         let detail = "\(fixedFrames) hardcoded frames, \(screenMain) UIScreen.main.bounds, \(screenMainOther) other UIScreen.main reads across \(swiftFiles.count) files"
         let outcome = CheckOutcome(key: "adaptive-layout", title: "Adaptive layout",
-            weight: 0.22, score: score, detail: detail, findings: findings)
+            weight: 0.22, score: score, detail: detail,
+            reference: Reference.modernizeUIKit, findings: findings)
         return (outcome, findings)
     }
 
@@ -184,7 +189,7 @@ enum AuditEngine {
                s.range(of: #"<true/>"#, options: .regularExpression) != nil {
                 blocked = true
                 findings.append(Finding(check: "full-screen", severity: .critical,
-                    message: "UIRequiresFullScreen=true skips Parallel View on the iPhone Fold. Remove it to opt in.",
+                    message: "UIRequiresFullScreen=true opts the app out of resizable presentation. Remove it so the system can give the app the full inner-display canvas.",
                     file: plist.path, line: nil))
             }
         }
@@ -192,9 +197,10 @@ enum AuditEngine {
         if blocked { score = 0 }
         else if scanned == 0 { score = 0.5 }
         else { score = 1 }
-        let detail = blocked ? "UIRequiresFullScreen=true found" : (scanned == 0 ? "no Info.plist scanned, verify build settings" : "Parallel View not blocked")
-        let outcome = CheckOutcome(key: "full-screen", title: "Parallel View opt-in",
-            weight: 0.08, score: score, detail: detail, findings: findings)
+        let detail = blocked ? "UIRequiresFullScreen=true found" : (scanned == 0 ? "no Info.plist scanned, verify build settings" : "resizable presentation not blocked")
+        let outcome = CheckOutcome(key: "full-screen", title: "Resizable presentation opt-in",
+            weight: 0.08, score: score, detail: detail,
+            reference: Reference.requiresFullScreen, findings: findings)
         return (outcome, findings)
     }
 
@@ -228,7 +234,8 @@ enum AuditEngine {
 
         let detail = "\(split) NavigationSplitView, \(sidebar) sidebar opt-ins, \(stack) stacks"
         let outcome = CheckOutcome(key: "navigation", title: "Adaptive navigation / sidebar",
-            weight: 0.25, score: score, detail: detail, findings: findings)
+            weight: 0.25, score: score, detail: detail,
+            reference: Reference.tabBarSidebar, findings: findings)
         return (outcome, findings)
     }
 
@@ -257,7 +264,8 @@ enum AuditEngine {
 
         let detail = swiftuiApp ? "SwiftUI @main App scene" : (sceneDelegate ? "UIKit scene delegate" : "scene lifecycle missing")
         let outcome = CheckOutcome(key: "scene", title: "UIScene lifecycle",
-            weight: 0.15, score: score, detail: detail, findings: findings)
+            weight: 0.15, score: score, detail: detail,
+            reference: Reference.sceneLifecycle, findings: findings)
         return (outcome, findings)
     }
 
@@ -292,7 +300,7 @@ enum AuditEngine {
 
         if effectiveGeometry == 0 && sizeClasses == 0 && geometryReader == 0 {
             findings.append(Finding(check: "fold-state", severity: .minor,
-                message: "No adaptive geometry handling (didUpdateEffectiveGeometry, size classes, GeometryReader). The app runs via Parallel View, but has no opinion about wider canvases.",
+                message: "No adaptive geometry handling (didUpdateEffectiveGeometry, size classes, GeometryReader). The app has no opinion about wider canvases.",
                 file: nil, line: nil))
         }
 
@@ -305,7 +313,8 @@ enum AuditEngine {
 
         let detail = "\(effectiveGeometry) effectiveGeometry, \(sizeClasses) size classes, \(geometryReader) GeometryReader, \(internalStrings) internal strings"
         let outcome = CheckOutcome(key: "fold-state", title: "Adaptive geometry (fold-aware)",
-            weight: 0.12, score: penalized, detail: detail, findings: findings)
+            weight: 0.12, score: penalized, detail: detail,
+            reference: Reference.sizeClasses, findings: findings)
         return (outcome, findings)
     }
 
@@ -336,7 +345,8 @@ enum AuditEngine {
 
         let detail = "\(sceneStorage) @SceneStorage, \(restoration) restoration, \(viewModels) view models"
         let outcome = CheckOutcome(key: "state", title: "State preservation",
-            weight: 0.08, score: score, detail: detail, findings: findings)
+            weight: 0.08, score: score, detail: detail,
+            reference: Reference.sceneStorage, findings: findings)
         return (outcome, findings)
     }
 
@@ -354,7 +364,8 @@ enum AuditEngine {
         }
         let detail = "\(stats.swiftuiFiles) SwiftUI files, \(stats.uikitFiles) UIKit files"
         let outcome = CheckOutcome(key: "framework", title: "SwiftUI vs UIKit",
-            weight: 0.10, score: score, detail: detail, findings: findings)
+            weight: 0.10, score: score, detail: detail,
+            reference: Reference.navigationSplitView, findings: findings)
         return (outcome, findings)
     }
 
@@ -384,7 +395,8 @@ enum AuditEngine {
             ? "no screenshot could be decoded"
             : "\(analyzed) screenshot(s) analyzed, avg layout score \(Int((score * 100).rounded()))%"
         let outcome = CheckOutcome(key: "captured-layout", title: "Captured layout (simulator)",
-            weight: 0.10, score: score, detail: detail, findings: findings)
+            weight: 0.10, score: score, detail: detail,
+            reference: Reference.modernizeUIKit, findings: findings)
         return (outcome, findings)
     }
 

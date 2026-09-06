@@ -1,33 +1,61 @@
 import Foundation
 
+/// The machine-readable audit result: FoldReady's public contract, documented in
+/// `docs/result-contract.md`. CI gates, the ranking site and third-party consumers read
+/// this, so the rules in `openspec/specs/audit/result-contract` apply to every change
+/// here: stable check keys, repository-relative finding paths, no absolute host paths,
+/// and a `schema_version` bump on any removal, rename or change of meaning.
 enum JSONReport {
 
     static func render(_ result: AuditResult) -> String {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        encoder.dateEncodingStrategy = .iso8601
+        let data = try! JSONSerialization.data(
+            withJSONObject: payload(result),
+            options: [.prettyPrinted, .sortedKeys])
+        return String(data: data, encoding: .utf8) ?? "{}"
+    }
 
-        let dict: [String: Any] = [
+    /// The payload without the generation timestamp: everything a consumer compares
+    /// between two runs. Two audits of the same tree with the same version must produce
+    /// an identical value here.
+    static func comparablePayload(_ result: AuditResult) -> [String: Any] {
+        var p = payload(result)
+        p.removeValue(forKey: "generated_at")
+        return p
+    }
+
+    /// Rounds to `places` decimals and returns a decimal number, so JSON serialisation
+    /// prints the value a human would write.
+    private static func decimal(_ value: Double, places: Int) -> NSDecimalNumber {
+        NSDecimalNumber(string: String(format: "%.\(places)f", value))
+    }
+
+    static func payload(_ result: AuditResult) -> [String: Any] {
+        [
+            "schema_version": resultSchemaVersion,
+            "foldready_version": foldreadyVersion,
             "app": result.appName,
-            "root": result.root,
-            "generatedAt": ISO8601DateFormatter().string(from: result.generatedAt),
+            "generated_at": ISO8601DateFormatter().string(from: result.generatedAt),
             "score": result.totalScore,
             "grade": result.grade,
             "risk": result.risk,
-            "estimatedPortingHours": result.hoursEstimate,
+            "estimated_porting_hours": result.hoursEstimate,
             "stats": [
-                "swiftFiles": result.stats.swiftFiles,
-                "swiftuiFiles": result.stats.swiftuiFiles,
-                "uikitFiles": result.stats.uikitFiles,
-                "xibOrStoryboard": result.stats.xibOrStoryboard,
-                "infoPlists": result.stats.infoPlists
+                "swift_files": result.stats.swiftFiles,
+                "swiftui_files": result.stats.swiftuiFiles,
+                "uikit_files": result.stats.uikitFiles,
+                "xib_or_storyboard": result.stats.xibOrStoryboard,
+                "info_plists": result.stats.infoPlists
             ],
             "checks": result.outcomes.map { o in
                 [
                     "key": o.key,
                     "title": o.title,
-                    "weight": o.weight,
+                    // Decimal, not Double: a weight of 0.08 has no exact binary form and
+                    // serialises as 0.080000000000000002, which makes two identical
+                    // results look different to anything diffing the JSON.
+                    "weight": decimal(o.weight, places: 4),
                     "score": (o.score * 100).rounded(),
+                    "reference": o.reference,
                     "detail": o.detail
                 ] as [String: Any]
             },
@@ -42,8 +70,5 @@ enum JSONReport {
                 return d
             }
         ]
-
-        let data = try! JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])
-        return String(data: data, encoding: .utf8) ?? "{}"
     }
 }

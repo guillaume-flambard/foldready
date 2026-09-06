@@ -1,24 +1,17 @@
 import Foundation
 
-enum TransformTier: String, Comparable, Sendable {
-    case safe
-    case review
-    case manual
-
-    private static let order: [TransformTier: Int] = [.safe: 0, .review: 1, .manual: 2]
-    static func < (lhs: TransformTier, rhs: TransformTier) -> Bool { order[lhs]! < order[rhs]! }
-}
-
 struct FileEdit: Sendable {
     let path: String
     let before: String
     let after: String
 }
 
+/// A mechanically safe edit: FoldReady can prove the change is correct without knowing
+/// the app's structure. Anything that needs judgement is a work-order entry instead
+/// (Port/WorkOrder.swift), never a patch.
 struct Patch: Sendable {
     let transformId: String
     let title: String
-    let tier: TransformTier
     let edits: [FileEdit]
     let newFiles: [String: String]
     let notes: [String]
@@ -56,6 +49,7 @@ struct PortPlan {
 struct PortResult {
     let appName: String
     let plan: PortPlan
+    let workOrder: WorkOrder
     let applied: Bool
     let appliedCount: Int
     let reportPath: String?
