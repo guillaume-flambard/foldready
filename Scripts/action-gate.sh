@@ -60,9 +60,16 @@ REPORT="$OUT/foldready-report.html"
 # base is a reason to skip the delta, never a reason to fail the job.
 BASE_SCORE=""
 DELTA=""
-if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
+if [[ "${GITHUB_EVENT_NAME:-}" != "pull_request" ]]; then
+  echo "note: not a pull request (event: ${GITHUB_EVENT_NAME:-none}) — no delta to report."
+else
   BASE_SHA="$(python3 -c "import json,os;print(json.load(open(os.environ['GITHUB_EVENT_PATH']))['pull_request']['base']['sha'])" 2>/dev/null || echo "")"
-  if [[ -n "$BASE_SHA" ]] && git -C "$GITHUB_WORKSPACE" cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+  if [[ -z "$BASE_SHA" ]]; then
+    echo "note: the event payload carries no base sha — no delta to report."
+  elif ! git -C "$GITHUB_WORKSPACE" cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+    echo "note: base commit ${BASE_SHA:0:8} is not in this checkout (shallow clone?) —"
+    echo "      add 'fetch-depth: 0' to actions/checkout to get a score delta."
+  else
     BASE_TREE="$WORK/base"
     if git -C "$GITHUB_WORKSPACE" worktree add --detach "$BASE_TREE" "$BASE_SHA" >/dev/null 2>&1; then
       BASE_OUT="$WORK/base-report"
@@ -78,8 +85,7 @@ if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]]; then
       fi
       git -C "$GITHUB_WORKSPACE" worktree remove --force "$BASE_TREE" >/dev/null 2>&1
     else
-      echo "note: could not check out the base commit (shallow clone?) — skipping the delta."
-      echo "      add 'fetch-depth: 0' to actions/checkout to get a score delta."
+      echo "note: could not add a worktree for the base commit — skipping the delta."
     fi
   fi
 fi
