@@ -135,8 +135,8 @@ export default function LandingPage() {
         </div>
         <div className="obj">
           <div className="ocard2">
-            <p className="q">Parallel View already runs every app — why port?</p>
-            <p className="a">It runs them — squeezed into the narrow column. Porting opts your app into the full inner display: a real sidebar on wide, scene lifecycles that survive the hinge, and a Fold-Ready Score you can print in your App Store listing.</p>
+            <p className="q">Our app already runs on it — why port?</p>
+            <p className="a">Two different questions. An app built against the iOS 27 SDK without the UIScene lifecycle does not launch at all, and that is not optional. Everything above that line is how well you use the room: a real sidebar when the scene is wide, layout that reflows, and state that survives a resize.</p>
           </div>
           <div className="ocard2">
             <p className="q">Can a static check really judge how my UI looks?</p>
