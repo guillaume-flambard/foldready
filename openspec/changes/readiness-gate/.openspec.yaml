@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-06
+goal: Make FoldReady the verifiable readiness gate teams run on every PR, not a
+  one-off port script Apple's own skill replaces.
