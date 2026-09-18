@@ -58,6 +58,19 @@ struct IdiomOrientationTests {
         let result = AuditEngine.run(root: root, appName: "App")
         #expect(!result.findings.contains { $0.check == "orientation" })
     }
+
+    @Test func aSourceOrientationBranchMakesTheCheckApplicableWithoutAPlist() {
+        // Task 4 ruled: no plist but a source `interfaceOrientation` branch is an orientation
+        // site, so the check applies and the branch is attributed to it.
+        let root = writeTree(["App/View.swift": """
+        import UIKit
+        let o = windowScene.interfaceOrientation
+        """], in: tempTree())
+        let result = AuditEngine.run(root: root, appName: "App")
+        #expect(result.outcomes.contains { $0.key == "orientation" },
+            "a source orientation branch is an orientation site")
+        #expect(result.findings.contains { $0.check == "orientation" && $0.file == "App/View.swift" })
+    }
 }
 
 /// The navigation and state checks read whole-file tokens, so a preview block that holds a

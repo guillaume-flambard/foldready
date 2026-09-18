@@ -5,21 +5,27 @@ is defensible enough for a team to fail a build on it.
 
 ## ADDED Requirements
 
-### Requirement: Syntax-aware attribution
+### Requirement: Lexed attribution
 
-Occurrences MUST be attributed using a Swift syntax tree rather than line matching. A
-match inside a comment, a string literal, or a disabled compilation branch MUST NOT be
-scored.
+Occurrences MUST be attributed from a lexed view of each Swift file rather than raw line
+matching, so that a match inside a comment or the literal text of a string cannot be
+scored. This is a lexer, not a syntax tree: declaration scope is out of scope for this
+change and the audit MUST NOT claim more attribution than it has.
 
 #### Scenario: Symbol named in a comment
 
 - **WHEN** a file mentions a flagged symbol only in a comment or documentation block
 - **THEN** the audit produces no scored finding for that file
 
-#### Scenario: File that fails to parse
+#### Scenario: Symbol inside a string literal
 
-- **WHEN** a Swift file cannot be parsed
-- **THEN** the audit reports it as unparsed, excludes it from scoring, and states how many
+- **WHEN** a flagged symbol appears only inside the literal text of a string
+- **THEN** it is not scored, and interpolation contents, which are real code, still are
+
+#### Scenario: File that fails to lex
+
+- **WHEN** a Swift file cannot be lexed, for example an unterminated block comment
+- **THEN** the audit reports it as unlexable, excludes it from scoring, and states how many
   files were excluded, rather than silently scoring it as clean
 
 ### Requirement: Non-shipping code is excluded from scoring

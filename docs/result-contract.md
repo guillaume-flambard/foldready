@@ -3,7 +3,7 @@
 `result.json` is FoldReady's public interface. CI gates, the ranking site and third-party
 consumers read it, so its shape is a contract rather than an implementation detail.
 
-**Current version: `schema_version` 4.**
+**Current version: `schema_version` 5.**
 
 Produce it with `foldready <path> --json`, or with `foldready gate <path> --json`, which
 adds a `gate` object to the same payload.
@@ -28,7 +28,7 @@ rather than reporting the rebalance as a regression.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `schema_version` | integer | Contract version. `4` today. |
+| `schema_version` | integer | Contract version. `5` today. |
 | `foldready_version` | string | Engine that produced the result. |
 | `app` | string | App name, from `--name` or the folder name. |
 | `generated_at` | string | ISO 8601 timestamp. The only field that changes between two runs of an unchanged tree. |
@@ -38,7 +38,7 @@ rather than reporting the rebalance as a regression.
 | `estimated_porting_hours` | number | Effort estimate, rounded to the half hour. |
 | `blockers` | array | Binary facts with a consequence, outside the score. See below. |
 | `score_is_provisional` | boolean | True when the app opted out of a resizable scene, so the quality score describes code that never gets the canvas. |
-| `stats` | object | `swift_files`, `ui_files`, `excluded_files`, `swiftui_files`, `uikit_files`, `xib_or_storyboard`, `info_plists`. |
+| `stats` | object | `swift_files`, `ui_files`, `excluded_files`, `swiftui_files`, `uikit_files`, `xib_or_storyboard`, `info_plists`, `failed_files`, and one count per exclusion reason: `excluded_tests`, `excluded_vendored`, `excluded_generated`, `excluded_by_config`. |
 | `build` | object | Literal toolchain values read from `project.pbxproj`. See below. |
 | `checks` | array | One entry per check, see below. |
 | `findings` | array | Located problems, see below. |
@@ -60,11 +60,12 @@ rather than reporting the rebalance as a regression.
 a consumer can recompute the total and detect a reweighting instead of mistaking it for a
 change in the audited app.
 
-Current keys and base weights: `adaptive-layout` 0.35, `adaptive-geometry` 0.35,
-`navigation` 0.20, `build-toolchain` 0.10, `state` 0.10, plus `captured-layout` 0.20 when
-screenshots are supplied. A check that does not apply to an app — no lists to preserve
-state in, no navigation container to adapt, no Xcode project file to read — drops out
-entirely and its weight is spread over the rest, so the reported weights always sum to 1.
+Current keys and base weights: `adaptive-layout` 0.35, `navigation` 0.20,
+`adaptive-geometry` 0.15, `build-toolchain` 0.10, `state` 0.10, `idiom` 0.10,
+`orientation` 0.10, plus `captured-layout` 0.20 when screenshots are supplied. A check that
+does not apply to an app — no lists to preserve state in, no navigation container to adapt,
+no Xcode project file to read, no orientation declared anywhere — drops out entirely and its
+weight is spread over the rest, so the reported weights always sum to 1.
 
 ## `build`
 
@@ -105,13 +106,24 @@ number turns a consequence into a school mark.
   fixed screen geometry or declaring a frame larger than a control. A soft decay rather
   than a share (which was near-constant on the corpus) or a threshold (which put a cliff at
   the anchor). 3% of UI files affected halves the check.
-- **`adaptive-geometry`** — half coverage, half purity. Coverage is size-class and
-  effective-geometry reads against a target of 2% of UI files; purity is those reads
-  against reads plus device-idiom or orientation branching. An app with no geometry reads or device branching receives full credit: standard containers can adapt without explicit geometry code.
+- **`adaptive-geometry`** — coverage only. Size-class and effective-geometry reads against a
+  target of 2% of UI files. An app that reads no geometry receives full credit: standard
+  containers can adapt without explicit geometry code, so the absence of a read is a missing
+  signal rather than a defect. Device-idiom and interface-orientation branching are no longer
+  folded in here; they are scored by the `idiom` and `orientation` checks.
 - **`navigation`**: standard navigation sites divided by standard plus legacy sites. NavigationStack, NavigationSplitView, TabView and UIKit navigation containers receive credit without a sidebar. Legacy NavigationView is a review signal, not an observed defect.
 - **`state`** — stateful view files that preserve scroll or selection, over stateful view
   files. Near zero across the corpus today: a frontier signal at a low weight, not a
   broken check.
+- **`idiom`** — share of UI files free of `UIDevice.current.userInterfaceIdiom` branching. A
+  branch describes a device, not the canvas the scene actually receives, which a resizable
+  scene is free to reshape. The finding is `medium` confidence because a deliberate
+  phone-only screen is invisible to a source scan.
+- **`orientation`** — supported interface orientations, read from `Info.plist` and from
+  source. A plist that declares only portrait orientations is a `major`, `high`-confidence
+  finding: it locks the app to one shape, so it cannot use the wider canvas. A source branch
+  on `interfaceOrientation` is a `minor`, `high`-confidence finding. The check does not apply
+  when no plist declares orientations and no source branches on one.
 
 ### Calibration
 
@@ -131,13 +143,15 @@ without re-cloning twenty repositories.
 | Field | Type | Meaning |
 |---|---|---|
 | `check` | string | The `key` of the check that produced it. |
-| `severity` | string | `critical`, `major`, `minor`, `info`. |
+| `severity` | string | `critical`, `major`, `minor`, `info`. How bad the finding would be if true. |
+| `confidence` | string | `high`, `medium`, `low`. How sure the audit is the finding is real, independent of severity. A match whose meaning depends on context the audit cannot see is `medium` or `low`, never `high`. |
 | `message` | string | What is wrong and what to do instead. |
 | `file` | string, optional | Repository-relative path. Absent for project-wide findings; a screenshot finding carries the image file name. |
 | `line` | integer, optional | 1-based. |
 
 Findings are ordered by severity, then check key, file, line and message, so a diff between
-two runs shows real changes rather than file system enumeration order.
+two runs shows real changes rather than file system enumeration order. `confidence` is not
+part of that order: it is a second axis the gate can filter on, not a sort key.
 
 ## `advisory[]`
 
@@ -173,6 +187,14 @@ shared with the runtime matrix in [readiness-review.md](readiness-review.md).
 | `rules[]` | array | `name`, `expected`, `actual`, `passed`, and `skipped_reason` when a rule could not be evaluated. |
 
 The exit code carries the same verdict: `0` pass, `2` policy breach, `1` execution error.
+
+When a baseline is loaded, the rules include `baseline-contract`: it fails when the
+baseline's `schema_version` differs from the engine's, naming both versions in `expected` and
+`actual`. Regression rules skip a baseline from another contract rather than report the
+rebalance as a regression; the `baseline-contract` failure is what tells the team to rewrite
+it. The severity ceiling can also be configured with `min_confidence`: findings below that
+level are reported but do not fail the build, and the rule's `actual` states how many were
+ignored. `min_confidence` is a `high`/`medium`/`low` level; any other value is a load error.
 
 ## Changing the contract
 
@@ -240,7 +262,7 @@ v3 corpus run. Grades express heuristic source scores, never device compatibilit
 Sources: [Prepare your app for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111461/)
 and [adaptive layouts](https://developer.apple.com/videos/play/tech-talks/111463/).
 
-## Version 4 (0.5.0, 18 September 2026)
+## Version 4 (0.4.0, 18 September 2026)
 
 Apple's preparation guidance states that below Xcode 27.1 an app does not extend under the
 status bar and camera on iPhone Duo, and names four surfaces a custom layout must handle.
@@ -262,3 +284,41 @@ Sources: [Preparing your app for iPhone Duo](https://developer.apple.com/documen
 [reserved regions](https://developer.apple.com/documentation/swiftui/geometryproxy/reservedregions(kind:options:layoutdirectionbehavior:)),
 [arrangement views](https://developer.apple.com/documentation/swiftui/arrangementview),
 and [vertical bars](https://developer.apple.com/documentation/swiftui/environmentvalues/toolbarverticaledge).
+
+## Version 5 (0.5.0, 19 September 2026)
+
+Scoring changed and two checks were added, so **v4 baselines are not comparable with v5
+results**. A gate presented with a v4 baseline fails a `baseline-contract` rule naming both
+versions rather than comparing an incomparable number. Regenerate the baseline with
+`foldready gate <path> --write-baseline`.
+
+- Every finding carries `confidence` (`high`, `medium`, `low`), a second axis independent of
+  `severity`. A finding whose meaning depends on context the audit cannot see is never
+  `high`; the `idiom` branch finding is `medium` because a phone-only screen is invisible to a
+  source scan.
+- New scored check `idiom` (base weight 0.10). Device-idiom branching is attributed to this
+  key rather than to `adaptive-geometry`.
+- New scored check `orientation` (base weight 0.10). It reads
+  `UISupportedInterfaceOrientations` in `Info.plist` as well as source `interfaceOrientation`
+  branches; a portrait-only plist is a `major` finding. It does not apply when no plist
+  declares orientations and no source branches on one.
+- `adaptive-geometry` drops to base weight 0.15 and is coverage-only. The device-branching
+  half moved to the two checks above. An app with no geometry read still receives full credit,
+  because the absence of a read is a missing signal rather than a defect.
+- Matches are attributed from a lexed view of each `.swift` file, so a symbol that appears only
+  in a comment or in the literal text of a string is no longer scored. A file the lexer cannot
+  finish is excluded and counted in `stats.failed_files` rather than scored clean. This is a
+  lexer, not a syntax tree: declaration scope is not resolved.
+- `stats` gains `failed_files` and one count per exclusion reason: `excluded_tests`,
+  `excluded_vendored`, `excluded_generated`, `excluded_by_config`. The reasons do not sum to
+  `excluded_files`: a non-UI Swift file that no rule excluded is in neither.
+- `exclude` and `include` path patterns in `.foldready.json` are read by the audit itself, so a
+  repository's own exclusions are reported by reason and an `include` entry always beats them.
+- `min_confidence` in `.foldready.json` is now typed. A value other than `high`, `medium` or
+  `low` is a load error rather than a silent fallback that makes the gate permissive.
+- The historical calibration above describes v2. Grades express heuristic source scores, never
+  device compatibility.
+
+Sources: [Modernize your UIKit app](https://developer.apple.com/videos/play/wwdc2026/278/),
+[UIDevice.userInterfaceIdiom](https://developer.apple.com/documentation/uikit/uidevice/userinterfaceidiom),
+and [UISupportedInterfaceOrientations](https://developer.apple.com/documentation/bundleresources/information-property-list/uisupportedinterfaceorientations).

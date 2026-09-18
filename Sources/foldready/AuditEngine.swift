@@ -672,6 +672,10 @@ enum AuditEngine {
             case "navigation": hours += gap * 24
             case "adaptive-geometry": hours += gap * 12
             case "state": hours += gap * 8
+            // Idiom branches are mechanical replacements; an orientation lock also edits a
+            // plist declaration, so it is closer to the state-preservation work.
+            case "idiom": hours += gap * 6
+            case "orientation": hours += gap * 8
             case "build-toolchain": hours += gap * 2
             default: break
             }

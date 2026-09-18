@@ -450,7 +450,18 @@ func main() {
     print("  \(Evidence.summary)")
     print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)\(provisional)")
     print("  est. porting effort: \(color("\(result.hoursEstimate) h", "32"))")
-    print("  \(result.stats.uiFiles) UI files of \(result.stats.swiftFiles) Swift files (\(result.stats.excludedFiles) excluded: tests, previews, vendored)")
+    // The four reasons are named rather than folded into one count, and not presented as a
+    // total: a non-UI Swift file that no rule excluded is in neither `ui_files` nor any of
+    // these counts, so only the reasons the audit actually applied are meaningful here.
+    let exclusions = result.stats.exclusions
+    var excludedReasons: [String] = []
+    if exclusions.tests > 0 { excludedReasons.append("\(exclusions.tests) tests") }
+    if exclusions.vendored > 0 { excludedReasons.append("\(exclusions.vendored) vendored") }
+    if exclusions.generated > 0 { excludedReasons.append("\(exclusions.generated) generated") }
+    if exclusions.byConfig > 0 { excludedReasons.append("\(exclusions.byConfig) config") }
+    let excludedNote = excludedReasons.isEmpty ? "none" : excludedReasons.joined(separator: ", ")
+    let failedNote = result.stats.failedFiles > 0 ? " · \(result.stats.failedFiles) unreadable" : ""
+    print("  \(result.stats.uiFiles) UI files of \(result.stats.swiftFiles) Swift files · excluded from scoring: \(excludedNote)\(failedNote)")
     for o in result.outcomes {
         let pct = Int((o.score * 100).rounded())
         print("    \(color(String(format: "%3d", pct) + "%", pct >= 60 ? "32" : (pct >= 35 ? "33" : "31")))  \(o.title)")

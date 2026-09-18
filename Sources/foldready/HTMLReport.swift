@@ -8,18 +8,33 @@ enum HTMLReport {
             .joined(separator: "\n")
         let findings = result.findings.isEmpty
             ? "<p class=\"ok\">No source or screenshot signals detected. Runtime compatibility is unverified.</p>"
-            : "<table><thead><tr><th>Severity</th><th>Check</th><th>Finding</th><th>File</th></tr></thead><tbody>"
+            : "<table><thead><tr><th>Severity</th><th>Confidence</th><th>Check</th><th>Finding</th><th>File</th></tr></thead><tbody>"
                 + result.findings.map { findingRow($0) }.joined(separator: "\n")
                 + "</tbody></table>"
         // The unlexable count is shown only when it is non-zero: such a file is excluded
         // from scoring, so the report must say so rather than read as if the tree were read.
+        // The exclusion reasons are listed separately as well, because a repository's own
+        // `exclude` list is an act the report has to make visible, not hide behind one count.
+        let exclusionReasons: [(String, Int)] = [
+            ("tests", result.stats.exclusions.tests),
+            ("vendored", result.stats.exclusions.vendored),
+            ("generated", result.stats.exclusions.generated),
+            ("config", result.stats.exclusions.byConfig)
+        ]
+        let exclusionBreakdown = exclusionReasons
+            .filter { $0.1 > 0 }
+            .map { "\($0.1) \($0.0)" }
+            .joined(separator: " · ")
         let summaryCards = [
             "<div class=\"card\"><div class=\"k\">Risk</div><div class=\"v\">\(result.risk)</div></div>",
             "<div class=\"card\"><div class=\"k\">Est. porting effort</div><div class=\"v\">\(result.hoursEstimate) h</div></div>",
             "<div class=\"card\"><div class=\"k\">Swift files</div><div class=\"v\">\(result.stats.swiftFiles)</div></div>",
             result.stats.failedFiles > 0
                 ? "<div class=\"card\"><div class=\"k\">Files the lexer could not read</div><div class=\"v\">\(result.stats.failedFiles)</div></div>"
-                : nil
+                : nil,
+            exclusionBreakdown.isEmpty
+                ? nil
+                : "<div class=\"card\"><div class=\"k\">Excluded from scoring</div><div class=\"v\" style=\"font-size:15px\">\(exclusionBreakdown)</div></div>"
         ].compactMap { $0 }.joined(separator: "\n            ")
 
         let gradeColor: String
@@ -73,6 +88,7 @@ enum HTMLReport {
           th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
           th { color:var(--dim); font-weight:600; }
           .sev { font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:.05em; }
+          .conf { color:var(--dim); text-transform:uppercase; font-size:11px; letter-spacing:.05em; }
           .critical { color:#EF4444; } .major { color:#F97316; } .minor { color:#FACC15; } .info { color:#94A3B8; }
           code { background:#0B1220; padding:1px 5px; border-radius:6px; font-size:12px; }
           .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
@@ -191,7 +207,7 @@ enum HTMLReport {
     private static func findingRow(_ f: Finding) -> String {
         let file = f.file.map { esc($0) } ?? "—"
         let line = f.line.map { ":\($0)" } ?? ""
-        return "<tr><td class=\"sev \(f.severity.rawValue)\">\(f.severity.rawValue)</td><td>\(esc(f.check))</td><td>\(esc(f.message))</td><td><code>\(file)\(line)</code></td></tr>"
+        return "<tr><td class=\"sev \(f.severity.rawValue)\">\(f.severity.rawValue)</td><td class=\"conf\">\(f.confidence.rawValue)</td><td>\(esc(f.check))</td><td>\(esc(f.message))</td><td><code>\(file)\(line)</code></td></tr>"
     }
 
     private static func logoBase64() -> String {

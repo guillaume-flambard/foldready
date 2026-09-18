@@ -55,17 +55,16 @@
       "weight": 0.35
     },
     {
-      "detail": "0 of 2 UI file(s) read size classes or effective geometry, 1 branch on device or orientation",
+      "detail": "0 of 2 UI file(s) read size classes or effective geometry",
       "key": "adaptive-geometry",
       "reference": "https://developer.apple.com/documentation/uikit/uitraitcollection/horizontalsizeclass",
-      "score": 0,
+      "score": 100,
       "signals": {
         "aware": 0,
-        "device_branching": 1,
         "ui_files": 2
       },
       "title": "Adaptive geometry",
-      "weight": 0.35
+      "weight": 0.15
     },
     {
       "detail": "0 of 1 stateful view file(s) preserve state",
@@ -78,9 +77,34 @@
       },
       "title": "State preservation",
       "weight": 0.1
+    },
+    {
+      "detail": "1 of 2 UI file(s) free of device-idiom branching",
+      "key": "idiom",
+      "reference": "https://developer.apple.com/documentation/uikit/uidevice/userinterfaceidiom",
+      "score": 50,
+      "signals": {
+        "clean": 1,
+        "ui_files": 2
+      },
+      "title": "Interface idiom",
+      "weight": 0.1
+    },
+    {
+      "detail": "0 of 1 orientation site(s) adapt to the scene",
+      "key": "orientation",
+      "reference": "https://developer.apple.com/documentation/bundleresources/information-property-list/uisupportedinterfaceorientations",
+      "score": 0,
+      "signals": {
+        "clean": 0,
+        "locked_plists": 1,
+        "sites": 1
+      },
+      "title": "Interface orientation",
+      "weight": 0.1
     }
   ],
-  "estimated_porting_hours": 29.5,
+  "estimated_porting_hours": 28.5,
   "evidence": {
     "duo_runtime_verified": false,
     "references": [
@@ -100,6 +124,7 @@
   "findings": [
     {
       "check": "adaptive-layout",
+      "confidence": "high",
       "evidence_kind": "static_signal",
       "file": "Legacy.swift",
       "line": 5,
@@ -108,16 +133,17 @@
       "severity": "major"
     },
     {
-      "check": "adaptive-geometry",
+      "check": "orientation",
+      "confidence": "high",
       "evidence_kind": "static_signal",
-      "file": "Legacy.swift",
-      "line": 7,
-      "message": "Layout branching on device idiom or interface orientation; a resizable scene is described by its size class.",
+      "file": "Info.plist",
+      "message": "Info.plist declares only portrait orientations, locking the app to one shape so it cannot use the full canvas when the scene is wider.",
       "requires_confirmation": true,
-      "severity": "minor"
+      "severity": "major"
     },
     {
       "check": "adaptive-layout",
+      "confidence": "high",
       "evidence_kind": "static_signal",
       "file": "Feed.swift",
       "line": 9,
@@ -126,7 +152,18 @@
       "severity": "minor"
     },
     {
+      "check": "idiom",
+      "confidence": "medium",
+      "evidence_kind": "static_signal",
+      "file": "Legacy.swift",
+      "line": 7,
+      "message": "Layout branching on the device idiom; a resizable scene is described by its size class, not by whether it is a phone or a tablet.",
+      "requires_confirmation": true,
+      "severity": "minor"
+    },
+    {
       "check": "state",
+      "confidence": "high",
       "evidence_kind": "static_signal",
       "file": "Feed.swift",
       "message": "Scroll or selection state is not preserved; a scene resize can rebuild the hierarchy and lose it.",
@@ -134,13 +171,18 @@
       "severity": "minor"
     }
   ],
-  "grade": "F",
+  "grade": "D",
   "risk": "high",
-  "schema_version": 4,
-  "score": 21,
+  "schema_version": 5,
+  "score": 41,
   "score_is_provisional": true,
   "stats": {
+    "excluded_by_config": 0,
     "excluded_files": 0,
+    "excluded_generated": 0,
+    "excluded_tests": 0,
+    "excluded_vendored": 0,
+    "failed_files": 0,
     "info_plists": 1,
     "swift_files": 2,
     "swiftui_files": 1,

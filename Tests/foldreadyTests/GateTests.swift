@@ -183,7 +183,7 @@ struct GateTests {
             "import UIKit\nlet i = UIDevice.current.userInterfaceIdiom\n"], in: tempTree())
         var policy = GatePolicy.empty
         policy.maxSeverity = .minor
-        policy.minConfidence = "high"
+        policy.minConfidence = .high
         let result = AuditEngine.run(root: root, appName: "App", policy: policy)
         #expect(result.findings.contains { $0.check == "idiom" && $0.confidence == .medium })
 
@@ -238,9 +238,44 @@ struct GateTests {
             result: result(total: 40, checks: [("navigation", 0)]),
             baseline: baseline, policy: policy)
 
-        #expect(outcome.exitCode == .pass, "a rebalance is not a regression")
-        #expect(outcome.rules.allSatisfy { $0.skippedReason != nil })
+        // The rebalance is not a regression, so the regression rules skip. The stale contract
+        // is its own failing rule: a silent pass on an incomparable number is what the
+        // `Score changes are declared` requirement forbids.
+        #expect(outcome.exitCode == .breach)
+        #expect(outcome.breaches.map(\.name) == ["baseline-contract"])
+        #expect(outcome.breaches.first?.actual == "baseline schema_version 1")
+        #expect(outcome.rules.filter { $0.name != "baseline-contract" }
+            .allSatisfy { $0.skippedReason != nil })
         #expect(outcome.rules.contains { $0.skippedReason?.contains("--write-baseline") == true })
+    }
+
+    @Test("A baseline from a different contract is named, and a matching one passes")
+    func baselineContract() throws {
+        let dir = tempDir()
+        let policy = try #require(try GatePolicy.load(
+            path: writePolicy(#"{ "max_total_regression": 0 }"#, in: dir)))
+
+        // A v4 baseline against this v5 engine.
+        let stalePath = dir.appendingPathComponent("stale.json").path
+        try #"{ "schema_version": 4, "score": 70, "checks": [] }"#
+            .write(toFile: stalePath, atomically: true, encoding: .utf8)
+        let stale = try #require(try Baseline.load(path: stalePath))
+        let failed = GateEngine.evaluate(result: result(total: 90, checks: [("navigation", 100)]),
+            baseline: stale, policy: policy)
+        let rule = try #require(failed.rules.first { $0.name == "baseline-contract" })
+        #expect(!rule.passed)
+        #expect(rule.expected == "baseline schema_version \(resultSchemaVersion)")
+        #expect(rule.actual == "baseline schema_version 4")
+
+        // A baseline written by this contract matches and passes.
+        let matchPath = dir.appendingPathComponent("match.json").path
+        try Baseline.serialise(result(total: 70, checks: [("navigation", 40)]))
+            .write(toFile: matchPath, atomically: true, encoding: .utf8)
+        let matching = try #require(try Baseline.load(path: matchPath))
+        #expect(matching.schemaVersion == resultSchemaVersion)
+        let passed = GateEngine.evaluate(result: result(total: 90, checks: [("navigation", 100)]),
+            baseline: matching, policy: policy)
+        #expect(passed.rules.first { $0.name == "baseline-contract" }?.passed == true)
     }
 
     @Test("A blocker fails a policy that forbids blockers")

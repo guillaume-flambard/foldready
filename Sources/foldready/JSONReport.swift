@@ -61,7 +61,16 @@ enum JSONReport {
                 "swiftui_files": result.stats.swiftuiFiles,
                 "uikit_files": result.stats.uikitFiles,
                 "xib_or_storyboard": result.stats.xibOrStoryboard,
-                "info_plists": result.stats.infoPlists
+                "info_plists": result.stats.infoPlists,
+                // The four reasons are reported separately rather than folded into
+                // `excluded_files`, because an aggressive `exclude` list in the audited
+                // repository must be visible. They are not a total: a non-UI Swift file that
+                // no rule excluded is in neither `ui_files` nor any of these counts.
+                "failed_files": result.stats.failedFiles,
+                "excluded_tests": result.stats.exclusions.tests,
+                "excluded_vendored": result.stats.exclusions.vendored,
+                "excluded_generated": result.stats.exclusions.generated,
+                "excluded_by_config": result.stats.exclusions.byConfig
             ],
             "checks": result.outcomes.map { o in
                 [
@@ -106,6 +115,7 @@ enum JSONReport {
                 var d: [String: Any] = [
                     "check": f.check,
                     "severity": f.severity.rawValue,
+                    "confidence": f.confidence.rawValue,
                     "message": f.message,
                     "evidence_kind": f.check == "captured-layout" ? "screenshot_signal" : "static_signal",
                     "requires_confirmation": true

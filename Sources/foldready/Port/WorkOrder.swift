@@ -216,13 +216,14 @@ enum WorkOrderBuilder {
             let acceptance = Acceptance.checkAtLeast(key: "adaptive-geometry", score: 70)
             entries.append(WorkOrderEntry(
                 id: "adaptive-geometry",
-                title: "Branch layout on size classes, not on device or orientation",
+                title: "Read size classes or the scene's effective geometry",
                 checkKey: "adaptive-geometry",
                 file: nil, line: nil,
                 requiredEndState: """
                     Layout decisions read the horizontal size class or the scene's \
-                    effective geometry. Device idiom and interface orientation do not \
-                    describe a resizable scene and must not drive layout.
+                    effective geometry, so the view adapts to whatever canvas it is given. \
+                    Device idiom and interface orientation describe a device, not the \
+                    scene's shape; they are scored by their own checks.
                     """,
                 reference: reference("adaptive-geometry"),
                 acceptance: acceptance,

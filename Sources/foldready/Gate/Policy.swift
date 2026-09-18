@@ -31,10 +31,10 @@ struct GatePolicy: Decodable, Sendable {
     var forbidBlockers: Bool?
     /// Path to the baseline file, relative to the audited repository.
     var baseline: String?
-    /// Act only on findings at or above this confidence. Reserved for `audit-fidelity`,
-    /// which introduces per-finding confidence; parsed here so a repository can adopt the
-    /// key before that change lands.
-    var minConfidence: String?
+    /// Act only on findings at or above this confidence. Typed as `Confidence` rather than a
+    /// string so a typo ("HIGH", "bogus") is a load error the caller reports, not a silent
+    /// fallback that quietly makes the gate permissive. The `min_confidence` key is unchanged.
+    var minConfidence: Confidence?
     /// Repository-relative path patterns the audit must drop from scoring, beside the
     /// built-in test/vendored/generated rules. Each dropped file is reported by reason.
     var exclude: [String]?
@@ -188,6 +188,19 @@ enum GateEngine {
                 + "emits v\(resultSchemaVersion). Rewrite it with --write-baseline."
             : nil
 
+        // `Score changes are declared`: a baseline from a different contract version is not
+        // comparable, so name it as its own rule. The regression rules skip rather than
+        // report the rebalance as a regression, but a silent pass on an incomparable number
+        // is worse than a red build: the team must rewrite the baseline deliberately.
+        if let baseline {
+            let matches = baseline.schemaVersion == resultSchemaVersion
+            rules.append(RuleResult(
+                name: "baseline-contract",
+                expected: "baseline schema_version \(resultSchemaVersion)",
+                actual: "baseline schema_version \(baseline.schemaVersion)",
+                passed: matches))
+        }
+
         if policy.forbidBlockers == true {
             rules.append(RuleResult(
                 name: "no blockers",
@@ -263,7 +276,7 @@ enum GateEngine {
             // or above the configured floor. An absent `min_confidence` falls back to `.low`,
             // the weakest level, which keeps every finding: an unconfigured gate behaves
             // exactly as it did before findings carried a confidence.
-            let confidenceFloor = Confidence(rawValue: policy.minConfidence ?? "") ?? .low
+            let confidenceFloor = policy.minConfidence ?? .low
             let ignored = result.findings.filter { $0.confidence < confidenceFloor }.count
             let offenders = result.findings.filter {
                 $0.confidence >= confidenceFloor && $0.severity <= ceiling

@@ -13,7 +13,7 @@ Shipped and working:
 
 - A Swift scanner that audits local source and reports a readiness score with per-check
   findings.
-- A versioned result contract (`schema_version` 3), documented in
+- A versioned result contract (`schema_version` 5), documented in
   [result-contract.md](result-contract.md), with a committed golden payload.
 - A `gate` subcommand with committed baselines, per-rule reporting and distinct exit codes.
 - A GitHub Action that audits base and head on a pull request and posts the score delta.
@@ -93,10 +93,17 @@ unattended.
 
 Entry: the contract is stable at v4 and baselines exist.
 
-Work: `audit-fidelity`, then the remainder of `score-rebalance`. A syntax-aware Swift
-parser, default exclusions for previews, test targets, vendored and generated code,
-interface idiom and orientation as first-class checks including the plist keys, and a
-confidence field the gate can act on.
+Work: `audit-fidelity` ships contract v5. A dependency-free Swift lexer replaces line
+matching, so a comment or a string literal cannot lower a score and a file that cannot be
+lexed is reported rather than scored clean. Preview, test, vendored and generated code are
+excluded by default, configurable in `.foldready.json`, and reported by reason. Interface
+idiom and interface orientation become first-class scored checks, and the orientation check
+reads the `Info.plist` keys as well as source. Every finding carries a confidence level, and
+the gate can act on findings at or above a configured `min_confidence`.
+
+A full Swift syntax tree is explicitly out of scope: the demonstrated false positives are all
+comments and strings, and declaration-scope attribution is a recorded follow-up. The index
+re-audit under v5 remains blocked on the twenty app checkouts (issue #6).
 
 Exit: a red gate means a real finding, the false-positive paths named in the
 `audit-fidelity` design are closed by test, and the index is re-audited under the new
@@ -104,7 +111,7 @@ version.
 
 Why here and not earlier: the four Duo surfaces are advisory, so they tolerate line-based
 matching. A scored check that can fail a build does not, and the gate must not be trusted
-until the parser lands.
+until attribution is lexed rather than textual.
 
 ## Phase 4. The launch window (16 to 23 October)
 
@@ -118,7 +125,7 @@ Work:
    record the device, runtime and linked SDK in `capture.json`.
 3. Refresh the site and the README for availability day, with the launch dates and the
    documented Xcode floor.
-4. Re-audit the index under the v4 contract and publish the new scores.
+4. Re-audit the index under the v5 contract and publish the new scores.
 
 Exit: the report can say "tested against these device types, on this runtime, with this SDK"
 rather than "not tested".

@@ -48,8 +48,15 @@ The remaining automatic proposal removes `UIRequiresFullScreen`; review its rele
 before applying it. Structural changes are work orders for a developer or coding agent.
 Static verification only reports whether source signals changed.
 
-The engine checks adaptive layout, geometry, standard navigation, state preservation and the
-Xcode build floor. The build floor reads `LastUpgradeCheck` from `project.pbxproj`: Apple
+The engine checks adaptive layout, standard navigation, state preservation, interface idiom
+and orientation, and the Xcode build floor. Source is read through a lexer, so a flagged
+symbol in a comment or in the text of a string is not scored. Interface idiom is scored on
+its own: branching on `UIDevice.current.userInterfaceIdiom` describes a device, not the
+canvas the scene receives. Interface orientation reads the `UISupportedInterfaceOrientations`
+keys in `Info.plist` as well as source branches, because a portrait-only plist locks the app
+to one shape. Every finding carries a confidence level (`high`, `medium`, `low`) separate from
+its severity, and a gate can act only on findings at or above a configured confidence. The
+build floor reads `LastUpgradeCheck` from `project.pbxproj`: Apple
 requires Xcode 27.1 or later to use all of the available screen space on iPhone Duo, and below
 it the app does not extend under the status bar and camera. That value records the last Xcode
 upgrade and can be stale, so a gap is a prompt to confirm the toolchain that actually builds
@@ -78,8 +85,11 @@ matrix. Its device/runtime defaults are generic and may need local overrides.
 
 ## CI and result contract
 
-[Contract v4](docs/result-contract.md) adds the scored build floor, so every weight shifted and
-v3 scores are not comparable. Rewrite baselines deliberately after review. The Duo surface
+[Contract v5](docs/result-contract.md) adds the scored `idiom` and `orientation` checks, gives
+every finding a confidence level the gate can act on, and moves exclusions into
+`.foldready.json`, so every weight shifted and v4 scores are not comparable. A v4 baseline
+fails a `baseline-contract` rule naming both versions; rewrite it deliberately after review.
+The Duo surface
 questions sit in a separate `advisory` array outside the score: they cannot turn a gate red,
 and an empty advisory list does not make a passing run. Existing website rankings and reports
 are labelled historical until the source apps are re-audited.
@@ -99,7 +109,7 @@ Policy lives in `.foldready.json`; no policy means report-only:
 runtime launch assertion. Exit codes: 0 policy passed, 2 policy breach, 1 execution error.
 The GitHub Action is defined in [action.yml](action.yml).
 
-One line adds it to a workflow. Pin `@v0` to follow patches, or `@v0.4.0` to freeze:
+One line adds it to a workflow. Pin `@v0` to follow patches, or `@v0.5.0` to freeze:
 
 ```yaml
 - uses: guillaume-flambard/foldready@v0

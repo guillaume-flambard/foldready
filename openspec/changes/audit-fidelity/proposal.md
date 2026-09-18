@@ -15,10 +15,11 @@ plists, where `UISupportedInterfaceOrientations` actually locks an app down.
 
 ## What Changes
 
-- Audit parsing becomes syntax-aware for Swift rather than line-based, so occurrences are
-  attributed to real declarations and call sites.
+- Swift files are lexed rather than matched line by line, so a flagged symbol inside a
+  comment or the literal text of a string cannot be scored. A lexer, not a syntax tree:
+  declaration-scope attribution is a follow-up, and the specs say so.
 - Preview blocks, test targets, vendored dependencies, and generated code are excluded
-  from scoring by default, and the exclusion is configurable and reported.
+  from scoring by default, configurable through `.foldready.json`, and reported by reason.
 - Interface idiom and interface orientation become first-class scored checks with their
   own keys and references, including the plist orientation keys, instead of a hidden
   penalty.
@@ -39,7 +40,12 @@ plists, where `UISupportedInterfaceOrientations` actually locks an app down.
 
 ## Impact
 
-- `Sources/foldready/AuditEngine.swift`: parsing layer, new checks, exclusion rules.
-- `Package.swift`: a Swift syntax parsing dependency.
-- Scores change for every app in the index, so the demo data and any published baselines
-  must be regenerated, and the result contract version bumped.
+- `Sources/foldready/AuditEngine.swift`: lexing layer, two new checks, plist orientation read,
+  exclusion rules.
+- `Sources/foldready/SwiftLexer.swift`: new. A dependency-free lexer; no `swift-syntax`.
+- `Sources/foldready/Exclusions.swift`, `Finding.swift`, `Gate/Policy.swift`, `JSONReport.swift`,
+  `HTMLReport.swift`, `Version.swift`: confidence, exclusions by reason, `minConfidence` read,
+  contract v5.
+- Scores change for every app in the index, so the published data must be regenerated under v5
+  and the result contract version bumped. The regeneration is blocked on the external corpus
+  and is tracked as issue #6.

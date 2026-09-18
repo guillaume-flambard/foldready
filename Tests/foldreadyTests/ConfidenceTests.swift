@@ -26,6 +26,15 @@ struct ConfidenceTests {
     @Test func gateFiltersBelowTheConfiguredConfidence() throws {
         let policy = try JSONDecoder().decode(GatePolicy.self,
             from: Data(#"{"minConfidence":"high"}"#.utf8))
-        #expect(policy.minConfidence == "high")
+        #expect(policy.minConfidence == .high)
+    }
+
+    @Test func aTypoInMinConfidenceIsALoadErrorNotASilentFallback() {
+        // A string here would decode a typo and fall back to permissive; the typed level
+        // makes "HIGH" and "bogus" errors the caller reports.
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(GatePolicy.self,
+                from: Data(#"{"minConfidence":"HIGH"}"#.utf8))
+        }
     }
 }
