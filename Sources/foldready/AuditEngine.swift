@@ -58,6 +58,9 @@ struct AuditStats: Sendable {
     /// `var`, not `let`: a stored `let` with a default is omitted from the synthesised
     /// memberwise initialiser, which would leave `AuditEngine` no way to set the count.
     var failedFiles: Int = 0
+    /// Files each exclusion rule dropped, so the result states what was not scored and why.
+    /// `var` for the same reason as `failedFiles`.
+    var exclusions: ExclusionReport = ExclusionReport()
 }
 
 struct AuditResult: Sendable {
@@ -137,7 +140,9 @@ struct AuditResult: Sendable {
 
 enum AuditEngine {
 
-    static func run(root: String, appName: String, screenshots: [String] = []) -> AuditResult {
+    static func run(root: String, appName: String, screenshots: [String] = [],
+                    policy: GatePolicy = .empty) -> AuditResult {
+        let policy = resolvePolicy(policy, root: root)
         let allSwift = walk(extension: "swift", at: root)
         let plists = walk(extension: "plist", at: root)
         let projectFiles = walk(extension: "pbxproj", at: root)
@@ -145,14 +150,16 @@ enum AuditEngine {
 
         // Everything scored is measured over shipping UI files. Tests, snapshots,
         // generated code and vendored dependencies are counted and reported, not scored.
-        let uiFiles = allSwift.filter { Exclusions.isUIFile($0) }
+        // The repository's own `exclude`/`include` policy extends and overrides the defaults.
+        let uiFiles = allSwift.filter { Exclusions.isUIFile($0, policy: policy) }
         // Lex each UI file once and hand the checks that view, so a comment or the literal
         // text of a string can never be scored. A file the lexer cannot finish is reported
         // through `stats.failedFiles` and excluded, never silently scored clean.
         let lexed = uiFiles.map { SwiftLexer.lex($0) }
         let scorable = lexed.filter { !$0.failed }
         let stats = makeStats(root: root, allSwift: allSwift, uiFiles: uiFiles, plists: plists,
-                              failedFiles: lexed.count - scorable.count)
+                              failedFiles: lexed.count - scorable.count,
+                              exclusions: exclusionReport(allSwift: allSwift, policy: policy))
 
         let blockers = [
             Blockers.sceneLifecycle(swiftFiles: allSwift),
@@ -225,9 +232,39 @@ enum AuditEngine {
         return result
     }
 
+    /// The audit reads the repository's own `.foldready.json` when the caller passes none, so
+    /// the CLI, the CI action and `contract-golden.py` all honour an `exclude`/`include` list
+    /// without extra plumbing. A caller that passes a non-empty policy has already loaded it,
+    /// so this never reads the file twice for the same audit; only an empty policy triggers
+    /// the fallback. A malformed file is not fatal here: the gate path reports it as an error,
+    /// and a plain audit keeps the built-in rules rather than refusing to run.
+    private static func resolvePolicy(_ policy: GatePolicy, root: String) -> GatePolicy {
+        guard policy.isEmpty else { return policy }
+        let path = (root as NSString).appendingPathComponent(GatePolicy.defaultFileName)
+        return (try? GatePolicy.load(path: path)) ?? .empty
+    }
+
+    /// Counts the files each exclusion rule dropped. A file excluded by an `include` override
+    /// is in scope and counted nowhere; a file the built-in rules and an `exclude` entry both
+    /// match is `config`, because the repository's own list is the visible act.
+    private static func exclusionReport(allSwift: [FileContent],
+                                        policy: GatePolicy) -> ExclusionReport {
+        var report = ExclusionReport()
+        for file in allSwift {
+            switch Exclusions.isExcludedPath(file.path, policy: policy) {
+            case .tests: report.tests += 1
+            case .vendored: report.vendored += 1
+            case .generated: report.generated += 1
+            case .config: report.byConfig += 1
+            case nil: break
+            }
+        }
+        return report
+    }
+
     private static func makeStats(root: String, allSwift: [FileContent],
                                   uiFiles: [FileContent], plists: [FileContent],
-                                  failedFiles: Int) -> AuditStats {
+                                  failedFiles: Int, exclusions: ExclusionReport) -> AuditStats {
         var swiftui = 0, uikit = 0
         for file in uiFiles {
             if file.content.contains("import SwiftUI") { swiftui += 1 }
@@ -243,7 +280,8 @@ enum AuditEngine {
             uikitFiles: uikit,
             xibOrStoryboard: xibs + storyboards,
             infoPlists: plists.count,
-            failedFiles: failedFiles)
+            failedFiles: failedFiles,
+            exclusions: exclusions)
     }
 
     // MARK: - Checks

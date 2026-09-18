@@ -35,6 +35,12 @@ struct GatePolicy: Decodable, Sendable {
     /// which introduces per-finding confidence; parsed here so a repository can adopt the
     /// key before that change lands.
     var minConfidence: String?
+    /// Repository-relative path patterns the audit must drop from scoring, beside the
+    /// built-in test/vendored/generated rules. Each dropped file is reported by reason.
+    var exclude: [String]?
+    /// Repository-relative path patterns that force a file back into scope, beating both the
+    /// built-in rules and `exclude`: an explicitly included path is always audited.
+    var include: [String]?
 
     static let empty = GatePolicy()
 
@@ -42,6 +48,7 @@ struct GatePolicy: Decodable, Sendable {
         minScore == nil && maxTotalRegression == nil
             && (noRegressionChecks?.isEmpty ?? true) && maxSeverity == nil
             && forbidBlockers != true
+            && (exclude?.isEmpty ?? true) && (include?.isEmpty ?? true)
     }
 
     /// Default config file name, looked up at the root of the audited repository.

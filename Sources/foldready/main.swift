@@ -143,13 +143,38 @@ func printBlockers(_ result: AuditResult) {
     }
 }
 
+/// Loads the repository policy for an audit path. An absent file is `empty`; a malformed one
+/// is warned about and treated as `empty`, because a plain audit has no error channel. The
+/// gate path loads strictly and reports the malformed file as a run error instead.
+func loadAuditPolicy(root: String, config: String? = nil) -> GatePolicy {
+    let path = config ?? (root as NSString).appendingPathComponent(GatePolicy.defaultFileName)
+    do {
+        return try GatePolicy.load(path: path) ?? .empty
+    } catch {
+        FileHandle.standardError.write(Data("warning: \(error)\n".utf8))
+        return .empty
+    }
+}
+
 /// Runs the audit, evaluates the policy, prints the verdict, and returns the exit code.
 /// Kept separate from `main` so the gate's reporting is readable in one place.
 func runGate(root: String, appName: String, opts: CliOptions, screenshots: [String]) -> GateExit {
     let configPath = opts.config ?? (root as NSString).appendingPathComponent(GatePolicy.defaultFileName)
     let baselinePath = opts.baseline ?? (root as NSString).appendingPathComponent(GatePolicy.defaultBaselineName)
 
-    let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
+    // Load the policy before the audit: the audit itself honours the repository's
+    // `exclude`/`include` list, so it must run with the same policy the gate evaluates.
+    // Passing the loaded policy means `AuditEngine.run` does not read the file a second time.
+    let policy: GatePolicy
+    do {
+        policy = try GatePolicy.load(path: configPath) ?? .empty
+    } catch {
+        FileHandle.standardError.write(Data("error: \(error)\n".utf8))
+        return .error
+    }
+
+    let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots,
+                                 policy: policy)
 
     if opts.writeBaseline {
         do {
@@ -164,10 +189,8 @@ func runGate(root: String, appName: String, opts: CliOptions, screenshots: [Stri
         return .pass
     }
 
-    let policy: GatePolicy
     let baseline: Baseline?
     do {
-        policy = try GatePolicy.load(path: configPath) ?? .empty
         // An explicit --baseline wins over the policy file's own baseline path.
         let resolved = opts.baseline ?? policy.baseline.map {
             (root as NSString).appendingPathComponent($0)
@@ -350,7 +373,8 @@ func main() {
     }
 
     if opts.verify {
-        let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
+        let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots,
+                                     policy: loadAuditPolicy(root: root))
         print(color("FoldReady verify", "36") + " - \(appName)")
         printBlockers(result)
         print("  \(Evidence.summary)")
@@ -404,7 +428,8 @@ func main() {
         exit(0)
     }
 
-    let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
+    let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots,
+                                 policy: loadAuditPolicy(root: root))
 
     let outDir = opts.outDir ?? (root as NSString).appendingPathComponent("foldready-report")
     try? fm.createDirectory(atPath: outDir, withIntermediateDirectories: true)

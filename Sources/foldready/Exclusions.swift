@@ -1,5 +1,28 @@
 import Foundation
 
+/// Why a file was kept out of scoring. The reasons are reported separately, so an aggressive
+/// `exclude` list in the audited repository is visible rather than folded into one opaque
+/// count.
+enum ExclusionReason: Sendable {
+    /// Test targets, snapshot directories, fixtures and mocks.
+    case tests
+    /// Vendored or built dependencies: Pods, Carthage, node_modules, DerivedData.
+    case vendored
+    /// Machine-generated source, e.g. `.generated.swift`.
+    case generated
+    /// Dropped by the audited repository's own `.foldready.json` `exclude` list.
+    case config
+}
+
+/// How many files each exclusion rule dropped, carried on `AuditStats` so the result states
+/// what the audit refused to score and why.
+struct ExclusionReport: Sendable, Equatable {
+    var tests: Int = 0
+    var vendored: Int = 0
+    var generated: Int = 0
+    var byConfig: Int = 0
+}
+
 /// What the audit refuses to score, and why.
 ///
 /// Measured on the twenty-app corpus (2026-09-06): 92% of the frame findings were
@@ -20,28 +43,58 @@ enum Exclusions {
     /// avatar, a badge, a spinner — not something that should reflow.
     static let iconPointLimit: Double = 100
 
-    private static let excludedPathFragments = [
+    private static let testsPathFragments = [
         "/tests/", "/test/", "tests/", "/testing/", "uitests", "snapshots/", "snapshot/",
-        "/pods/", "/carthage/", "/vendor/", "/vendored/", "/thirdparty/", "/third_party/",
-        "/.build/", "/deriveddata/", "/node_modules/", "/fixtures/", "/mocks/"
+        "/fixtures/", "/mocks/"
     ]
 
-    private static let excludedFileSuffixes = [
-        "tests.swift", "test.swift", "spec.swift", "snapshothelper.swift",
-        ".generated.swift", "mock.swift", "mocks.swift"
+    private static let vendoredPathFragments = [
+        "/pods/", "/carthage/", "/vendor/", "/vendored/", "/thirdparty/", "/third_party/",
+        "/.build/", "/deriveddata/", "/node_modules/"
     ]
+
+    private static let testsFileSuffixes = [
+        "tests.swift", "test.swift", "spec.swift", "snapshothelper.swift",
+        "mock.swift", "mocks.swift"
+    ]
+
+    private static let generatedFileSuffixes = [".generated.swift"]
 
     /// True when the file is not shipping UI code: tests, snapshots, generated code, or a
-    /// vendored dependency.
+    /// vendored dependency. The default rule set, with no repository policy applied.
     static func isExcludedPath(_ path: String) -> Bool {
+        isExcludedPath(path, policy: .empty) != nil
+    }
+
+    /// The reason `path` is excluded under the built-in rules plus the repository policy, or
+    /// nil when it is in scope. An `include` entry beats both the built-in rules and an
+    /// `exclude` entry: an explicitly included path is always audited.
+    static func isExcludedPath(_ path: String, policy: GatePolicy) -> ExclusionReason? {
+        if matchesAny(policy.include, path) { return nil }
+        if matchesAny(policy.exclude, path) { return .config }
+        return defaultExclusion(for: path)
+    }
+
+    /// A configured pattern matches by case-insensitive substring, the same shape as the
+    /// built-in fragments, so an entry can name a file or a whole directory.
+    private static func matchesAny(_ patterns: [String]?, _ path: String) -> Bool {
+        guard let patterns, !patterns.isEmpty else { return false }
+        let lower = path.lowercased()
+        return patterns.contains { !$0.isEmpty && lower.contains($0.lowercased()) }
+    }
+
+    private static func defaultExclusion(for path: String) -> ExclusionReason? {
         let lower = "/" + path.lowercased()
-        if excludedPathFragments.contains(where: { lower.contains($0) }) { return true }
-        return excludedFileSuffixes.contains { lower.hasSuffix($0) }
+        if generatedFileSuffixes.contains(where: { lower.hasSuffix($0) }) { return .generated }
+        if testsFileSuffixes.contains(where: { lower.hasSuffix($0) }) { return .tests }
+        if vendoredPathFragments.contains(where: { lower.contains($0) }) { return .vendored }
+        if testsPathFragments.contains(where: { lower.contains($0) }) { return .tests }
+        return nil
     }
 
     /// True when the file participates in the UI: the denominator of every density check.
-    static func isUIFile(_ file: FileContent) -> Bool {
-        guard !isExcludedPath(file.path) else { return false }
+    static func isUIFile(_ file: FileContent, policy: GatePolicy = .empty) -> Bool {
+        guard isExcludedPath(file.path, policy: policy) == nil else { return false }
         return file.content.contains("import SwiftUI") || file.content.contains("import UIKit")
     }
 
