@@ -259,11 +259,21 @@ enum GateEngine {
         }
 
         if let ceiling = policy.maxSeverity {
-            let offenders = result.findings.filter { $0.severity <= ceiling }
+            // `Confidence.high` is the greatest level, so a finding is acted on when it is at
+            // or above the configured floor. An absent `min_confidence` falls back to `.low`,
+            // the weakest level, which keeps every finding: an unconfigured gate behaves
+            // exactly as it did before findings carried a confidence.
+            let confidenceFloor = Confidence(rawValue: policy.minConfidence ?? "") ?? .low
+            let ignored = result.findings.filter { $0.confidence < confidenceFloor }.count
+            let offenders = result.findings.filter {
+                $0.confidence >= confidenceFloor && $0.severity <= ceiling
+            }
+            let ignoredNote = ignored == 0
+                ? "" : " · ignored \(ignored) below \(confidenceFloor.rawValue) confidence"
             rules.append(RuleResult(
                 name: "severity ceiling",
                 expected: "no finding at or above \(ceiling.rawValue)",
-                actual: offenders.isEmpty ? "none" : "\(offenders.count) finding(s)",
+                actual: (offenders.isEmpty ? "none" : "\(offenders.count) finding(s)") + ignoredNote,
                 passed: offenders.isEmpty,
                 findings: offenders))
         }

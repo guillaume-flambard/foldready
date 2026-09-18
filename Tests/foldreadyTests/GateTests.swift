@@ -9,6 +9,25 @@ private func tempDir() -> URL {
     return url
 }
 
+/// Writes a tree of files, creating intermediate directories, and returns its root path.
+/// Copied from `IdiomOrientationTests.swift`, where the helpers are file-private.
+private func writeTree(_ files: [String: String], in parent: URL) -> String {
+    for (path, content) in files {
+        let url = parent.appendingPathComponent(path)
+        try? FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? content.write(to: url, atomically: true, encoding: .utf8)
+    }
+    return parent.path
+}
+
+private func tempTree() -> URL {
+    let url = FileManager.default.temporaryDirectory
+        .appendingPathComponent("fr-gate-tree-\(UUID().uuidString)", isDirectory: true)
+    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    return url
+}
+
 /// A result with the given total and per-check scores, built without touching the disk.
 private func result(total: Double, checks: [(String, Double)],
                     blockers: [Blocker] = []) -> AuditResult {
@@ -154,6 +173,43 @@ struct GateTests {
             baseline: nil, policy: policy)
         #expect(outcome.exitCode == .breach)
         #expect(outcome.breaches.first?.name == "severity ceiling")
+    }
+
+    @Test("Findings below the configured confidence do not trip the severity ceiling")
+    func minConfidenceIgnoresLowerConfidenceFindings() throws {
+        // The idiom check emits a minor finding at medium confidence: a gate set to act on
+        // high confidence only must ignore it, and say that it did.
+        let root = writeTree(["App/View.swift":
+            "import UIKit\nlet i = UIDevice.current.userInterfaceIdiom\n"], in: tempTree())
+        var policy = GatePolicy.empty
+        policy.maxSeverity = .minor
+        policy.minConfidence = "high"
+        let result = AuditEngine.run(root: root, appName: "App", policy: policy)
+        #expect(result.findings.contains { $0.check == "idiom" && $0.confidence == .medium })
+
+        let outcome = GateEngine.evaluate(result: result, baseline: nil, policy: policy)
+        #expect(outcome.exitCode == .pass)
+        let ceiling = try #require(outcome.rules.first { $0.name == "severity ceiling" })
+        #expect(ceiling.passed)
+        #expect(ceiling.actual.contains("ignored 1 below high confidence"),
+            "a gate that passed by ignoring a finding says so: \(ceiling.actual)")
+    }
+
+    @Test("An absent min_confidence still acts on every finding, whatever its confidence")
+    func absentMinConfidenceActsOnEveryFinding() throws {
+        // The same tree the confidence filter ignores: with no `min_confidence` the medium
+        // finding trips the ceiling exactly as it did before confidence existed.
+        let root = writeTree(["App/View.swift":
+            "import UIKit\nlet i = UIDevice.current.userInterfaceIdiom\n"], in: tempTree())
+        var policy = GatePolicy.empty
+        policy.maxSeverity = .minor
+        let result = AuditEngine.run(root: root, appName: "App", policy: policy)
+
+        let outcome = GateEngine.evaluate(result: result, baseline: nil, policy: policy)
+        #expect(outcome.exitCode == .breach)
+        let ceiling = try #require(outcome.breaches.first { $0.name == "severity ceiling" })
+        #expect(ceiling.findings.contains { $0.check == "idiom" })
+        #expect(!ceiling.actual.contains("ignored"), "an unconfigured gate ignores nothing: \(ceiling.actual)")
     }
 
     @Test("An unknown check key in the policy is reported, not ignored")
