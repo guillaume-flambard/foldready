@@ -1,6 +1,6 @@
 # audit-fidelity — implementation plan
 
-> **For agentic workers:** execute task by task, in order. Steps use checkbox (`- [x]`)
+> **For agentic workers:** execute task by task, in order. Steps use checkbox (`- [ ]`)
 > syntax for tracking. Run `./Scripts/check.sh` before every commit.
 
 **Goal:** replace line-based matching with a dependency-free Swift lexer, promote interface
@@ -874,9 +874,10 @@ recorded so the repository does not read as more complete than it is.
   this change's scope.
 - **Index re-audit under v5 (issue #6).** The published index in `web/lib/index-data.ts` still
   carries the older contract's per-app check keys and stays labelled historical on the site. The
-  re-audit is blocked on the twenty audited app checkouts, which live outside this repository and
-  are passed to `Scripts/build-index.sh` as arguments. It is tracked as issue #6 and is not a
-  code gap.
-- **Objective-C and build settings.** The lexer covers `.swift` files only; a `.m` or `.h` scan
-  still has text matching, and the report keeps saying so. Resolving build settings or the linked
-  SDK is not attempted; that remains a runtime question for the Duo simulator work in Phase 4.
+  re-audit needs the twenty audited app checkouts, which live outside this repository and are
+  handed to the scanner as arguments; the audited results are then turned into the published
+  index by `Scripts/generate-index.py`. It is tracked as issue #6 and is not a code gap.
+- **Objective-C and build settings.** The scanner reads `.swift` and `.plist` files only; a
+  `.m` or `.h` target is not analysed at all rather than analysed textually. Resolving build
+  settings or the linked SDK is not attempted; that remains a runtime question for the Duo
+  simulator work in Phase 4.

@@ -55,8 +55,8 @@ The repository currently reports `resultSchemaVersion = 4` and `foldreadyVersion
 - A Swift syntax tree. This change ships a lexer, and the spec is rewritten to say so rather
   than to claim a parser it does not have. Declaration-scope attribution (is this match inside
   a real type body or a nested test helper) is recorded as a follow-up, not built here.
-- Objective-C. The lexer is for `.swift` files; a `.m` or `.h` scan still only has text
-  matching, and the report keeps saying so.
+- Objective-C. The scanner reads `.swift` and `.plist` files only, so a `.m` or `.h` target
+  is not analysed at all rather than analysed textually.
 - Making the audit resolve build settings or the linked SDK. That stays a runtime question.
 - Re-auditing the public index in this change. The index regeneration is blocked on the twenty
   app checkouts, which live outside this repository; it is tracked as issue #6.
