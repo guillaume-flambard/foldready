@@ -41,6 +41,7 @@ export default function LandingPage() {
             <h3>Source scanner</h3><p className="price">Free</p>
             <p className="what">Repeatable source signals for your team and CI.</p>
             <ul><li>Layout and navigation checks with Apple sources</li><li>Heuristic score and effort estimate</li><li>Local reports and regression policies</li><li>Work orders for reviewed changes</li></ul>
+            <pre className="snippet"><code>{`- uses: guillaume-flambard/foldready@v0`}</code></pre>
             <a className="btn btn-sec" href="https://github.com/guillaume-flambard/foldready#usage">Get the CLI</a>
           </div>
           <div className="pcard featured">

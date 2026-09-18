@@ -394,3 +394,17 @@ footer.foot .mono { margin-left: auto; }
 }
 
 .field textarea { min-height: 110px; resize: vertical; }
+
+.snippet {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ink2);
+  overflow-x: auto;
+}
+.snippet code {
+  font: 500 12px/1.5 var(--font-mono);
+  color: var(--txt);
+  white-space: pre;
+}

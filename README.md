@@ -99,6 +99,16 @@ Policy lives in `.foldready.json`; no policy means report-only:
 runtime launch assertion. Exit codes: 0 policy passed, 2 policy breach, 1 execution error.
 The GitHub Action is defined in [action.yml](action.yml).
 
+One line adds it to a workflow. Pin `@v0` to follow patches, or `@v0.4.0` to freeze:
+
+```yaml
+- uses: guillaume-flambard/foldready@v0
+```
+
+The action builds its own pinned source on a macOS runner, so the code that produces the
+score is the code at the ref the workflow pinned. No policy file means report-only; add
+`.foldready.json` and commit a baseline to make it fail the build.
+
 ## Development
 
 ```sh
