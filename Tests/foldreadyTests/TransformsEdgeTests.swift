@@ -25,71 +25,14 @@ private func run(_ root: String, apply: Bool = false) -> PortResult {
 @Suite("Transforms edge cases")
 struct TransformsEdgeTests {
 
-    @Test("sidebar insertion targets the right class in a multi-class file")
-    func sidebarScopedInsertion() throws {
-        let root = fixture([
-            "App.swift": """
-            import UIKit
-
-            class Other: UIViewController {
-                override func viewDidLoad() {
-                    super.viewDidLoad()
-                }
-            }
-
-            class Root: UITabBarController {
-                override func viewDidLoad() {
-                    super.viewDidLoad()
-                }
-            }
-            """,
-        ])
-        let res = run(root, apply: true)
-        let content = try read(root, "App.swift")
-        #expect(content.contains("mode = .tabSidebar"))
-        // insertion must be inside Root, after Other's viewDidLoad
-        #expect(content.range(of: "mode = .tabSidebar")!.lowerBound > content.range(of: "class Root")!.lowerBound)
-        #expect(content.range(of: "class Other")!.lowerBound < content.range(of: "class Root")!.lowerBound)
-    }
-
-    @Test("deployment target below iOS 26 wraps the sidebar opt-in in #available")
-    func availabilityGuard() throws {
-        let root = fixture([
-            "project.pbxproj": """
-            // !$*UTF8*$!
-            {
-                IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-            }
-            """,
-            "Root.swift": """
-            import UIKit
-            class Root: UITabBarController {
-                override func viewDidLoad() { super.viewDidLoad() }
-            }
-            """,
-        ])
-        let res = run(root, apply: true)
-        let content = try read(root, "Root.swift")
-        #expect(content.contains("if #available(iOS 26.0, *)"))
-    }
-
-    @Test("deployment target 26+ inserts the sidebar opt-in plainly")
-    func noAvailabilityGuardOn26() throws {
-        let root = fixture([
-            "project.pbxproj": """
-            { IPHONEOS_DEPLOYMENT_TARGET = 26.0; }
-            """,
-            "Root.swift": """
-            import UIKit
-            class Root: UITabBarController {
-                override func viewDidLoad() { super.viewDidLoad() }
-            }
-            """,
-        ])
-        let res = run(root, apply: true)
-        let content = try read(root, "Root.swift")
-        #expect(content.contains("mode = .tabSidebar"))
-        #expect(!content.contains("#available(iOS 26.0"))
+    @Test("Default port preserves navigation at every deployment target", arguments: ["15.0", "26.0", "27.1"])
+    func navigationIsOptional(target: String) throws {
+        let source = "import UIKit\nclass Root: UITabBarController { override func viewDidLoad() { super.viewDidLoad() } }"
+        let root = fixture(["Root.swift": source,
+                            "project.pbxproj": "{ IPHONEOS_DEPLOYMENT_TARGET = \(target); }"])
+        let result = run(root, apply: true)
+        #expect(try read(root, "Root.swift") == source)
+        #expect(!result.plan.patches.contains { $0.transformId == "sidebar-optin" })
     }
 
     @Test("UIRequiresFullScreen removed across plist variants")

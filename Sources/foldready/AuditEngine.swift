@@ -64,6 +64,42 @@ struct AuditResult: Sendable {
     let blockers: [Blocker]
     let stats: AuditStats
     let hoursEstimate: Double
+    /// Duo surfaces the source suggests. Advisory: they never enter the score, any check
+    /// score, or the gate verdict.
+    let advisory: [AdvisoryFinding]
+    /// Toolchain generations read from the scanned project files, reported as read.
+    let build: BuildSignal
+
+    init(
+        root: String,
+        appName: String,
+        generatedAt: Date,
+        totalScore: Double,
+        outcomes: [CheckOutcome],
+        findings: [Finding],
+        blockers: [Blocker],
+        stats: AuditStats,
+        hoursEstimate: Double,
+        advisory: [AdvisoryFinding] = [],
+        build: BuildSignal = .empty
+    ) {
+        self.root = root
+        self.appName = appName
+        self.generatedAt = generatedAt
+        self.totalScore = totalScore
+        self.outcomes = outcomes
+        self.findings = findings
+        self.blockers = blockers
+        self.stats = stats
+        self.hoursEstimate = hoursEstimate
+        self.advisory = advisory
+        self.build = build
+    }
+
+    /// Runtime checks that would settle the advisory surface signals, once each.
+    var advisoryRuntimeChecks: [String] {
+        DuoSurfaces.runtimeChecks(for: advisory)
+    }
 
     /// True when the app has declined the resizable canvas, which makes the quality score
     /// a statement about code that never gets the room it is measured against.
@@ -98,6 +134,8 @@ enum AuditEngine {
     static func run(root: String, appName: String, screenshots: [String] = []) -> AuditResult {
         let allSwift = walk(extension: "swift", at: root)
         let plists = walk(extension: "plist", at: root)
+        let projectFiles = walk(extension: "pbxproj", at: root)
+        let build = BuildFloor.read(projectFiles: projectFiles)
 
         // Everything scored is measured over shipping UI files. Tests, snapshots,
         // generated code and vendored dependencies are counted and reported, not scored.
@@ -113,7 +151,8 @@ enum AuditEngine {
             navigation(uiFiles: uiFiles),
             adaptiveLayout(uiFiles: uiFiles),
             adaptiveGeometry(uiFiles: uiFiles),
-            statePreservation(uiFiles: uiFiles)
+            statePreservation(uiFiles: uiFiles),
+            buildToolchain(build: build)
         ]
         if !screenshots.isEmpty {
             results.append(capturedLayout(screenshots: screenshots))
@@ -132,7 +171,9 @@ enum AuditEngine {
             findings: Finding.deterministicOrder(findings),
             blockers: blockers,
             stats: stats,
-            hoursEstimate: estimateHours(stats: stats, outcomes: outcomes, blockers: blockers)
+            hoursEstimate: estimateHours(stats: stats, outcomes: outcomes, blockers: blockers),
+            advisory: DuoSurfaces.analyze(uiFiles: uiFiles),
+            build: build
         )
     }
 
@@ -191,58 +232,29 @@ enum AuditEngine {
 
     // MARK: - Checks
 
-    /// Whether the app has adopted a navigation container that can become a sidebar.
-    ///
-    /// Measured, not assumed: across the corpus, `adopted` is 0 for eighteen apps and 1
-    /// for two. No formula can grade a signal that reality has not yet spread out, and
-    /// the file-level denominator counted every file mentioning a stack, not the roots.
-    /// So this is reported as the binary capability it is, at a weight that says it
-    /// matters: it is the adaptation a wide canvas is for.
+    /// Standard navigation adapts without a sidebar opt-in. This is a source signal,
+    /// not proof that a particular screen or transition renders correctly.
     private static func navigation(uiFiles: [FileContent]) -> CheckResult {
-        var findings: [Finding] = []
         var adopted = 0
-        var notAdopted: [String] = []
-
+        var legacy: [String] = []
         for file in uiFiles {
-            let sidebarCapable = file.content.contains("NavigationSplitView")
-                || file.content.contains(".adaptiveSidebar()")
-                || file.content.contains("tabBarController.sidebar")
-                || file.content.contains("sidebar.preferredPlacement")
-                || file.content.contains("preferredPlacement = .sidebar")
-                || file.content.contains(".tabViewStyle(.sidebarAdaptable)")
-            let hasRoot = file.content.contains("NavigationStack")
-                || file.content.contains("NavigationView")
-                || file.content.contains(": UITabBarController")
-                || file.content.contains("UITabBarController {")
-
-            if sidebarCapable {
-                adopted += 1
-            } else if hasRoot {
-                notAdopted.append(file.path)
-            }
+            let source = file.content
+            let standard = ["NavigationStack", "NavigationSplitView", "TabView",
+                            "UINavigationController", "UISplitViewController", "UITabBarController"]
+                .contains { source.contains($0) }
+            if standard { adopted += 1 }
+            else if source.contains("NavigationView") { legacy.append(file.path) }
         }
-
-        let total = adopted + notAdopted.count
-        guard total > 0 else {
-            return CheckResult(key: "navigation", title: "Adaptive navigation / sidebar",
-                score: nil, detail: "no root navigation container found",
-                reference: Reference.tabBarSidebar, findings: [], baseWeight: 0.20,
-                signals: ["adopted": 0, "containers": 0])
+        let total = adopted + legacy.count
+        let findings = legacy.sorted().map { path in
+            Finding(check: "navigation", severity: .minor,
+                message: "Legacy NavigationView found. Review migration to standard navigation; a sidebar is optional and no rendering failure has been observed.",
+                file: path, line: nil)
         }
-
-        for path in notAdopted.sorted() {
-            findings.append(Finding(check: "navigation", severity: .major,
-                message: "Root navigation that cannot become a sidebar: the panes will not split when the scene is wide.",
-                file: path, line: nil))
-        }
-
-        return CheckResult(
-            key: "navigation", title: "Adaptive navigation / sidebar",
-            score: adopted > 0 ? 1.0 : 0.0,
-            detail: adopted > 0
-                ? "\(adopted) sidebar-capable container(s) across \(total) navigation site(s)"
-                : "no sidebar-capable container across \(total) navigation site(s)",
-            reference: Reference.tabBarSidebar, findings: findings, baseWeight: 0.20,
+        return CheckResult(key: "navigation", title: "Standard adaptive navigation",
+            score: total == 0 ? nil : Double(adopted) / Double(total),
+            detail: "\(adopted) standard navigation site(s), \(legacy.count) legacy site(s). Sidebar placement is optional.",
+            reference: Reference.prepareDuo, findings: findings, baseWeight: 0.20,
             signals: ["adopted": Double(adopted), "containers": Double(total)])
     }
 
@@ -368,7 +380,7 @@ enum AuditEngine {
         // three corpus apps for an absence rather than for a mistake.
         let score: Double
         if aware + deviceBranching == 0 {
-            score = coverage
+            score = 1.0
         } else {
             let purity = Double(aware) / Double(aware + deviceBranching)
             score = 0.5 * coverage + 0.5 * purity
@@ -446,7 +458,7 @@ enum AuditEngine {
                 scores.append(result.layoutScore)
                 if result.letterbox > 0.08 {
                     findings.append(Finding(check: "captured-layout", severity: .major,
-                        message: String(format: "Letterboxing detected (%.0f%% of the frame is uniform margin). The layout hardcodes a portrait fit and will show bands when it gets horizontal room.",
+                        message: String(format: "Uniform margins detected (%.0f%% of the frame). Inspect the image and linked SDK: this may be intentional spacing or system compatibility presentation, not a layout defect.",
                             result.letterbox * 100),
                         file: result.file, line: nil))
                 }
@@ -469,6 +481,47 @@ enum AuditEngine {
             signals: ["analyzed": Double(analyzed)])
     }
 
+    // MARK: - Build floor
+
+    /// Apple requires Xcode 27.1 or later to use all of the available screen space on
+    /// iPhone Duo. The source signal is `LastUpgradeCheck` in the project file, which
+    /// records the last Xcode upgrade and can be stale: a gap is a prompt to confirm the
+    /// toolchain that actually builds the app, not proof that a shipped binary fails.
+    private static func buildToolchain(build: BuildSignal) -> CheckResult {
+        guard let highest = build.highestUpgradeCheck else {
+            return CheckResult(key: "build-toolchain", title: "Xcode 27.1 build floor",
+                score: nil,
+                detail: build.isEmpty ? "no Xcode project file found" : "project file records no LastUpgradeCheck value",
+                reference: Reference.duoPreparation, findings: [], baseWeight: 0.10,
+                signals: ["last_upgrade_check": 0, "projects": Double(build.upgradeChecks.count)])
+        }
+
+        let file = build.upgradeChecks.first { $0.value == highest }?.file
+        let floor = BuildFloor.xcode27_1Generation
+        var signals: [String: Double] = [
+            "last_upgrade_check": Double(highest),
+            "xcode_27_1_generation": Double(floor)
+        ]
+        if let objectVersion = build.objectVersions.max() {
+            signals["object_version"] = Double(objectVersion)
+        }
+
+        if highest >= floor {
+            return CheckResult(key: "build-toolchain", title: "Xcode 27.1 build floor",
+                score: 1,
+                detail: "LastUpgradeCheck \(highest) in \(file ?? "the project file") is at or above the Xcode 27.1 generation (\(floor)).",
+                reference: Reference.duoPreparation, findings: [], baseWeight: 0.10, signals: signals)
+        }
+
+        let finding = Finding(check: "build-toolchain", severity: .minor,
+            message: "Xcode 27.1 or later is required to use all of the available screen space on iPhone Duo; below it the app does not extend under the status bar and camera. LastUpgradeCheck reads \(highest), which records the last Xcode upgrade and can be stale: confirm the toolchain that actually builds the app.",
+            file: file, line: nil)
+        return CheckResult(key: "build-toolchain", title: "Xcode 27.1 build floor",
+            score: 0,
+            detail: "LastUpgradeCheck \(highest) in \(file ?? "the project file") is below the Xcode 27.1 generation (\(floor)).",
+            reference: Reference.duoPreparation, findings: [finding], baseWeight: 0.10, signals: signals)
+    }
+
     // MARK: - Effort estimate
 
     private static func estimateHours(stats: AuditStats, outcomes: [CheckOutcome],
@@ -485,6 +538,7 @@ enum AuditEngine {
             case "navigation": hours += gap * 24
             case "adaptive-geometry": hours += gap * 12
             case "state": hours += gap * 8
+            case "build-toolchain": hours += gap * 2
             default: break
             }
         }

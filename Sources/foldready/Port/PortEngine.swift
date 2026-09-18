@@ -17,7 +17,6 @@ enum PortEngine {
         // other coding agent) executes and `verify` then re-scores.
         let patches = [
             Transforms.removeFullScreen(input),
-            Transforms.sidebarOptIn(input),
         ]
             .filter { !$0.isNoop }
             .sorted { $0.transformId < $1.transformId }

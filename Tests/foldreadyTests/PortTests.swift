@@ -79,7 +79,7 @@ struct PortEngineTests {
             options: PortOptions(apply: false, outDir: nil))
         let ids = result.plan.patches.map(\.transformId)
         #expect(ids.contains("remove-fullscreen"))
-        #expect(ids.contains("sidebar-optin"))
+        #expect(!ids.contains("sidebar-optin"))
         // Structural migrations are work orders now, never regex-generated patches.
         #expect(!ids.contains("adaptive-navigation"))
         #expect(!ids.contains("screen-bounds"))
@@ -95,13 +95,13 @@ struct PortEngineTests {
             options: PortOptions(apply: false, outDir: nil))
         let ids = Set(result.workOrder.entries.map(\.id))
         #expect(ids.contains("scene-lifecycle"))
-        #expect(ids.contains("adaptive-navigation"))
+        #expect(!ids.contains("adaptive-navigation"))
         for entry in result.workOrder.entries {
             #expect(entry.reference.hasPrefix("https://developer.apple.com/"))
             #expect(!entry.requiredEndState.isEmpty)
         }
         let markdown = result.workOrder.markdown()
-        #expect(markdown.contains("xcrun agent skills export"))
+        #expect(markdown.contains("App Resizability"))
         #expect(markdown.contains("Done when"))
     }
 
@@ -116,7 +116,7 @@ struct PortEngineTests {
         #expect(!plist.contains("UIRequiresFullScreen"))
 
         let rootFile = try String(contentsOfFile: (root as NSString).appendingPathComponent("Root.swift"), encoding: .utf8)
-        #expect(rootFile.contains("mode = .tabSidebar"))
+        #expect(!rootFile.contains("mode = .tabSidebar"))
 
         // No speculative rewrite of the SwiftUI navigation, and no placeholder delegate.
         let feed = try String(contentsOfFile: (root as NSString).appendingPathComponent("Feed.swift"), encoding: .utf8)
@@ -124,12 +124,13 @@ struct PortEngineTests {
         #expect(!FileManager.default.fileExists(atPath: (root as NSString).appendingPathComponent("SceneDelegate.swift")))
     }
 
-    @Test("the score improves after applying the safe edits")
+    @Test("removing an opt-out changes blockers, not the quality score")
     func scoreImproves() throws {
         let root = makeFixture()
         let before = AuditEngine.run(root: root, appName: "PortMe")
         _ = PortEngine.run(root: root, appName: "PortMe", options: PortOptions(apply: true, outDir: nil))
         let after = AuditEngine.run(root: root, appName: "PortMe")
-        #expect(after.totalScore > before.totalScore)
+        #expect(after.totalScore == before.totalScore)
+        #expect(after.blockers.count < before.blockers.count)
     }
 }

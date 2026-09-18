@@ -43,6 +43,31 @@ private func app(clean: Int, offending: Int, prefix: String = "F") -> [String: S
 @Suite("Scoring")
 struct ScoringTests {
 
+    @Test("Standard navigation needs no sidebar or explicit geometry reads", arguments: ["NavigationStack", "NavigationSplitView", "TabView"])
+    func standardNavigation(container: String) {
+        let result = AuditEngine.run(root: tree(["App.swift": """
+            import SwiftUI
+            @main struct Demo: App { var body: some Scene { WindowGroup { \(container) { Text("Hello") } } } }
+            """]), appName: "Standard")
+        #expect(result.outcomes.first { $0.key == "navigation" }?.score == 1)
+        #expect(result.outcomes.first { $0.key == "adaptive-geometry" }?.score == 1)
+        #expect(!result.findings.contains { $0.check == "navigation" })
+        #expect(!WorkOrderBuilder.build(from: result).entries.contains { $0.id == "adaptive-navigation" })
+        let evidence = JSONReport.payload(result)["evidence"] as? [String: Any]
+        #expect(evidence?["duo_runtime_verified"] as? Bool == false)
+        #expect(evidence?["sdk_status"] as? String == "unresolved")
+    }
+
+    @Test("Legacy and standard navigation mixed together still flags the legacy site")
+    func mixedNavigation() {
+        let result = AuditEngine.run(root: tree([
+            "Modern.swift": "import SwiftUI\nstruct Modern: View { var body: some View { NavigationStack { Text(\"Hi\") } } }",
+            "Old.swift": "import SwiftUI\nstruct Old: View { var body: some View { NavigationView { Text(\"Hi\") } } }"
+        ]), appName: "Mixed")
+        #expect(result.outcomes.first { $0.key == "navigation" }?.score == 0.5)
+        #expect(result.findings.contains { $0.file == "Old.swift" && $0.severity == .minor })
+    }
+
     @Test("A UIKit app that adapts is not penalised for being UIKit")
     func uikitCanScoreWell() {
         let uikit = tree([
