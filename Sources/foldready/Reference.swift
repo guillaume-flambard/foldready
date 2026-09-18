@@ -7,6 +7,9 @@ import Foundation
 /// not published is either labelled as unconfirmed where it appears, or removed. Every
 /// URL here was verified to resolve before being added.
 enum Reference {
+    static let prepareDuo = "https://developer.apple.com/videos/play/tech-talks/111461/"
+    static let adaptiveDuo = "https://developer.apple.com/videos/play/tech-talks/111463/"
+
     /// WWDC26 "Modernize your UIKit app": the four resizability audit areas (scene
     /// lifecycle, main screen references, idiom checks, orientation checks), the adaptive
     /// sidebar opt-in, and the app modernization agent skill.
@@ -38,4 +41,30 @@ enum Reference {
 
     /// `@SceneStorage`: per-scene state that survives a scene being torn down and rebuilt.
     static let sceneStorage = "https://developer.apple.com/documentation/swiftui/scenestorage"
+
+    /// Apple's iPhone Duo preparation guidance. Carries the build floor (Xcode 27.1 or
+    /// later to use all of the inner display) and names the four surfaces a custom
+    /// layout has to handle. Referenced by the scored `build-toolchain` check.
+    static let duoPreparation =
+        "https://developer.apple.com/documentation/technologyoverviews/preparing-your-app-for-iphone-duo"
+
+    /// Reserved regions: the fold division and the camera occlusion a custom layout must
+    /// query with `GeometryProxy.reservedRegions(...)` or `UIView.reservedRegions(...)`.
+    static let reservedRegions =
+        "https://developer.apple.com/documentation/swiftui/geometryproxy/reservedregions(kind:options:layoutdirectionbehavior:)"
+
+    /// Arrangement views: `ArrangementView` and `UIArrangementViewController`, which
+    /// arrange panes around the fold with `.split` and `.overlay`.
+    static let arrangementViews =
+        "https://developer.apple.com/documentation/swiftui/arrangementview"
+
+    /// Vertical bars: `EnvironmentValues.toolbarVerticalEdge` and
+    /// `UITraitCollection.verticalBarEdge`, the side placement the system uses on Duo.
+    static let verticalBars =
+        "https://developer.apple.com/documentation/swiftui/environmentvalues/toolbarverticaledge"
+
+    /// Choosing a camera by the direction it faces: the active display can change as the
+    /// device opens, closes or rotates.
+    static let cameraDirection =
+        "https://developer.apple.com/documentation/avkit/choosing-a-camera-by-the-direction-it-faces"
 }
