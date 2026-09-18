@@ -8,6 +8,10 @@ document is a rule a contributor breaks in good faith, so it is enforced here.
 Two guards:
   1. every `CheckOutcome(...)` construction passes a `reference:` argument;
   2. every reference constant in Reference.swift points at developer.apple.com.
+
+A third guard covers the advisory Duo surfaces (openspec/changes/duo-surface-audit): every
+surface named in DuoSurfaces.reference(for:) must map to a Reference constant. Advisory
+findings do not score, but they still make a claim about the platform, so the claim cites Apple.
 """
 import pathlib
 import re
@@ -16,6 +20,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ENGINE = ROOT / "Sources" / "foldready" / "AuditEngine.swift"
 REFERENCES = ROOT / "Sources" / "foldready" / "Reference.swift"
+SURFACES = ROOT / "Sources" / "foldready" / "DuoSurfaces.swift"
 
 
 def constructions(source: str):
@@ -44,6 +49,22 @@ def main() -> int:
             if not url.startswith("https://developer.apple.com/"):
                 failures.append(
                     f"{REFERENCES.relative_to(ROOT)}:{line_no}: '{url}' is not an Apple source")
+
+    # Advisory surfaces: every surface that can produce a finding must reach Reference.
+    surface_source = SURFACES.read_text()
+    if "func reference(for surface: String) -> String" not in surface_source:
+        failures.append(
+            f"{SURFACES.relative_to(ROOT)}: reference(for:) is missing; a surface without a "
+            "source is a platform claim nobody checked")
+    else:
+        for line_no, line in enumerate(surface_source.splitlines(), 1):
+            if "Reference." not in line:
+                continue
+            for constant in re.findall(r"Reference\.([A-Za-z0-9_]+)", line):
+                if f"static let {constant}" not in REFERENCES.read_text():
+                    failures.append(
+                        f"{SURFACES.relative_to(ROOT)}:{line_no}: Reference.{constant} is not "
+                        "declared in Reference.swift")
 
     if failures:
         print("sourcing check failed:", file=sys.stderr)

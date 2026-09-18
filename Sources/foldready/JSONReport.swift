@@ -35,6 +35,7 @@ enum JSONReport {
             "foldready_version": foldreadyVersion,
             "app": result.appName,
             "generated_at": ISO8601DateFormatter().string(from: result.generatedAt),
+            "evidence": Evidence.payload(surfaceChecks: result.advisoryRuntimeChecks),
             "score": result.totalScore,
             "grade": result.grade,
             "risk": result.risk,
@@ -46,7 +47,9 @@ enum JSONReport {
                     "title": b.title,
                     "consequence": b.consequence,
                     "reference": b.reference,
-                    "stops_launch": b.stopsLaunch
+                    "stops_launch": b.stopsLaunch,
+                    "evidence_kind": "static_signal",
+                    "requires_confirmation": true
                 ]
                 if let file = b.file { d["file"] = file }
                 return d
@@ -74,11 +77,38 @@ enum JSONReport {
                     "signals": o.signals.mapValues { decimal($0, places: 3) }
                 ] as [String: Any]
             },
+            // Advisory, read as read: the values below are literals from project files, not
+            // an inference about the toolchain that builds the app.
+            "build": [
+                "object_versions": result.build.objectVersions,
+                "last_upgrade_check": result.build.upgradeChecks.map { r -> [String: Any] in
+                    ["file": r.file, "value": r.value]
+                },
+                "xcode_27_1_generation": BuildFloor.xcode27_1Generation,
+                "note": "LastUpgradeCheck records the last Xcode upgrade and can be stale; confirm the toolchain that builds the app."
+            ],
+            // Advisory Duo surfaces. These never contribute to the score, a check score or
+            // the gate verdict; each is a question the runtime checklist can settle.
+            "advisory": result.advisory.map { a -> [String: Any] in
+                [
+                    "surface": a.surface,
+                    "message": a.message,
+                    "file": a.file,
+                    "line": a.line,
+                    "reference": a.reference,
+                    "runtime_check": a.runtimeCheck,
+                    "collapsed": a.collapsed,
+                    "evidence_kind": "static_signal",
+                    "requires_confirmation": true
+                ]
+            },
             "findings": result.findings.map { f in
                 var d: [String: Any] = [
                     "check": f.check,
                     "severity": f.severity.rawValue,
-                    "message": f.message
+                    "message": f.message,
+                    "evidence_kind": f.check == "captured-layout" ? "screenshot_signal" : "static_signal",
+                    "requires_confirmation": true
                 ]
                 if let file = f.file { d["file"] = file }
                 if let line = f.line { d["line"] = line }

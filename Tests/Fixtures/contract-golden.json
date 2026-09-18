@@ -1,33 +1,44 @@
 {
+  "advisory": [],
   "app": "ContractApp",
   "blockers": [
     {
       "consequence": "An app built against the iOS 27 SDK without the scene lifecycle does not launch. Apps already shipped, and apps still built against the iOS 26 SDK, keep working.",
+      "evidence_kind": "static_signal",
       "id": "scene-lifecycle-missing",
       "reference": "https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle",
+      "requires_confirmation": true,
       "stops_launch": true,
-      "title": "No UIScene lifecycle"
+      "title": "UIScene lifecycle not detected in scanned source"
     },
     {
       "consequence": "UIRequiresFullScreen=true opts the app out of a resizable scene, so the layout this score measures never gets the canvas.",
+      "evidence_kind": "static_signal",
       "file": "Info.plist",
       "id": "full-screen-opt-out",
       "reference": "https://developer.apple.com/documentation/bundleresources/information-property-list/uirequiresfullscreen",
+      "requires_confirmation": true,
       "stops_launch": false,
       "title": "Opted out of resizable presentation"
     }
   ],
+  "build": {
+    "last_upgrade_check": [],
+    "note": "LastUpgradeCheck records the last Xcode upgrade and can be stale; confirm the toolchain that builds the app.",
+    "object_versions": [],
+    "xcode_27_1_generation": 2710
+  },
   "checks": [
     {
-      "detail": "no sidebar-capable container across 1 navigation site(s)",
+      "detail": "1 standard navigation site(s), 0 legacy site(s). Sidebar placement is optional.",
       "key": "navigation",
-      "reference": "https://developer.apple.com/documentation/uikit/uitabbarcontroller/sidebar",
-      "score": 0,
+      "reference": "https://developer.apple.com/videos/play/tech-talks/111461/",
+      "score": 100,
       "signals": {
-        "adopted": 0,
+        "adopted": 1,
         "containers": 1
       },
-      "title": "Adaptive navigation / sidebar",
+      "title": "Standard adaptive navigation",
       "weight": 0.2
     },
     {
@@ -69,46 +80,64 @@
       "weight": 0.1
     }
   ],
-  "estimated_porting_hours": 53.5,
+  "estimated_porting_hours": 29.5,
+  "evidence": {
+    "duo_runtime_verified": false,
+    "references": [
+      "https://developer.apple.com/videos/play/tech-talks/111461/",
+      "https://developer.apple.com/videos/play/tech-talks/111463/"
+    ],
+    "runtime_checks_required": [
+      "Record Xcode, linked SDK, simulator or device, build and tested app version.",
+      "Test agreed critical journeys on outer and inner displays, including open/close transitions.",
+      "Test partial folding, rotation and Split View; check asymmetric safe areas and controls near cameras and hinge.",
+      "Verify selection, scroll position, input and navigation state survive resizing.",
+      "Separate reproduced defects from optional sidebar or arrangement improvements."
+    ],
+    "sdk_status": "unresolved",
+    "summary": "Source signals and optional screenshot heuristics only. iPhone Duo runtime compatibility is unverified; SDK and build configuration are not resolved. Existing apps can run without recompilation."
+  },
   "findings": [
     {
       "check": "adaptive-layout",
+      "evidence_kind": "static_signal",
       "file": "Legacy.swift",
       "line": 5,
       "message": "UIScreen.main.bounds is a fixed geometry read; use the view's own bounds or the window scene.",
-      "severity": "major"
-    },
-    {
-      "check": "navigation",
-      "file": "Feed.swift",
-      "message": "Root navigation that cannot become a sidebar: the panes will not split when the scene is wide.",
+      "requires_confirmation": true,
       "severity": "major"
     },
     {
       "check": "adaptive-geometry",
+      "evidence_kind": "static_signal",
       "file": "Legacy.swift",
       "line": 7,
       "message": "Layout branching on device idiom or interface orientation; a resizable scene is described by its size class.",
+      "requires_confirmation": true,
       "severity": "minor"
     },
     {
       "check": "adaptive-layout",
+      "evidence_kind": "static_signal",
       "file": "Feed.swift",
       "line": 9,
       "message": "Hardcoded frame larger than a control: it will not reflow when the scene changes width.",
+      "requires_confirmation": true,
       "severity": "minor"
     },
     {
       "check": "state",
+      "evidence_kind": "static_signal",
       "file": "Feed.swift",
       "message": "Scroll or selection state is not preserved; a scene resize can rebuild the hierarchy and lose it.",
+      "requires_confirmation": true,
       "severity": "minor"
     }
   ],
   "grade": "F",
   "risk": "high",
-  "schema_version": 2,
-  "score": 1,
+  "schema_version": 4,
+  "score": 21,
   "score_is_provisional": true,
   "stats": {
     "excluded_files": 0,
