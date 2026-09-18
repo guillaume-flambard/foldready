@@ -6,8 +6,8 @@
 #
 # Notes:
 #   - No code signing needed for the simulator.
-#   - The iPhone Fold simulator device type ships with Xcode 27. Until then the
-#     widest device is used; swap the DEVICE_HINT below when Xcode 27 lands.
+#   - Generic simulator capture only, not Duo pose or journey validation.
+#     Apple lists Xcode 27.1 beta for later in September 2026.
 set -euo pipefail
 
 REPO="${1:?usage: capture.sh <repo> [--name App] [--out dir] [--landscape]}"
@@ -23,6 +23,8 @@ while [[ $# -gt 0 ]]; do
     *) echo "unknown arg: $1"; exit 1 ;;
   esac
 done
+
+echo "Generic simulator screenshot only; Duo poses and journeys are not tested." >&2
 
 DEVICE_HINT="${FOLDREAD_DEVICE:-iPhone 16 Pro Max}"
 RUNTIME_HINT="${FOLDREAD_RUNTIME:-iOS-18-5}"
