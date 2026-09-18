@@ -72,7 +72,14 @@
       unchanged (92/72/76/63/56/50), confirming the contract change moved no static score.
       IceCubesApp upstream grew (424 -> 428 Swift files, 214 -> 215.5 h) and two repo
       attributions were wrong (MochiDiffusion, Dime); both corrected.
-- [ ] 6.2 Tag a release, publish the action, and add the one-line install snippet to the
-      README and the site.
-- [ ] 6.3 Replace the "good first issue" placeholder with issues drawn from these tasks, so
-      the fork and any future contributor have something scoped to take.
+- [x] 6.2 Tag a release, publish the action, and add the one-line install snippet to the
+      README and the site. Tagged `v0.4.0` on 2026-09-18; the release workflow verified the
+      tag against the binary, published the release and moved the `v0` major tag to the same
+      commit, so `uses: guillaume-flambard/foldready@v0` resolves. The snippet is in the
+      README CI section and on the landing page's free-scanner card, with a `snippet` style
+      built from the existing tokens.
+- [x] 6.3 Replace the "good first issue" placeholder with issues drawn from these tasks, so
+      the fork and any future contributor have something scoped to take. The placeholder
+      (#1) is now an index of the real work; scoped issues are #4 (audit-fidelity),
+      #5 (verify the work order against Apple's exported skill) and #6 (regenerate the
+      public index under contract v4).

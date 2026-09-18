@@ -69,18 +69,22 @@ before launch.
 
 ## Phase 2. Release and distribution (25 September to 2 October)
 
-Entry: Phase 1 merged.
+Entry: Phase 1 merged. **Done 18 September, ahead of the window.**
 
 Work:
 
 1. Tag the release, publish the action, and add the one-line install snippet to the README
-   (readiness-gate task 6.2).
+   (readiness-gate task 6.2). `v0.4.0` tagged and published; the release workflow moved the
+   `v0` major tag to the same commit, so `uses: guillaume-flambard/foldready@v0` resolves.
+   The snippet is in the README and on the landing page.
 2. Replace the placeholder "good first issue" with scoped issues drawn from the open tasks
-   (readiness-gate task 6.3).
-3. Version the release in `Version.swift` and the changelog.
+   (readiness-gate task 6.3). Issues #4, #5 and #6; #1 is now an index of them.
+3. Version the release in `Version.swift` and the changelog. `Version.swift` reads `0.4.0`
+   and the release workflow enforces tag-against-binary; no changelog file exists in this
+   repository, GitHub release notes are generated from the commit range.
 
 Exit: a stranger can add one line to a workflow and get a score on a pull request without
-speaking to anyone.
+speaking to anyone. **Met:** pin `@v0`, no policy file means report-only.
 
 Does not do: promotion. Distribution first, so any attention lands on something that works
 unattended.
