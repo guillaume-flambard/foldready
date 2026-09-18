@@ -1,4 +1,7 @@
 .build/
+__pycache__/
+*.xcuserstate
+xcuserdata/
 .DS_Store
 *.png
 !brand/png/

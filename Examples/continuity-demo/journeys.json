@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "journeys": [
+    {"id": "form", "checkpoints": [
+      {"id": "name-entered", "steps": ["step1"], "expected": {"name": "Ada", "details": ""}, "broken_fails": true},
+      {"id": "details-entered", "steps": ["step1", "step2"], "expected": {"name": "Ada", "details": "12 Test Street"}, "broken_fails": true}
+    ]},
+    {"id": "cart", "checkpoints": [
+      {"id": "item-added", "steps": ["step1"], "expected": {"quantity": "1", "orders": "0"}, "broken_fails": false},
+      {"id": "order-placed", "steps": ["step1", "step2"], "expected": {"quantity": "1", "orders": "1"}, "broken_fails": true}
+    ]},
+    {"id": "draft", "checkpoints": [
+      {"id": "body-entered", "steps": ["step1"], "expected": {"body": "Delivery notes", "saves": "0"}, "broken_fails": true},
+      {"id": "draft-saved", "steps": ["step1", "step2"], "expected": {"body": "Delivery notes", "saves": "1"}, "broken_fails": true}
+    ]}
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "source_sha256": "",
+  "observer": "",
+  "protocol": "docs/continuity-benchmark.md",
+  "measurements": [
+    {
+      "journey": "form",
+      "approach": "generated",
+      "task": "preparation",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "form",
+      "approach": "generated",
+      "task": "diagnosis",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "form",
+      "approach": "explicit",
+      "task": "preparation",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "form",
+      "approach": "explicit",
+      "task": "diagnosis",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "cart",
+      "approach": "generated",
+      "task": "preparation",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "cart",
+      "approach": "generated",
+      "task": "diagnosis",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "cart",
+      "approach": "explicit",
+      "task": "preparation",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "cart",
+      "approach": "explicit",
+      "task": "diagnosis",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "draft",
+      "approach": "generated",
+      "task": "preparation",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "draft",
+      "approach": "generated",
+      "task": "diagnosis",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "draft",
+      "approach": "explicit",
+      "task": "preparation",
+      "seconds": null,
+      "notes": ""
+    },
+    {
+      "journey": "draft",
+      "approach": "explicit",
+      "task": "diagnosis",
+      "seconds": null,
+      "notes": ""
+    }
+  ]
+}

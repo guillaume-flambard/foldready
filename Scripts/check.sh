@@ -9,6 +9,9 @@ swift build
 echo "==> swift test"
 swift test
 
+echo "==> continuity evidence contract (no simulator required)"
+python3 -m unittest discover -s Tests/continuity -v
+
 # Every scored check must cite an Apple source (openspec/specs/evidence/sourcing).
 # The runtime test asserts the emitted references; this catches a new check at the source,
 # before anyone runs it.

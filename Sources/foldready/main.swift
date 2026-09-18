@@ -35,6 +35,7 @@ func usage() -> Never {
       foldready port <path> [options]     Generate porting patches (or apply with --apply)
       foldready verify <path> [options]   Re-audit after a port (score delta)
       foldready gate <path> [options]     Audit and enforce a readiness policy (for CI)
+      foldready continuity <project>     Experimental XCTest continuity comparison (--help)
 
     OPTIONS
       --name <name>           App name used in the report (default: folder name)
@@ -44,7 +45,7 @@ func usage() -> Never {
       --open                  Open the HTML report in the default browser
       --apply                 (port) write the provably safe edits to the working tree
       --work-order <file>     (verify) re-check a work order written by `port`
-      --build                 (verify) build + capture the app on the widest simulator, add the visual check
+      --build                 (verify) build + capture a simulator screenshot (not a Duo pose test)
       --config <file>         (gate) policy file (default: <path>/\(GatePolicy.defaultFileName))
       --baseline <file>       (gate) baseline result (default: <path>/\(GatePolicy.defaultBaselineName))
       --write-baseline        (gate) write the current result to the baseline path and exit
@@ -191,6 +192,7 @@ func runGate(root: String, appName: String, opts: CliOptions, screenshots: [Stri
 
     print(color("FoldReady gate", "36") + " - \(appName)")
     printBlockers(result)
+    print("  \(Evidence.summary)")
     print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)")
     if let description = outcome.baselineDescription {
         print("  baseline: \(description)")
@@ -253,6 +255,9 @@ func printGateJSON(result: AuditResult, outcome: GateOutcome) {
 }
 
 func main() {
+    if CommandLine.arguments.dropFirst().first == "continuity" {
+        exit(ContinuityCommand.run(Array(CommandLine.arguments.dropFirst(2))))
+    }
     let opts = parseArgs(Array(CommandLine.arguments.dropFirst()))
 
     let root = (opts.path as NSString).expandingTildeInPath
@@ -333,7 +338,8 @@ func main() {
         print("  building + capturing on the widest simulator…")
         if let dir = CapturePipeline.capture(root: root, appName: appName, shotsDir: shotsDir) {
             screenshots = listPNGs(in: dir)
-            print("  captured \(screenshots.count) screenshot(s) → \(shotsDir)")
+            print("  captured \(screenshots.count) screenshot(s); provenance: \(dir)/capture.json")
+            print("  One launch screenshot only; Duo poses and journeys were not tested.")
         } else {
             print("  build/capture failed (no project, or build error) — static score only.")
         }
@@ -347,6 +353,7 @@ func main() {
         let result = AuditEngine.run(root: root, appName: appName, screenshots: screenshots)
         print(color("FoldReady verify", "36") + " - \(appName)")
         printBlockers(result)
+        print("  \(Evidence.summary)")
         print("  score after port: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)")
         for o in result.outcomes where o.key == "captured-layout" {
             print("  captured layout: \(color(String(format: "%.0f%%", o.score * 100), o.score >= 0.6 ? "32" : "33"))  (\(o.detail))")
@@ -415,6 +422,7 @@ func main() {
     print(color("FoldReady", "36") + " - \(appName)")
     printBlockers(result)
     let provisional = result.scoreIsProvisional ? " (provisional: the app opted out of a resizable scene)" : ""
+    print("  \(Evidence.summary)")
     print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)\(provisional)")
     print("  est. porting effort: \(color("\(result.hoursEstimate) h", "32"))")
     print("  \(result.stats.uiFiles) UI files of \(result.stats.swiftFiles) Swift files (\(result.stats.excludedFiles) excluded: tests, previews, vendored)")

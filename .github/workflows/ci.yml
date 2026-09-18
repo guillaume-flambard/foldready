@@ -15,6 +15,8 @@ jobs:
         run: swift build
       - name: Swift test
         run: swift test
+      - name: Continuity evidence contract
+        run: python3 -m unittest discover -s Tests/continuity -v
       - name: Sourcing (every check cites Apple)
         run: python3 Scripts/sourcing-check.py
       - name: Result contract (golden)
