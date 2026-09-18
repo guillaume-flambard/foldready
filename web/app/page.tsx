@@ -1,157 +1,73 @@
 import Link from "next/link";
-import { APPS, BLOCKED_APPS, GRADE_COLOR, type AppScore } from "@/lib/data";
-import { ScoreGauge } from "@/components/ScoreGauge";
-import { href } from "@/lib/href";
 
 export default function LandingPage() {
-  const hero = APPS[0];
   return (
     <main className="wrap">
       <header className="hero">
         <div>
-          <span className="kicker">iPhone Fold · 9 September 2026 · iOS 27</span>
-          <h1>Your iOS app, ready for a screen that changes size.</h1>
-          <p className="lede">
-            A static audit of your source tree. It reports the blocking facts first — an app
-            built against the iOS 27 SDK without the UIScene lifecycle does not launch —
-            then scores 0–100 how well the app uses a wide, resizable scene, and estimates
-            the work in hours.
-          </p>
+          <span className="kicker">iPhone Duo · launch 23 October 2026</span>
+          <h1>Find what needs attention before your app reaches iPhone Duo.</h1>
+          <p className="lede">Review your critical journeys, identify layout risks and agree the fixes. FoldReady combines a free source scanner with a human review of your app and its test coverage.</p>
           <div className="ctas">
-            <a className="btn btn-pri" href={href("/get-scored")}>Score my app free</a>
-            <a className="btn btn-ghost" href="#how">Read the methodology</a>
+            <Link className="btn btn-pri" href="/get-scored">Request a review · $349</Link>
+            <a className="btn btn-ghost" href="https://github.com/guillaume-flambard/foldready#usage">Run the free scanner</a>
           </div>
-          <p className="proof-note">
-            <span className="row">
-              <span className="mono" style={{ color: "var(--gF)" }}>{BLOCKED_APPS.length}</span>
-              <span className="mono" style={{ color: "var(--dim)" }}>/</span>
-              <span className="mono">{APPS.length}</span>
-            </span>
-            Indexed open-source apps that do not launch on the iOS 27 SDK
-          </p>
         </div>
-        <div>
-          <ScoreGauge score={hero.score} grade={hero.grade} size={300} />
+        <div className="ocard">
+          <h2>What is available today</h2>
+          <p>Source analysis, a review of up to three agreed critical journeys, and a prioritized test and remediation plan. Existing apps can run on Duo without recompilation.</p>
+          <p>Duo simulator testing depends on Xcode 27.1 beta, announced for later in September. Any later simulator pass is scoped separately. Physical-device testing is not included.</p>
+          <a href="https://developer.apple.com/iphone-duo/">Apple tools and availability</a>
         </div>
       </header>
 
-      <section className="proof">
-        <p className="lab">The Fold-Ready Index so far</p>
-        <div className="row">
-          {APPS.map((a: AppScore) => (
-            <Link className="app" key={a.slug} href={`/report/${a.slug}`}>
-              <span className="n" style={{ color: GRADE_COLOR[a.grade] }}>{a.score}</span>
-              <span className="nm">{a.name}<span className="mono">{a.grade}</span></span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       <section className="block" id="how">
         <div className="sec-head-land">
-          <p className="lab">What you get</p>
-          <h2>A measurement, a plan, and a ship date.</h2>
-          <p>One pipeline from source tree to featured-ready. Each tier feeds the next, so you never re-explain your app.</p>
+          <p className="lab">How the review works</p>
+          <h2>A report your team can act on.</h2>
+          <p>For teams maintaining older UIKit apps or custom interfaces with critical flows to protect.</p>
         </div>
         <div className="offer">
-          <div className="ocard">
-            <span className="ico">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 16a7 7 0 1 1 14 0"/><path d="M12 16l4-5.5"/><circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>
-            </span>
-            <h3>Static audit</h3>
-            <p>Blocking facts first, then four weighted checks against the iOS 27 adaptivity requirements. You get a 0–100 score, a grade whose meaning does not move, and an estimate in hours — in minutes, not weeks. Every check cites its Apple source.</p>
-            <span className="tag">self-serve · free</span>
-          </div>
-          <div className="ocard">
-            <span className="ico">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/><path d="M9 9l-1.5-1.5M15 9l1.5-1.5M9 15l-1.5 1.5M15 15l1.5 1.5" strokeWidth="1.2"/></svg>
-            </span>
-            <h3>Captured-layout pass</h3>
-            <p>We build your app and open it on the 7.8in inner display. Every finding cites file:line, so your team ships fixes instead of reading essays.</p>
-            <span className="tag">in the full report</span>
-          </div>
-          <div className="ocard">
-            <span className="ico">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M12 5v14"/><path d="M6.5 12l2.2 2.2 4.6-4.6"/></svg>
-            </span>
-            <h3>Porting service</h3>
-            <p>Engineers who shipped foldable UI port your app behind a fixed price and a date. Featured-ready on day one, QA'd on device, before launch.</p>
-            <span className="tag">fixed price</span>
-          </div>
+          <div className="ocard"><h3>1. Agree the scope</h3><p>One app, one source revision and up to three critical journeys. Confirm access, build requirements and available test environments before work starts.</p></div>
+          <div className="ocard"><h3>2. Separate evidence from assumptions</h3><p>Source signals are candidates for review. Reproduced defects include the environment, steps and evidence. Optional improvements, such as a sidebar, are listed separately.</p></div>
+          <div className="ocard"><h3>3. Decide the next change</h3><p>Get a prioritized plan and a work order your team or coding agent can use. Corrections are quoted after review, with acceptance criteria for each agreed journey.</p></div>
         </div>
       </section>
 
       <section className="block" id="pricing">
-        <div className="sec-head-land">
-          <p className="lab">Pricing</p>
-          <h2>Pay for the port, not the guesswork.</h2>
-          <p>Audit yourself for free. Buy the captured pass when you need receipts. Let us port it when you need it shipped.</p>
-        </div>
+        <div className="sec-head-land"><p className="lab">Pricing</p><h2>Start with a scoped review.</h2><p>The paid service covers analysis and human judgement. The scanner remains free and local.</p></div>
         <div className="pricing">
           <div className="pcard">
-            <h3>Self-serve audit</h3>
-            <p className="price">Free</p>
-            <p className="what">Score and hours estimate, generated from your source tree.</p>
-            <ul>
-              <li>7 static checks, weighted</li>
-              <li>0–100 score · A–F grade</li>
-              <li>Port estimate in hours</li>
-              <li>Findings with file:line</li>
-            </ul>
-            <a className="btn btn-sec" href="#pricing">Score it yourself</a>
+            <h3>Source scanner</h3><p className="price">Free</p>
+            <p className="what">Repeatable source signals for your team and CI.</p>
+            <ul><li>Layout and navigation checks with Apple sources</li><li>Heuristic score and effort estimate</li><li>Local reports and regression policies</li><li>Work orders for reviewed changes</li></ul>
+            <a className="btn btn-sec" href="https://github.com/guillaume-flambard/foldready#usage">Get the CLI</a>
           </div>
           <div className="pcard featured">
-            <span className="flag">Recommended</span>
-            <h3>Full report</h3>
-            <p className="price">$349 <small>/ app</small></p>
-            <p className="what">The static audit plus a captured-layout pass with receipts and a roadmap.</p>
-            <ul>
-              <li>Everything in self-serve</li>
-              <li>Captured 7.8in layout pass</li>
-              <li>Findings with file:line</li>
-              <li>Remediation roadmap by effort</li>
-              <li>Re-score included for 90 days</li>
-            </ul>
-            <a className="btn btn-pri" href="#pricing">Buy full report</a>
+            <span className="flag">Human review</span><h3>Readiness review</h3><p className="price">$349 <small>/ app</small></p>
+            <p className="what">One source revision and up to three agreed critical journeys.</p>
+            <ul><li>Source findings reviewed for relevance</li><li>SDK and build assumptions documented</li><li>Available screenshots reviewed in context</li><li>Prioritized fixes and Duo test checklist</li><li>One follow-up review of the same scope within 30 days</li></ul>
+            <Link className="btn btn-pri" href="/get-scored">Request a review</Link>
           </div>
           <div className="pcard">
-            <h3>Porting service</h3>
-            <p className="price">From $4,900</p>
-            <p className="what">A fixed-price port by engineers who shipped foldable UI.</p>
-            <ul>
-              <li>Full report included</li>
-              <li>Sidebar + adaptive navigation</li>
-              <li>Fold-state &amp; scene lifecycles</li>
-              <li>QA on device · ship-by date</li>
-            </ul>
-            <a className="btn btn-sec" href="#pricing">Talk to us</a>
+            <h3>Corrections and validation</h3><p className="price">Scoped quote</p>
+            <p className="what">Implementation and testing against agreed acceptance criteria.</p>
+            <ul><li>Fixes selected from the review</li><li>Build and test environment agreed in advance</li><li>Before/after evidence for tested journeys</li><li>Untested configurations explicitly listed</li></ul>
+            <Link className="btn btn-sec" href="/get-scored">Discuss the scope</Link>
           </div>
         </div>
       </section>
 
       <section className="block" id="objections" style={{ borderBottom: 0 }}>
-        <div className="sec-head-land">
-          <p className="lab">Why port</p>
-          <h2>The objections we hear, measured.</h2>
-        </div>
+        <div className="sec-head-land"><p className="lab">Before you start</p><h2>What the results mean.</h2></div>
         <div className="obj">
-          <div className="ocard2">
-            <p className="q">Our app already runs on it — why port?</p>
-            <p className="a">Two different questions. An app built against the iOS 27 SDK without the UIScene lifecycle does not launch at all, and that is not optional. Everything above that line is how well you use the room: a real sidebar when the scene is wide, layout that reflows, and state that survives a resize.</p>
-          </div>
-          <div className="ocard2">
-            <p className="q">Can a static check really judge how my UI looks?</p>
-            <p className="a">The Fold-Ready audit is static plus a captured-layout pass: we build your app, open it on a 7.8in display, and pixel-check the frames. Findings cite file:line, not vibes.</p>
-          </div>
-          <div className="ocard2">
-            <p className="q">We have no foldable hardware and no time.</p>
-            <p className="a">You don't need either. The audit runs headless on your CI and returns an hours estimate; device QA is part of the porting tier, not your problem to source.</p>
-          </div>
-          <div className="ocard2">
-            <p className="q">We're SwiftUI already — aren't we safe?</p>
-            <p className="a">Mostly — the framework check is worth only 15% of the score. Navigation and layout carry the weight, and the index shows pure-SwiftUI apps still dropping to C for a single squeezed tab bar.</p>
-          </div>
+          <div className="ocard2"><p className="q">Does every app need a port?</p><p className="a">No. Apple says existing apps run without recompilation, and standard navigation adapts automatically. The review focuses on your custom layouts and critical journeys. A sidebar is an optional design choice.</p></div>
+          <div className="ocard2"><p className="q">Does a high score prove compatibility?</p><p className="a">No. Source analysis cannot prove rendering, state preservation or a successful launch. Screenshot margins can come from compatibility presentation or intentional spacing. Runtime evidence needs a named build, environment and tested journey.</p></div>
+          <div className="ocard2"><p className="q">Why use this alongside Apple tooling?</p><p className="a">Apple announced the App Resizability skill for Xcode 27.1. FoldReady helps prioritize the work and record what was checked; your team can use Apple tooling to implement changes.</p></div>
+          <div className="ocard2"><p className="q">When can Duo testing happen?</p><p className="a">Apple lists Xcode 27.1 beta for later in September. Confirm tool availability and build access when agreeing a simulator pass. Every delivery names the environments actually tested.</p></div>
         </div>
+        <p className="spec">Sources, checked 11 September 2026: <a href="https://www.apple.com/newsroom/2026/09/apple-unveils-iphone-duo/">Apple announcement</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111461/">Prepare your app for iPhone Duo</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111463/">Adaptive layouts</a>.</p>
+        <p className="spec"><Link href="/ranking">View historical source audits</Link>. These pre-announcement scores are archived, not current Duo compatibility results.</p>
       </section>
     </main>
   );

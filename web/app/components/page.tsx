@@ -38,7 +38,7 @@ export default function ComponentsPage() {
         <h1>FoldReady design system</h1>
         <p className="lede">
           FoldReady is a precision instrument: an audit that scores and ports iOS apps for
-          the iPhone Fold. The system speaks like a calibrated tool — monospaced
+          the iPhone Duo. The system speaks like a calibrated tool — monospaced
           measurements, hairline structure, one vivid accent that means focus. Nothing
           bounces, nothing pleads; the numbers carry the confidence.
         </p>
@@ -139,7 +139,7 @@ export default function ComponentsPage() {
             <div className="frow">
               <span className="chip sev-n"><span className="dot" />Minor</span>
               <span className="chk">Fold state</span>
-              <span className="msg">Hardcoded frame width/height literals will not reflow on the 7.8in inner display.</span>
+              <span className="msg">Fixed frame literals found. Review resizing behavior on the intended build and environment.</span>
               <span className="file">GalleryToolbarView.swift:31</span>
             </div>
           </div>
@@ -158,7 +158,7 @@ export default function ComponentsPage() {
         <div className="frame" style={{ marginBottom: 16 }}>
           <div className="comphead"><span className="no">06</span><h3>Button</h3><span className="spec">Primary · secondary · ghost · disabled</span></div>
           <div className="row3" style={{ alignItems: "center" }}>
-            <a className="btn btn-pri" href="#gallery">Score my app</a>
+            <a className="btn btn-pri" href="#gallery">Request a review</a>
             <a className="btn btn-sec" href="#gallery">Read the methodology</a>
             <a className="btn btn-ghost" href="#gallery">View report</a>
             <button className="btn btn-pri" disabled>Disabled</button>
@@ -238,7 +238,7 @@ export default function ComponentsPage() {
               <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5 L10.2 16.5 L18 8" fill="none" stroke="#052E16" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </span>
             <h4>All 7 checks pass</h4>
-            <p>Zero findings across every foldable check. MochiDiffusion is ready for the 7.8in inner display — no port required.</p>
+            <p>Example: no source signals detected. Runtime compatibility remains unverified.</p>
             <a className="btn btn-sec" href={href("/report/mochidiffusion")}>Download clean report</a>
           </div>
         </div>

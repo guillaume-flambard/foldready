@@ -6,16 +6,17 @@ export function GetScoredForm() {
   const [appName, setAppName] = useState("");
   const [repo, setRepo] = useState("");
   const [email, setEmail] = useState("");
+  const [journeys, setJourneys] = useState("");
   const [sent, setSent] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const cliCmd = `foldready ${repo.trim() || "<repo>"} --name "${appName.trim() || "App"}"`;
+  const cliCmd = "foldready <local-source-directory> --json --open";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const subject = encodeURIComponent(`Fold-Ready Score: ${appName.trim() || "my app"}`);
+    const subject = encodeURIComponent(`FoldReady readiness review: ${appName.trim() || "my app"}`);
     const body = encodeURIComponent(
-      `App: ${appName.trim()}\nRepo / source: ${repo.trim()}\nEmail: ${email.trim()}\n\nI want the Fold-Ready audit (score, findings with file:line, hours estimate).`
+      `App: ${appName.trim()}\nRepo / source: ${repo.trim()}\nEmail: ${email.trim()}\nCritical journeys: ${journeys.trim()}\n\nI would like to discuss the $349 readiness review. Please confirm the scope, test environments and delivery date before work starts.`
     );
     window.location.href = `mailto:hello@memolabs.dev?subject=${subject}&body=${body}`;
     setSent(true);
@@ -37,16 +38,17 @@ export function GetScoredForm() {
           <input value={appName} onChange={(e) => setAppName(e.target.value)} placeholder="MyApp" required />
         </label>
         <label className="field">
-          <span>Repo URL or local path <em>optional</em></span>
-          <input value={repo} onChange={(e) => setRepo(e.target.value)} placeholder="https://github.com/org/my-app or ~/code/my-app" />
+          <span>Repository URL <em>optional</em></span>
+          <input value={repo} onChange={(e) => setRepo(e.target.value)} placeholder="https://github.com/org/my-app" />
         </label>
         <label className="field">
           <span>Work email</span>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" required />
         </label>
-        <button className="btn btn-pri" type="submit" style={{ width: "100%" }}>Request my Fold-Ready Score</button>
+        <label className="field"><span>Up to three critical journeys</span><textarea value={journeys} onChange={(e) => setJourneys(e.target.value)} placeholder="For example: sign in, checkout, account settings" required /></label>
+        <button className="btn btn-pri" type="submit" style={{ width: "100%" }}>Prepare review request</button>
         <p className="spec" style={{ marginTop: 10 }}>
-          Opens your mail client with the details prefilled. We reply within 48h with the score, every blocking finding (file:line) and an hours estimate. $349 for the full report with the captured-layout pass.
+          Opens an email draft. Sending it requests a scope discussion; no payment is taken. You do not need to share private source code in this form.
         </p>
       </form>
 
@@ -61,11 +63,11 @@ export function GetScoredForm() {
         </div>
         <p className="spec" style={{ marginTop: 12 }}>
           Then: <code>foldready &lt;repo&gt; --open</code> opens the HTML report, and{" "}
-          <code>foldready port &lt;repo&gt; --tiers srm</code> generates the porting patch.
+          <code>foldready port &lt;repo&gt;</code> prepares a patch proposal and work order for review.
         </p>
         {sent && (
           <p className="chip ready" style={{ marginTop: 14 }}>
-            <span className="dot" /> Mail client opened — hit send and we'll take it from there.
+            <span className="dot" /> Email draft requested. If your mail client did not open, email hello@memolabs.dev. Nothing has been sent automatically.
           </p>
         )}
       </div>

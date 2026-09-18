@@ -30,9 +30,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FoldReady — your iOS app, ready for the iPhone Fold",
+  title: "FoldReady | iPhone Duo readiness review",
   description:
-    "A Fold-Ready Score for your iOS app, and the porting work to be featured on the iPhone Fold day one. Static + pixel audit of your source tree, then fixed-price adaptation to the 7.8 inch inner display.",
+    "Free local source analysis and scoped human reviews for iPhone Duo. Prioritized fixes, critical journeys and explicit test coverage.",
 };
 
 export const viewport: Viewport = {

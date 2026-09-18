@@ -4,7 +4,6 @@ import { APPS, CHECK_LABELS, CHECK_MEANING, CHECK_WEIGHTS, GRADE_COLOR, appBySlu
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { SeverityChip, SegBar } from "@/components/ScoreCard";
 import { PageMotion } from "@/components/Motion";
-import { PortPlan } from "@/components/PortPlan";
 import { href } from "@/lib/href";
 
 export function generateStaticParams() {
@@ -17,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!app) return { title: "Report not found — FoldReady" };
   return {
     title: `Fold-Ready Report · ${app.name}`,
-    description: `Fold-Ready audit of ${app.name} for the iPhone Fold: score ${app.score}, grade ${app.grade}, ${app.hours}h port estimate, ${app.findings} findings.`,
+    description: `Fold-Ready audit of ${app.name} (archived contract v2): score ${app.score}, grade ${app.grade}, ${app.hours}h port estimate, ${app.findings} findings.`,
   };
 }
 
@@ -53,6 +52,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
   return (
     <main className="wrap">
       <PageMotion />
+      <p className="lede" style={{ paddingTop: 32 }}>Archived pre-announcement report. This v2 score and its remediation suggestions are superseded. No Duo runtime compatibility was verified; rerun the current CLI before making decisions.</p>
       <nav className="crumbs">
         <Link href="/ranking">Fold-Ready Index</Link>
         <span className="sep">/</span>
@@ -193,7 +193,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         ))}
       </section>
 
-      <PortPlan slug={app.slug} repoPath={app.repo} />
+      <p className="spec">Historical patch proposals are withdrawn. Run the current CLI to prepare a reviewed work order.</p>
 
       <section className="block" style={{ borderBottom: 0 }}>
         <div className="band">

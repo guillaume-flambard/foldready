@@ -16,7 +16,7 @@ function ThemeToggle() {
 }
 
 const LINKS = [
-  { href: "/ranking", label: "Index" },
+  { href: "/ranking", label: "Archive" },
   { href: "/", label: "How it works", anchor: "#how" },
   { href: "/", label: "Pricing", anchor: "#pricing" },
 ];
@@ -43,7 +43,7 @@ export function Nav() {
       <div className="right">
         <ThemeToggle />
         <Link className="btn btn-pri" href="/get-scored" style={{ padding: "11px 18px", fontSize: "14px" }}>
-          Score my app
+          Request a review
         </Link>
       </div>
     </nav>

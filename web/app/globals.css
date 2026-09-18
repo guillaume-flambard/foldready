@@ -339,9 +339,9 @@ select.sort:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; 
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field span { font: 600 11px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
 .field span em { text-transform: none; letter-spacing: 0; font-style: normal; color: var(--slate2); }
-.field input { background: var(--ink2); border: 1px solid var(--line); border-radius: 10px; color: var(--txt); font: 500 14px/1.4 var(--font-body); padding: 12px 14px; }
-.field input:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-color: var(--blue); }
-.field input::placeholder { color: var(--slate2); }
+.field input, .field textarea { background: var(--ink2); border: 1px solid var(--line); border-radius: 10px; color: var(--txt); font: 500 14px/1.4 var(--font-body); padding: 12px 14px; }
+.field input:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-color: var(--blue); }
+.field input::placeholder, .field textarea::placeholder { color: var(--slate2); }
 .copybox { display: flex; align-items: center; gap: 10px; background: var(--ink2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 10px 10px 14px; }
 .copybox code { font: 500 12px/1.5 var(--font-mono); color: var(--txt); flex: 1; overflow-x: auto; white-space: nowrap; }
 .gs-cli code { font-family: var(--font-mono); font-size: 12px; color: var(--blue); }
@@ -392,3 +392,5 @@ footer.foot .mono { margin-left: auto; }
   color: var(--sevMajor, #EF4444);
   font-weight: 600;
 }
+
+.field textarea { min-height: 110px; resize: vertical; }

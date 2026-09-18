@@ -26,20 +26,10 @@ export function RankingClient() {
   return (
     <>
       <div className="head">
-        <span className="kicker">Independent index · 7.8in inner display</span>
-        <h1>Fold-Ready Index</h1>
-        <p className="lede">
-          Twenty well-known open-source iOS apps, audited with the FoldReady CLI. The score
-          measures what an app does with a wide, resizable scene: sidebar navigation, layout
-          that reflows, size classes instead of device checks, state that survives a resize.
-          Every check cites the Apple source it is derived from, and the grade bands mean the
-          same thing whenever the audit ran.
-        </p>
-        <p className="lede" style={{ marginTop: 12 }}>
-          <b>{BLOCKED_APPS.length} of {APPS.length} do not launch at all</b> when built against
-          the iOS 27 SDK: they have no UIScene lifecycle. That is reported before any score,
-          because it is not a matter of degree.
-        </p>
+        <span className="kicker">Archive · pre-announcement scoring</span>
+        <h1>Historical source audits</h1>
+        <p className="lede">These contract v2 results predate the iPhone Duo announcement. Their navigation and geometry scoring has been superseded in v3. They have not been re-audited and must not be used as current compatibility verdicts or correction quotes.</p>
+        <p className="spec">The old scanner flagged potential lifecycle issues in {BLOCKED_APPS.length} of {APPS.length} source trees. These were source signals, not observed launch failures. SDK and build configuration were not resolved.</p>
         <div className="legend">
           {GRADES.map((g) => (
             <span key={g}><b className="g" style={{ color: `var(--g${g})` }}>{g}</b> {GRADE_MEANING[g]}</span>

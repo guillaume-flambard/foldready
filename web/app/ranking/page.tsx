@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { RankingClient } from "./RankingClient";
 
 export const metadata: Metadata = {
-  title: "Fold-Ready Index — every iOS app, scored for the iPhone Fold",
+  title: "Historical source audits | FoldReady",
   description:
-    "Independent Fold-Ready Scores for open-source iOS apps, measured for the 7.8in inner display of the iPhone Fold.",
+    "Archived pre-announcement source scores. These are not current iPhone Duo compatibility results.",
 };
 
 export default function RankingPage() {
