@@ -68,7 +68,9 @@ vertically on the side, and camera direction when the active display changes. Th
 questions, not defects: they never change the score or a gate verdict, and each one names the
 runtime check that would settle it.
 
-Potential lifecycle and full-screen opt-out blockers are reported separately. Source scans
+Potential lifecycle and full-screen opt-out blockers are reported separately. The scanner
+reads `.swift` and `.plist` files only, so a `.m`/`.h` target is not analysed at all; resolving
+build settings or the linked SDK from source is out of scope. Source scans
 cannot resolve every build setting, generated declaration or Objective-C implementation;
 confirm potential blockers in the target build. The linked SDK is not inferred from the
 source score. A legacy app's migration requirement is not proof its shipped binary fails.

@@ -47,8 +47,15 @@ struct GatePolicy: Decodable, Sendable {
     var isEmpty: Bool {
         minScore == nil && maxTotalRegression == nil
             && (noRegressionChecks?.isEmpty ?? true) && maxSeverity == nil
-            && forbidBlockers != true
+            && forbidBlockers != true && minConfidence == nil
             && (exclude?.isEmpty ?? true) && (include?.isEmpty ?? true)
+    }
+
+    /// True when the policy compares against a baseline. A committed baseline is only a
+    /// contract question for a policy that reads it: a repo that gates on `forbid_blockers`
+    /// alone must not red-build on an engine upgrade for a rule it never opted into.
+    var comparesAgainstBaseline: Bool {
+        maxTotalRegression != nil || !(noRegressionChecks ?? []).isEmpty || minScore != nil
     }
 
     /// Default config file name, looked up at the root of the audited repository.
@@ -191,8 +198,10 @@ enum GateEngine {
         // `Score changes are declared`: a baseline from a different contract version is not
         // comparable, so name it as its own rule. The regression rules skip rather than
         // report the rebalance as a regression, but a silent pass on an incomparable number
-        // is worse than a red build: the team must rewrite the baseline deliberately.
-        if let baseline {
+        // is worse than a red build: the team must rewrite the baseline deliberately. The
+        // rule is emitted only for a policy that actually compares against the baseline: a
+        // `forbid_blockers`-only policy stays report-only on a stale baseline.
+        if let baseline, policy.comparesAgainstBaseline {
             let matches = baseline.schemaVersion == resultSchemaVersion
             rules.append(RuleResult(
                 name: "baseline-contract",

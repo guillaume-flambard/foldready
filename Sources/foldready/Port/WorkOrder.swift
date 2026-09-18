@@ -230,6 +230,52 @@ enum WorkOrderBuilder {
                 metWhenWritten: acceptance.isMet(by: result)))
         }
 
+        // A file branching on the device idiom, one entry per file.
+        for file in files(in: result, check: "idiom", matching: "") {
+            let acceptance = Acceptance.findingResolved(check: "idiom", file: file.path)
+            entries.append(WorkOrderEntry(
+                id: "idiom-branching",
+                title: "Branch on the canvas, not the device idiom",
+                checkKey: "idiom",
+                file: file.path, line: file.line,
+                requiredEndState: """
+                    Layout decisions read the horizontal size class or the scene's effective \
+                    geometry instead of branching on UIDevice.current.userInterfaceIdiom. The \
+                    scene describes the canvas it is given: Apple's Duo guidance treats a \
+                    device as a device, so a resizable scene can change shape under an idiom \
+                    branch. Sidebar placement is optional and is not the point; this entry is \
+                    about what the layout reads. Static acceptance means the signal \
+                    disappeared, not that the app was tested on iPhone Duo.
+                    """,
+                reference: reference("idiom"),
+                acceptance: acceptance,
+                metWhenWritten: acceptance.isMet(by: result)))
+        }
+
+        // A plist or source file that pins interface orientation, one entry per site.
+        for file in files(in: result, check: "orientation", matching: "") {
+            let acceptance = Acceptance.findingResolved(check: "orientation", file: file.path)
+            entries.append(WorkOrderEntry(
+                id: "orientation-lock",
+                title: "Let the canvas decide its orientation",
+                checkKey: "orientation",
+                file: file.path, line: file.line,
+                requiredEndState: """
+                    An app locked to a single orientation in \
+                    UISupportedInterfaceOrientations will not get the resizable canvas the \
+                    score measures, and a source branch on interfaceOrientation makes the \
+                    same device-level decision the size class would settle. Declare the \
+                    orientations the app genuinely supports, or read the size class instead \
+                    of the device's current rotation. Sidebar placement is optional and is \
+                    not the point; this entry is about the shape the app accepts. Static \
+                    acceptance means the signal disappeared, not that the app was tested on \
+                    iPhone Duo.
+                    """,
+                reference: reference("orientation"),
+                acceptance: acceptance,
+                metWhenWritten: acceptance.isMet(by: result)))
+        }
+
         if result.outcomes.contains(where: { $0.key == "state" }) && score("state") < 70 {
             let acceptance = Acceptance.checkAtLeast(key: "state", score: 70)
             entries.append(WorkOrderEntry(

@@ -295,6 +295,52 @@ struct GateTests {
         #expect(clean.exitCode == .pass, "a low score is not a blocker")
     }
 
+    @Test("A forbid_blockers policy with a stale baseline does not breach on baseline-contract")
+    func staleBaselineDoesNotFireWithoutRegressionPolicy() throws {
+        let dir = tempDir()
+        let policy = try #require(try GatePolicy.load(
+            path: writePolicy(#"{ "forbid_blockers": true }"#, in: dir)))
+
+        // A v4 baseline against this v5 engine: real, but a policy that never compares
+        // against it must not fail on it.
+        let stalePath = dir.appendingPathComponent("stale.json").path
+        try #"{ "schema_version": 4, "score": 70, "checks": [] }"#
+            .write(toFile: stalePath, atomically: true, encoding: .utf8)
+        let stale = try #require(try Baseline.load(path: stalePath))
+
+        let outcome = GateEngine.evaluate(
+            result: result(total: 90, checks: [("navigation", 100)]),
+            baseline: stale, policy: policy)
+        #expect(outcome.exitCode == .pass)
+        #expect(!outcome.rules.contains { $0.name == "baseline-contract" })
+    }
+
+    @Test("A min_confidence-only policy is not empty, and gates on severity alone")
+    func minConfidenceOnlyIsNotReportOnly() throws {
+        let dir = tempDir()
+        let policy = try #require(try GatePolicy.load(
+            path: writePolicy(#"{ "min_confidence": "high" }"#, in: dir)))
+        #expect(!policy.isEmpty)
+        #expect(policy.comparesAgainstBaseline == false)
+
+        let outcome = GateEngine.evaluate(result: result(total: 90, checks: [("scene", 90)]),
+            baseline: nil, policy: policy)
+        #expect(outcome.policyConfigured)
+    }
+
+    @Test("The snake_case min_confidence file key decodes, and garbage fails loudly")
+    func minConfidenceFileKey() throws {
+        let dir = tempDir()
+        // The real `.foldready.json` spelling: snake_case, as the loader converts it.
+        let policy = try #require(try GatePolicy.load(
+            path: writePolicy(#"{ "min_confidence": "high" }"#, in: dir)))
+        #expect(policy.minConfidence == .high)
+
+        // Typed as `Confidence?`, so a garbage value is a load error, not a silent fallback.
+        let bad = writePolicy(#"{ "min_confidence": "HIGH" }"#, in: dir)
+        #expect(throws: GatePolicy.LoadError.self) { try GatePolicy.load(path: bad) }
+    }
+
     @Test("Exit codes separate a failing app from a broken pipeline")
     func exitCodes() {
         #expect(GateExit.pass.rawValue == 0)

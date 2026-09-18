@@ -36,6 +36,24 @@ private let unreadyApp = [
     """
 ]
 
+private let idiomAndLockedApp = [
+    "Info.plist": """
+    <key>UISupportedInterfaceOrientations</key>
+    <array><string>UIInterfaceOrientationPortrait</string></array>
+    """,
+    "View.swift": """
+    import UIKit
+
+    final class View: UIViewController {
+        func layout() {
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                _ = 1
+            }
+        }
+    }
+    """
+]
+
 private let readyApp = [
     "Feed.swift": """
     import SwiftUI
@@ -80,11 +98,28 @@ struct WorkOrderTests {
         }
     }
 
+    @Test("A device-idiom branch and a portrait-only plist both produce a work order entry")
+    func newChecksAreCovered() {
+        let result = AuditEngine.run(root: tree(idiomAndLockedApp), appName: "Locked")
+        #expect(result.findings.contains { $0.check == "idiom" },
+            "the fixture must trip the idiom check to exercise the entry")
+        #expect(result.findings.contains { $0.check == "orientation" },
+            "the fixture must trip the orientation check to exercise the entry")
+
+        let order = WorkOrderBuilder.build(from: result)
+        #expect(order.entries.contains { $0.checkKey == "idiom" })
+        #expect(order.entries.contains { $0.checkKey == "orientation" })
+    }
+
     @Test("A ready app produces no work order entries")
     func readyAppHasNothingToHandOver() {
         let result = AuditEngine.run(root: tree(readyApp), appName: "Ready")
         let order = WorkOrderBuilder.build(from: result)
         #expect(order.entries.isEmpty)
+        // A clean fixture gets no idiom or orientation entry either: the new coverage must
+        // not manufacture remediation for an app that has nothing to fix.
+        #expect(!order.entries.contains { $0.checkKey == "idiom" })
+        #expect(!order.entries.contains { $0.checkKey == "orientation" })
         #expect(order.markdown().contains("Nothing to hand over"))
     }
 

@@ -167,12 +167,12 @@ enum AuditEngine {
         ].compactMap { $0 }
 
         var results = [
-            navigation(lexed: scorable),
-            adaptiveLayout(lexed: scorable),
-            adaptiveGeometry(lexed: scorable),
-            statePreservation(lexed: scorable),
-            idiom(lexed: scorable),
-            orientation(lexed: scorable, plists: plists),
+            navigation(scorable: scorable),
+            adaptiveLayout(scorable: scorable),
+            adaptiveGeometry(scorable: scorable),
+            statePreservation(scorable: scorable),
+            idiom(scorable: scorable),
+            orientation(scorable: scorable, plists: plists),
             buildToolchain(build: build)
         ]
         if !screenshots.isEmpty {
@@ -295,13 +295,13 @@ enum AuditEngine {
 
     /// Standard navigation adapts without a sidebar opt-in. This is a source signal,
     /// not proof that a particular screen or transition renders correctly.
-    private static func navigation(lexed: [LexedFile]) -> CheckResult {
+    private static func navigation(scorable: [LexedFile]) -> CheckResult {
         var adopted = 0
         var legacy: [String] = []
         let standardContainers = ["NavigationStack", "NavigationSplitView", "TabView",
                                   "UINavigationController", "UISplitViewController",
                                   "UITabBarController"]
-        for file in lexed {
+        for file in scorable {
             let standard = standardContainers.contains { containsOutsidePreview($0, in: file) }
             if standard { adopted += 1 }
             else if containsOutsidePreview("NavigationView", in: file) { legacy.append(file.path) }
@@ -325,12 +325,12 @@ enum AuditEngine {
     /// problems to nothing: Signal scored 100 with 22 offending files, WordPress 98 with
     /// 119. Offending files over UI files is a density, bounded in [0, 1], that two apps
     /// of very different sizes share when their code is equally affected.
-    private static func adaptiveLayout(lexed: [LexedFile]) -> CheckResult {
+    private static func adaptiveLayout(scorable: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var offending = Set<String>()
         var iconFrames = 0
 
-        for file in lexed {
+        for file in scorable {
             for line in file.lines {
                 guard !file.isPreview(line: line.number) else { continue }
                 let code = line.code
@@ -363,7 +363,7 @@ enum AuditEngine {
             }
         }
 
-        guard !lexed.isEmpty else {
+        guard !scorable.isEmpty else {
             return CheckResult(key: "adaptive-layout", title: "Adaptive layout",
                 score: nil, detail: "no UI files found", reference: Reference.modernizeUIKit,
                 findings: [], baseWeight: 0.35, signals: ["offending": 0, "ui_files": 0])
@@ -375,15 +375,15 @@ enum AuditEngine {
         // cliff, where 5.05% scored zero and 4.9% scored two. `1 / (1 + density/k)` falls
         // steeply where it matters and never reaches an implausible zero.
         // k = 0.03: 3% of UI files reading fixed geometry halves the check.
-        let density = Double(offending.count) / Double(lexed.count)
+        let density = Double(offending.count) / Double(scorable.count)
         let score = 1.0 / (1.0 + density / Exclusions.layoutDensityHalfPoint)
         return CheckResult(
             key: "adaptive-layout", title: "Adaptive layout",
             score: score,
-            detail: "\(offending.count) of \(lexed.count) UI file(s) use fixed geometry"
+            detail: "\(offending.count) of \(scorable.count) UI file(s) use fixed geometry"
                 + (iconFrames > 0 ? " · \(iconFrames) icon-sized frame(s) not scored" : ""),
             reference: Reference.modernizeUIKit, findings: findings, baseWeight: 0.35,
-            signals: ["offending": Double(offending.count), "ui_files": Double(lexed.count),
+            signals: ["offending": Double(offending.count), "ui_files": Double(scorable.count),
                       "icon_frames": Double(iconFrames)])
     }
 
@@ -392,12 +392,12 @@ enum AuditEngine {
     /// The device-branching half moved to the `idiom` and `orientation` checks; what is left
     /// is coverage of the trait environment. An app that reads no geometry has a missing
     /// signal rather than a defect, so absence is not scored zero.
-    private static func adaptiveGeometry(lexed: [LexedFile]) -> CheckResult {
+    private static func adaptiveGeometry(scorable: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var aware = 0
         var internalStrings = 0
 
-        for file in lexed {
+        for file in scorable {
             var fileIsAware = false
             for line in file.lines {
                 guard !file.isPreview(line: line.number) else { continue }
@@ -417,7 +417,7 @@ enum AuditEngine {
             if fileIsAware { aware += 1 }
         }
 
-        guard !lexed.isEmpty else {
+        guard !scorable.isEmpty else {
             return CheckResult(key: "adaptive-geometry", title: "Adaptive geometry",
                 score: nil, detail: "no UI files found", reference: Reference.sizeClasses,
                 findings: [], baseWeight: 0.15, signals: ["aware": 0, "ui_files": 0])
@@ -426,7 +426,7 @@ enum AuditEngine {
         // Coverage anchor, calibrated on the twenty-app corpus (2026-09-06): an app is
         // credited with full coverage once one UI file in fifty reads the scene geometry.
         // Recorded in docs/result-contract.md with its corpus and date, not hidden here.
-        let target = max(1.0, Double(lexed.count) * Exclusions.geometryCoverageAnchor)
+        let target = max(1.0, Double(scorable.count) * Exclusions.geometryCoverageAnchor)
         let coverage = min(1.0, Double(aware) / target)
         // An app that reads no geometry has a missing signal to report, not a mistake: three
         // corpus apps were punished for the absence before this guard.
@@ -435,22 +435,22 @@ enum AuditEngine {
         return CheckResult(
             key: "adaptive-geometry", title: "Adaptive geometry",
             score: score,
-            detail: "\(aware) of \(lexed.count) UI file(s) read size classes or effective geometry"
+            detail: "\(aware) of \(scorable.count) UI file(s) read size classes or effective geometry"
                 + (internalStrings > 0 ? " · \(internalStrings) internal fold string(s)" : ""),
             reference: Reference.sizeClasses, findings: findings, baseWeight: 0.15,
-            signals: ["aware": Double(aware), "ui_files": Double(lexed.count)])
+            signals: ["aware": Double(aware), "ui_files": Double(scorable.count)])
     }
 
     /// Share of stateful views that preserve their state.
     ///
     /// The laddered version returned 70 whenever the app had view models, which was
     /// seventeen of the twenty corpus apps.
-    private static func statePreservation(lexed: [LexedFile]) -> CheckResult {
+    private static func statePreservation(scorable: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var stateful = 0
         var preserved = 0
 
-        for file in lexed {
+        for file in scorable {
             let holdsState = ["List(", "List {", "ScrollView", "UITableView",
                               "UICollectionView", "Table("]
                 .contains { containsOutsidePreview($0, in: file) }
@@ -491,11 +491,11 @@ enum AuditEngine {
     /// `UIDevice.current.userInterfaceIdiom` branch describes a device, not a canvas, and a
     /// resizable one can change shape under it. The finding is `medium` confidence because a
     /// deliberate phone-only screen is invisible to a source scan.
-    private static func idiom(lexed: [LexedFile]) -> CheckResult {
+    private static func idiom(scorable: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var clean = 0
 
-        for file in lexed {
+        for file in scorable {
             var branches = false
             for line in file.lines {
                 guard !file.isPreview(line: line.number) else { continue }
@@ -508,7 +508,7 @@ enum AuditEngine {
             if !branches { clean += 1 }
         }
 
-        guard !lexed.isEmpty else {
+        guard !scorable.isEmpty else {
             return CheckResult(key: "idiom", title: "Interface idiom",
                 score: nil, detail: "no UI files found", reference: Reference.interfaceIdiom,
                 findings: [], baseWeight: 0.10, signals: ["clean": 0, "ui_files": 0])
@@ -516,10 +516,10 @@ enum AuditEngine {
 
         return CheckResult(
             key: "idiom", title: "Interface idiom",
-            score: Double(clean) / Double(lexed.count),
-            detail: "\(clean) of \(lexed.count) UI file(s) free of device-idiom branching",
+            score: Double(clean) / Double(scorable.count),
+            detail: "\(clean) of \(scorable.count) UI file(s) free of device-idiom branching",
             reference: Reference.interfaceIdiom, findings: findings, baseWeight: 0.10,
-            signals: ["clean": Double(clean), "ui_files": Double(lexed.count)])
+            signals: ["clean": Double(clean), "ui_files": Double(scorable.count)])
     }
 
     /// Interface orientation, read from the Info.plist declaration and from source branches.
@@ -529,7 +529,7 @@ enum AuditEngine {
     /// makes the same device-level decision the size class would settle. The check does not
     /// apply when no plist declares orientations and no source file branches on one, so its
     /// weight is spread over the checks that do.
-    private static func orientation(lexed: [LexedFile], plists: [FileContent]) -> CheckResult {
+    private static func orientation(scorable: [LexedFile], plists: [FileContent]) -> CheckResult {
         var findings: [Finding] = []
         var sites = 0
         var clean = 0
@@ -549,7 +549,7 @@ enum AuditEngine {
             }
         }
 
-        for file in lexed {
+        for file in scorable {
             var branches = false
             for line in file.lines {
                 guard !file.isPreview(line: line.number) else { continue }

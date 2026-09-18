@@ -145,10 +145,13 @@ struct LexedCheckTests {
     }
 
     @Test func anUnlexableFileIsReportedAndNotScored() {
+        // The flagged symbol sits on a line BEFORE the unterminated comment. Blanking the
+        // comment alone would leave it visible to a check, so exclusion (not blanking) is the
+        // only reason it is not scored: the assertion discriminates between the two.
         let root = writeTree(["App/Broken.swift": """
         import SwiftUI
-        /* never closed
         let x = UIScreen.main.bounds
+        /* never closed
         """], in: tempTree())
         let result = AuditEngine.run(root: root, appName: "App")
 
