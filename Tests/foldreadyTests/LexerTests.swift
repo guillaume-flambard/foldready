@@ -67,6 +67,26 @@ struct LexerTests {
         #expect(file.failed)
     }
 
+    @Test func nestedStringInsideInterpolationIsDropped() {
+        let file = lexed("let s = \"\\(mark(\"UIScreen.main.bounds\"))\"\n")
+        #expect(!file.matches(Exclusions.screenMainBounds))
+    }
+
+    @Test func unterminatedStringFailsTheFile() {
+        let file = lexed("let s = \"never closed\n")
+        #expect(file.failed)
+    }
+
+    @Test func unterminatedMultilineStringFailsTheFile() {
+        let file = lexed("let s = \"\"\"\nnever closed\n")
+        #expect(file.failed)
+    }
+
+    @Test func unterminatedRawStringFailsTheFile() {
+        let file = lexed("let s = #\"never closed\n")
+        #expect(file.failed)
+    }
+
     @Test func previewBodyIsRecordedAsARange() {
         let source = """
         struct A: View { var body: some View { Text("a") } }
