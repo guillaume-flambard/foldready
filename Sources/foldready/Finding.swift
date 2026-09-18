@@ -13,6 +13,25 @@ enum Severity: String, Comparable, Codable, Sendable {
     }
 }
 
+/// How sure the audit is that a finding is real, independent of how bad it would be if true.
+///
+/// Severity is "how bad if true"; confidence is "how sure we are". They are separate because
+/// a context-dependent signal can be severe and uncertain at once, and a team should be able
+/// to fail a build on the certain ones without silencing the rest.
+enum Confidence: String, Comparable, Codable, Sendable {
+    case high
+    case medium
+    case low
+
+    private static let order: [Confidence: Int] = [.high: 0, .medium: 1, .low: 2]
+
+    /// Inverted against `order` so `high` is the greatest: a gate comparing against a
+    /// minimum keeps the strongest findings.
+    static func < (lhs: Confidence, rhs: Confidence) -> Bool {
+        order[lhs]! > order[rhs]!
+    }
+}
+
 struct Finding: Sendable {
     let check: String
     let severity: Severity
@@ -22,6 +41,9 @@ struct Finding: Sendable {
     let file: String?
     /// 1-based line number.
     let line: Int?
+    /// How sure the audit is this finding is real. Defaults to `.high`: the strongest
+    /// claim, so an unlabelled site behaves exactly as before confidence existed.
+    let confidence: Confidence = .high
 
     /// Total order over findings, so two audits of the same tree emit the same list in
     /// the same order regardless of file system enumeration order. `Array.sorted` is not
