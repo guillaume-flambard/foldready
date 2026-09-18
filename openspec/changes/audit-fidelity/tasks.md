@@ -1,6 +1,6 @@
 # audit-fidelity — implementation plan
 
-> **For agentic workers:** execute task by task, in order. Steps use checkbox (`- [ ]`)
+> **For agentic workers:** execute task by task, in order. Steps use checkbox (`- [x]`)
 > syntax for tracking. Run `./Scripts/check.sh` before every commit.
 
 **Goal:** replace line-based matching with a dependency-free Swift lexer, promote interface
@@ -49,7 +49,7 @@ under `Scripts/` for the sourcing and golden guards.
   - `struct LexedFile: Sendable { let path: String; let lines: [LexedLine]; let previewRanges: [ClosedRange<Int>]; let failed: Bool; func contains(_ token: String) -> Bool; func matches(_ regex: NSRegularExpression?) -> Bool }`
   - `enum SwiftLexer { static func lex(_ file: FileContent) -> LexedFile }`
 
-- [ ] **Step 1: Write the failing lexer tests**
+- [x] **Step 1: Write the failing lexer tests**
 
 ```swift
 import Testing
@@ -147,12 +147,12 @@ struct LexerTests {
 }
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `swift test --filter Lexer`
 Expected: FAIL — `cannot find 'SwiftLexer' in scope`.
 
-- [ ] **Step 3: Implement the lexer**
+- [x] **Step 3: Implement the lexer**
 
 ```swift
 import Foundation
@@ -348,12 +348,12 @@ enum SwiftLexer {
 }
 ```
 
-- [ ] **Step 4: Run the tests and confirm they pass**
+- [x] **Step 4: Run the tests and confirm they pass**
 
 Run: `swift test --filter Lexer`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Sources/foldready/SwiftLexer.swift Tests/foldreadyTests/LexerTests.swift
@@ -373,7 +373,7 @@ git commit -m "feat: lex Swift files so comments and strings cannot be scored"
   `low`; `Finding` gains `let confidence: Confidence`.
 - Consumes: nothing new.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```swift
 import Testing
@@ -402,12 +402,12 @@ struct ConfidenceTests {
 }
 ```
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `swift test --filter Confidence`
 Expected: FAIL — no `Confidence` type, no `confidence` property.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `Sources/foldready/Finding.swift`:
 
@@ -438,12 +438,12 @@ Add `let confidence: Confidence` to `Finding`, and an initialiser parameter
 `confidence: Confidence = .high` so existing call sites keep compiling with the strongest
 claim; each check then sets its level explicitly in later tasks.
 
-- [ ] **Step 4: Run the tests and confirm they pass**
+- [x] **Step 4: Run the tests and confirm they pass**
 
 Run: `swift test --filter Confidence`
 Expected: PASS. Then `swift test` — the whole suite must still pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Sources/foldready/Finding.swift Tests/foldreadyTests/ConfidenceTests.swift
@@ -464,7 +464,7 @@ git commit -m "feat: give every finding a confidence level"
 - Produces: `AuditEngine.run` lexes each UI file once and every check consumes `[LexedFile]`;
   `Exclusions.previewLines(in:)` is deleted.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `LexerTests.swift`:
 
@@ -488,12 +488,12 @@ struct LexedCheckTests {
 Reuse the `tempTree`/`writeTree` helpers from `DuoSurfaceTests.swift` (they are file-private;
 copy them into `LexerTests.swift` or promote them to a small shared test helper file).
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `swift test --filter LexedCheckTests`
 Expected: FAIL — the comment still produces a finding.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `AuditEngine.run`, after `let uiFiles = allSwift.filter { Exclusions.isUIFile($0) }`, add:
 
@@ -508,12 +508,12 @@ matching on `line.code`. Delete `Exclusions.previewLines(in:)` and its call site
 failed count: add `failedFiles: Int` to `AuditStats` and set it from `lexed.count - scorable.count`,
 so an unlexable file is visible rather than silently clean.
 
-- [ ] **Step 4: Run the full suite and confirm it passes**
+- [x] **Step 4: Run the full suite and confirm it passes**
 
 Run: `swift test`
 Expected: PASS. The golden fixture may shift; that is Task 7's job.
 
-- [ ] **Step 5: Surface the unlexable count**
+- [x] **Step 5: Surface the unlexable count**
 
 The spec's `File that fails to lex` scenario requires the count to be stated. It already
 appears in `stats`, but the human report must show it too. Add to `HTMLReport`'s summary cards
@@ -524,7 +524,7 @@ contains the failed count, and whose audit produces no finding for the affected 
 Run: `swift test`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add Sources/foldready/AuditEngine.swift Sources/foldready/Exclusions.swift Sources/foldready/HTMLReport.swift Tests/foldreadyTests/LexerTests.swift
@@ -547,7 +547,7 @@ git commit -m "feat: score lexed lines, and report files the lexer could not fin
   `userInterfaceIdiom`/`interfaceOrientation` findings move off `adaptive-geometry`;
   `adaptive-geometry` baseWeight becomes 0.15.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```swift
 import Testing
@@ -597,12 +597,12 @@ struct IdiomOrientationTests {
 }
 ```
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `swift test --filter IdiomOrientation`
 Expected: FAIL — no `idiom` or `orientation` check exists.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `Reference.swift`:
 
@@ -632,12 +632,12 @@ private static func orientation(lexed: [LexedFile], plists: [FileContent]) -> Ch
 `major` at `confidence: .high` with the plist path, and is `nil` (not applicable) when no plist
 declares orientations. Append both to the results array.
 
-- [ ] **Step 4: Run the suite and confirm it passes**
+- [x] **Step 4: Run the suite and confirm it passes**
 
 Run: `swift test --filter IdiomOrientation` then `swift test`
 Expected: PASS, and `adaptive-geometry` no longer emits idiom findings.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Sources/foldready/AuditEngine.swift Sources/foldready/Reference.swift Sources/foldready/Exclusions.swift Tests/foldreadyTests/IdiomOrientationTests.swift
@@ -661,7 +661,7 @@ git commit -m "feat: score interface idiom and orientation, including the plist 
   `ExclusionReport { tests, vendored, generated, byConfig: Int }` carried on `AuditStats`;
   `AuditEngine.run(root:appName:screenshots:policy:)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```swift
 import Testing
@@ -695,12 +695,12 @@ struct ExclusionsTests {
 }
 ```
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `swift test --filter ExclusionsTests`
 Expected: FAIL — `GatePolicy` has no `exclude`/`include`, `run` has no `policy:`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 - `GatePolicy`: add `var exclude: [String]?` and `var include: [String]?` (both `convertFromSnakeCase`
   friendly).
@@ -713,12 +713,12 @@ Expected: FAIL — `GatePolicy` has no `exclude`/`include`, `run` has no `policy
 - `main.swift`: load `.foldready.json` from the audited root before the audit and pass it in, for
   the audit, verify and gate paths.
 
-- [ ] **Step 4: Run the suite and confirm it passes**
+- [x] **Step 4: Run the suite and confirm it passes**
 
 Run: `swift test`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Sources/foldready/Exclusions.swift Sources/foldready/Gate/Policy.swift Sources/foldready/AuditEngine.swift Sources/foldready/main.swift Tests/foldreadyTests/ExclusionsTests.swift
@@ -738,7 +738,7 @@ git commit -m "feat: exclude by configuration and report every exclusion by reas
 - Produces: gate rules filter findings below the configured confidence; a `confidence`
   rule result names how many were ignored.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```swift
 @Test func minConfidenceIgnoresLowerConfidenceFindings() throws {
@@ -755,23 +755,23 @@ git commit -m "feat: exclude by configuration and report every exclusion by reas
 }
 ```
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `swift test --filter minConfidence`
 Expected: FAIL — the medium finding still trips `maxSeverity`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In the severity rule, filter `result.findings` by
 `Confidence(rawValue: policy.minConfidence ?? "") ?? .low` before comparing severity, and
 include the ignored count in the rule's `actual` string.
 
-- [ ] **Step 4: Run the suite and confirm it passes**
+- [x] **Step 4: Run the suite and confirm it passes**
 
 Run: `swift test --filter Gate`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add Sources/foldready/Gate/Policy.swift Tests/foldreadyTests/GateTests.swift
@@ -796,19 +796,19 @@ git commit -m "feat: let the gate act only on findings at the configured confide
 - Produces: `schema_version` 5; findings carry `confidence`; checks include `idiom` and
   `orientation`; stats include exclusion reasons and failed files.
 
-- [ ] **Step 1: Bump the version and extend the fixture**
+- [x] **Step 1: Bump the version and extend the fixture**
 
 Set `resultSchemaVersion = 5` and `foldreadyVersion = "0.5.0"`. Add a `userInterfaceIdiom`
 branch to `Tests/Fixtures/ContractApp/Feed.swift`, or a portrait-only plist, so the v5 golden
 exercises the new keys.
 
-- [ ] **Step 2: Emit the new fields**
+- [x] **Step 2: Emit the new fields**
 
 In `JSONReport.payload`, add `"confidence": f.confidence.rawValue` to each finding dict, and
 the exclusion/failed counts to `stats`. In `HTMLReport`, render confidence beside severity and
 state the exclusion breakdown.
 
-- [ ] **Step 3: Make the gate name a baseline from a different contract**
+- [x] **Step 3: Make the gate name a baseline from a different contract**
 
 The `Score changes are declared` requirement has a second scenario: when a team upgrades, the
 gate must report that the baseline was produced by a different contract version. `Baseline`
@@ -821,19 +821,19 @@ naming both versions in `expected`/`actual`. Write the test first: a baseline JS
 Run: `swift test --filter baselineContract`
 Expected: FAIL, then PASS after the implementation.
 
-- [ ] **Step 4: Regenerate the golden and update the docs**
+- [x] **Step 4: Regenerate the golden and update the docs**
 
 Run: `python3 Scripts/contract-golden.py --update`
 Then update `docs/result-contract.md` (version 5, the two checks, the confidence field, the
 exclusion reasons, the `baseline-contract` rule, a `## Version 5` section stating v4 baselines
 are not comparable), the README engine paragraph, and `docs/roadmap.md` Phase 3.
 
-- [ ] **Step 5: Run the full check**
+- [x] **Step 5: Run the full check**
 
 Run: `./Scripts/check.sh`
 Expected: `==> all checks passed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
@@ -848,13 +848,35 @@ git commit -m "feat: contract v5 — lexed attribution, idiom and orientation ch
 - Modify: `openspec/changes/audit-fidelity/tasks.md` (this file)
 - Modify: `docs/roadmap.md`
 
-- [ ] **Step 1: Tick the tasks** as each completes.
-- [ ] **Step 2: Note the deferred work.** Add a line stating declaration-scope attribution is a
+- [x] **Step 1: Tick the tasks** as each completes.
+- [x] **Step 2: Note the deferred work.** Add a line stating declaration-scope attribution is a
   follow-up and that the index regeneration is issue #6.
-- [ ] **Step 3: Run `openspec validate audit-fidelity --strict`** and `./Scripts/check.sh`.
-- [ ] **Step 4: Commit.**
+- [x] **Step 3: Run `openspec validate audit-fidelity --strict`** and `./Scripts/check.sh`.
+- [x] **Step 4: Commit.**
 
 ```bash
 git add openspec/changes/audit-fidelity/tasks.md docs/roadmap.md
 git commit -m "openspec: record audit-fidelity progress and its deferred scope"
 ```
+
+---
+
+## Deferred scope
+
+This change is closed at contract v5. The following work is deliberately not done here and is
+recorded so the repository does not read as more complete than it is.
+
+- **Declaration-scope attribution.** What shipped is a lexer, not a parser. It guarantees a
+  match inside a comment or the literal text of a string never reaches a check, and that a file
+  it cannot finish is reported as unlexable rather than scored clean. It cannot yet tell that a
+  match sits inside a real type body versus a nested test helper or a debug-only branch. A real
+  Swift syntax tree (declaration-scope attribution) is a deferred follow-up, deliberately out of
+  this change's scope.
+- **Index re-audit under v5 (issue #6).** The published index in `web/lib/index-data.ts` still
+  carries the older contract's per-app check keys and stays labelled historical on the site. The
+  re-audit is blocked on the twenty audited app checkouts, which live outside this repository and
+  are passed to `Scripts/build-index.sh` as arguments. It is tracked as issue #6 and is not a
+  code gap.
+- **Objective-C and build settings.** The lexer covers `.swift` files only; a `.m` or `.h` scan
+  still has text matching, and the report keeps saying so. Resolving build settings or the linked
+  SDK is not attempted; that remains a runtime question for the Duo simulator work in Phase 4.

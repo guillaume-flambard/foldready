@@ -17,7 +17,8 @@ Shipped and working:
   [result-contract.md](result-contract.md), with a committed golden payload.
 - A `gate` subcommand with committed baselines, per-rule reporting and distinct exit codes.
 - A GitHub Action that audits base and head on a pull request and posts the score delta.
-- A public site that renders the index from real audits.
+- A public site that renders the index from real audits, labelled historical while the v5
+  re-audit is pending (Phase 4, item 4).
 - A scoped human deliverable, described in [readiness-review.md](readiness-review.md).
 
 Built but unvalidated:
@@ -91,23 +92,25 @@ unattended.
 
 ## Phase 3. Audit fidelity (October, first half)
 
-Entry: the contract is stable at v4 and baselines exist.
+Entry: the contract is stable at v4 and baselines exist. **Done 19 September, ahead of the
+window.**
 
-Work: `audit-fidelity` ships contract v5. A dependency-free Swift lexer replaces line
+Work: `audit-fidelity` shipped contract v5. A dependency-free Swift lexer replaced line
 matching, so a comment or a string literal cannot lower a score and a file that cannot be
 lexed is reported rather than scored clean. Preview, test, vendored and generated code are
 excluded by default, configurable in `.foldready.json`, and reported by reason. Interface
-idiom and interface orientation become first-class scored checks, and the orientation check
+idiom and interface orientation became first-class scored checks, and the orientation check
 reads the `Info.plist` keys as well as source. Every finding carries a confidence level, and
-the gate can act on findings at or above a configured `min_confidence`.
+the gate acts on findings at or above a configured `min_confidence`.
 
 A full Swift syntax tree is explicitly out of scope: the demonstrated false positives are all
 comments and strings, and declaration-scope attribution is a recorded follow-up. The index
 re-audit under v5 remains blocked on the twenty app checkouts (issue #6).
 
-Exit: a red gate means a real finding, the false-positive paths named in the
-`audit-fidelity` design are closed by test, and the index is re-audited under the new
-version.
+Exit: a red gate means a real finding for the demonstrated false-positive classes, and the
+comment, string-literal and preview paths named in the `audit-fidelity` design are closed by
+test. **Met** at contract v5. The index re-audit is not part of this phase; it is Phase 4,
+item 4.
 
 Why here and not earlier: the four Duo surfaces are advisory, so they tolerate line-based
 matching. A scored check that can fail a build does not, and the gate must not be trusted
