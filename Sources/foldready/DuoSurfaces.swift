@@ -58,9 +58,9 @@ enum DuoSurfaces {
         }
     }
 
-    static func analyze(uiFiles: [FileContent]) -> [AdvisoryFinding] {
+    static func analyze(lexed: [LexedFile]) -> [AdvisoryFinding] {
         var findings: [AdvisoryFinding] = []
-        for file in uiFiles {
+        for file in lexed {
             if !uses(file, ["reservedRegions", "ReservedRegion"]),
                let hits = hits(in: file, matching: isReservedRegionSignal) {
                 findings.append(make(
@@ -147,28 +147,27 @@ enum DuoSurfaces {
 
     // MARK: - Helpers
 
-    private static func uses(_ file: FileContent, _ tokens: [String]) -> Bool {
-        tokens.contains { file.content.contains($0) }
+    private static func uses(_ file: LexedFile, _ tokens: [String]) -> Bool {
+        tokens.contains { file.contains($0) }
     }
 
     /// The 1-based line of the first matching non-preview line and the number of matches
     /// in the file. Preview code is skipped for the same reason the scored checks skip it.
-    private static func hits(in file: FileContent, matching predicate: (String) -> Bool) -> (line: Int, count: Int)? {
-        let skipped = Exclusions.previewLines(in: file.content)
+    private static func hits(in file: LexedFile, matching predicate: (String) -> Bool) -> (line: Int, count: Int)? {
         var first = 0
         var count = 0
-        for (index, raw) in file.content.split(separator: "\n", omittingEmptySubsequences: false).enumerated() {
-            if skipped.contains(index) { continue }
-            if predicate(String(raw)) {
+        for line in file.lines {
+            guard !file.isPreview(line: line.number) else { continue }
+            if predicate(line.code) {
                 count += 1
-                if first == 0 { first = index + 1 }
+                if first == 0 { first = line.number }
             }
         }
         guard count > 0 else { return nil }
         return (first, count)
     }
 
-    private static func make(surface: String, message: String, file: FileContent, hits: (line: Int, count: Int)) -> AdvisoryFinding {
+    private static func make(surface: String, message: String, file: LexedFile, hits: (line: Int, count: Int)) -> AdvisoryFinding {
         AdvisoryFinding(
             surface: surface,
             message: message,

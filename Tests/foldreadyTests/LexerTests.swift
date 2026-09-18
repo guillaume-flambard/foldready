@@ -6,6 +6,25 @@ private func lexed(_ source: String) -> LexedFile {
     SwiftLexer.lex(FileContent(path: "App/View.swift", content: source))
 }
 
+/// Writes a tree of files, creating intermediate directories, and returns its root path.
+/// Copied from `DuoSurfaceTests.swift`, where the helpers are file-private.
+private func writeTree(_ files: [String: String], in parent: URL) -> String {
+    for (path, content) in files {
+        let url = parent.appendingPathComponent(path)
+        try? FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? content.write(to: url, atomically: true, encoding: .utf8)
+    }
+    return parent.path
+}
+
+private func tempTree() -> URL {
+    let url = FileManager.default.temporaryDirectory
+        .appendingPathComponent("fr-lexed-\(UUID().uuidString)", isDirectory: true)
+    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    return url
+}
+
 @Suite("Lexer")
 struct LexerTests {
 
@@ -109,5 +128,35 @@ struct LexerTests {
         let after = file.lines.first { $0.code.contains("struct After") }
         #expect(after != nil)
         #expect(!(file.previewRanges.last?.contains((after?.number ?? 0) - 1) ?? false))
+    }
+}
+
+@Suite("Lexed checks")
+struct LexedCheckTests {
+
+    @Test func aSymbolOnlyInACommentDoesNotScore() {
+        let root = writeTree(["App/View.swift": """
+        import SwiftUI
+        // UIScreen.main.bounds
+        struct View1: View { var body: some View { Text("x") } }
+        """], in: tempTree())
+        let result = AuditEngine.run(root: root, appName: "App")
+        #expect(!result.findings.contains { $0.message.contains("UIScreen.main.bounds") })
+    }
+
+    @Test func anUnlexableFileIsReportedAndNotScored() {
+        let root = writeTree(["App/Broken.swift": """
+        import SwiftUI
+        /* never closed
+        let x = UIScreen.main.bounds
+        """], in: tempTree())
+        let result = AuditEngine.run(root: root, appName: "App")
+
+        #expect(result.stats.failedFiles == 1)
+        #expect(!result.findings.contains { $0.file == "App/Broken.swift" })
+
+        let html = HTMLReport.render(result)
+        #expect(html.contains(
+            "<div class=\"k\">Files the lexer could not read</div><div class=\"v\">1</div>"))
     }
 }

@@ -11,6 +11,16 @@ enum HTMLReport {
             : "<table><thead><tr><th>Severity</th><th>Check</th><th>Finding</th><th>File</th></tr></thead><tbody>"
                 + result.findings.map { findingRow($0) }.joined(separator: "\n")
                 + "</tbody></table>"
+        // The unlexable count is shown only when it is non-zero: such a file is excluded
+        // from scoring, so the report must say so rather than read as if the tree were read.
+        let summaryCards = [
+            "<div class=\"card\"><div class=\"k\">Risk</div><div class=\"v\">\(result.risk)</div></div>",
+            "<div class=\"card\"><div class=\"k\">Est. porting effort</div><div class=\"v\">\(result.hoursEstimate) h</div></div>",
+            "<div class=\"card\"><div class=\"k\">Swift files</div><div class=\"v\">\(result.stats.swiftFiles)</div></div>",
+            result.stats.failedFiles > 0
+                ? "<div class=\"card\"><div class=\"k\">Files the lexer could not read</div><div class=\"v\">\(result.stats.failedFiles)</div></div>"
+                : nil
+        ].compactMap { $0 }.joined(separator: "\n            ")
 
         let gradeColor: String
         switch result.grade {
@@ -105,9 +115,7 @@ enum HTMLReport {
 
           <h2>Summary</h2>
           <div class="cards">
-            <div class="card"><div class="k">Risk</div><div class="v">\(result.risk)</div></div>
-            <div class="card"><div class="k">Est. porting effort</div><div class="v">\(result.hoursEstimate) h</div></div>
-            <div class="card"><div class="k">Swift files</div><div class="v">\(result.stats.swiftFiles)</div></div>
+            \(summaryCards)
           </div>
 
           <h2>Score breakdown</h2>

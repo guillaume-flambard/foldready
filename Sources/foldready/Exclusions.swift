@@ -70,28 +70,4 @@ enum Exclusions {
         guard let regex else { return false }
         return regex.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)) != nil
     }
-
-    /// Line indices (0-based) that sit inside a preview block. Cheap brace matching from
-    /// the declaration line: a preview is a leaf, so it does not need a real parser.
-    static func previewLines(in content: String) -> Set<Int> {
-        let lines = content.components(separatedBy: .newlines)
-        var inside = Set<Int>()
-        var depth = 0
-        var active = false
-        for (index, line) in lines.enumerated() {
-            if !active,
-               line.contains("#Preview") || line.contains(": PreviewProvider")
-                || line.range(of: #"static var previews\s*:"#, options: .regularExpression) != nil {
-                active = true
-                depth = 0
-            }
-            if active {
-                inside.insert(index)
-                depth += line.filter { $0 == "{" }.count
-                depth -= line.filter { $0 == "}" }.count
-                if depth <= 0 && line.contains("}") { active = false }
-            }
-        }
-        return inside
-    }
 }

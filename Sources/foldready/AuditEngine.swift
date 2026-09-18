@@ -52,6 +52,12 @@ struct AuditStats: Sendable {
     let uikitFiles: Int
     let xibOrStoryboard: Int
     let infoPlists: Int
+    /// UI files the lexer could not finish. Such a file is excluded from scoring and
+    /// reported rather than scored clean, so the count must be visible in the result.
+    ///
+    /// `var`, not `let`: a stored `let` with a default is omitted from the synthesised
+    /// memberwise initialiser, which would leave `AuditEngine` no way to set the count.
+    var failedFiles: Int = 0
 }
 
 struct AuditResult: Sendable {
@@ -140,7 +146,13 @@ enum AuditEngine {
         // Everything scored is measured over shipping UI files. Tests, snapshots,
         // generated code and vendored dependencies are counted and reported, not scored.
         let uiFiles = allSwift.filter { Exclusions.isUIFile($0) }
-        let stats = makeStats(root: root, allSwift: allSwift, uiFiles: uiFiles, plists: plists)
+        // Lex each UI file once and hand the checks that view, so a comment or the literal
+        // text of a string can never be scored. A file the lexer cannot finish is reported
+        // through `stats.failedFiles` and excluded, never silently scored clean.
+        let lexed = uiFiles.map { SwiftLexer.lex($0) }
+        let scorable = lexed.filter { !$0.failed }
+        let stats = makeStats(root: root, allSwift: allSwift, uiFiles: uiFiles, plists: plists,
+                              failedFiles: lexed.count - scorable.count)
 
         let blockers = [
             Blockers.sceneLifecycle(swiftFiles: allSwift),
@@ -148,10 +160,10 @@ enum AuditEngine {
         ].compactMap { $0 }
 
         var results = [
-            navigation(uiFiles: uiFiles),
-            adaptiveLayout(uiFiles: uiFiles),
-            adaptiveGeometry(uiFiles: uiFiles),
-            statePreservation(uiFiles: uiFiles),
+            navigation(lexed: scorable),
+            adaptiveLayout(lexed: scorable),
+            adaptiveGeometry(lexed: scorable),
+            statePreservation(lexed: scorable),
             buildToolchain(build: build)
         ]
         if !screenshots.isEmpty {
@@ -172,7 +184,7 @@ enum AuditEngine {
             blockers: blockers,
             stats: stats,
             hoursEstimate: estimateHours(stats: stats, outcomes: outcomes, blockers: blockers),
-            advisory: DuoSurfaces.analyze(uiFiles: uiFiles),
+            advisory: DuoSurfaces.analyze(lexed: scorable),
             build: build
         )
     }
@@ -212,7 +224,8 @@ enum AuditEngine {
     }
 
     private static func makeStats(root: String, allSwift: [FileContent],
-                                  uiFiles: [FileContent], plists: [FileContent]) -> AuditStats {
+                                  uiFiles: [FileContent], plists: [FileContent],
+                                  failedFiles: Int) -> AuditStats {
         var swiftui = 0, uikit = 0
         for file in uiFiles {
             if file.content.contains("import SwiftUI") { swiftui += 1 }
@@ -227,23 +240,23 @@ enum AuditEngine {
             swiftuiFiles: swiftui,
             uikitFiles: uikit,
             xibOrStoryboard: xibs + storyboards,
-            infoPlists: plists.count)
+            infoPlists: plists.count,
+            failedFiles: failedFiles)
     }
 
     // MARK: - Checks
 
     /// Standard navigation adapts without a sidebar opt-in. This is a source signal,
     /// not proof that a particular screen or transition renders correctly.
-    private static func navigation(uiFiles: [FileContent]) -> CheckResult {
+    private static func navigation(lexed: [LexedFile]) -> CheckResult {
         var adopted = 0
         var legacy: [String] = []
-        for file in uiFiles {
-            let source = file.content
+        for file in lexed {
             let standard = ["NavigationStack", "NavigationSplitView", "TabView",
                             "UINavigationController", "UISplitViewController", "UITabBarController"]
-                .contains { source.contains($0) }
+                .contains { file.contains($0) }
             if standard { adopted += 1 }
-            else if source.contains("NavigationView") { legacy.append(file.path) }
+            else if file.contains("NavigationView") { legacy.append(file.path) }
         }
         let total = adopted + legacy.count
         let findings = legacy.sorted().map { path in
@@ -264,35 +277,34 @@ enum AuditEngine {
     /// problems to nothing: Signal scored 100 with 22 offending files, WordPress 98 with
     /// 119. Offending files over UI files is a density, bounded in [0, 1], that two apps
     /// of very different sizes share when their code is equally affected.
-    private static func adaptiveLayout(uiFiles: [FileContent]) -> CheckResult {
+    private static func adaptiveLayout(lexed: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var offending = Set<String>()
         var iconFrames = 0
 
-        for file in uiFiles {
-            let previews = Exclusions.previewLines(in: file.content)
-            let lines = file.content.components(separatedBy: .newlines)
-            for (index, line) in lines.enumerated() {
-                guard !previews.contains(index) else { continue }
+        for file in lexed {
+            for line in file.lines {
+                guard !file.isPreview(line: line.number) else { continue }
+                let code = line.code
 
-                if Exclusions.matches(Exclusions.screenMainBounds, line) {
+                if Exclusions.matches(Exclusions.screenMainBounds, code) {
                     offending.insert(file.path)
                     findings.append(Finding(check: "adaptive-layout", severity: .major,
                         message: "UIScreen.main.bounds is a fixed geometry read; use the view's own bounds or the window scene.",
-                        file: file.path, line: index + 1))
-                } else if Exclusions.matches(Exclusions.screenMain, line) {
+                        file: file.path, line: line.number))
+                } else if Exclusions.matches(Exclusions.screenMain, code) {
                     offending.insert(file.path)
                     findings.append(Finding(check: "adaptive-layout", severity: .minor,
                         message: "UIScreen.main is deprecated in iOS 27; derive scale and geometry from the window scene and trait collection.",
-                        file: file.path, line: index + 1))
+                        file: file.path, line: line.number))
                 }
 
-                switch Exclusions.isScorableFrame(line: line) {
+                switch Exclusions.isScorableFrame(line: code) {
                 case .some(true):
                     offending.insert(file.path)
                     findings.append(Finding(check: "adaptive-layout", severity: .minor,
                         message: "Hardcoded frame larger than a control: it will not reflow when the scene changes width.",
-                        file: file.path, line: index + 1))
+                        file: file.path, line: line.number))
                 case .some(false):
                     // Icon-sized: reported as information, never scored. 92% of the frame
                     // findings on the corpus were this.
@@ -303,7 +315,7 @@ enum AuditEngine {
             }
         }
 
-        guard !uiFiles.isEmpty else {
+        guard !lexed.isEmpty else {
             return CheckResult(key: "adaptive-layout", title: "Adaptive layout",
                 score: nil, detail: "no UI files found", reference: Reference.modernizeUIKit,
                 findings: [], baseWeight: 0.35, signals: ["offending": 0, "ui_files": 0])
@@ -315,57 +327,56 @@ enum AuditEngine {
         // cliff, where 5.05% scored zero and 4.9% scored two. `1 / (1 + density/k)` falls
         // steeply where it matters and never reaches an implausible zero.
         // k = 0.03: 3% of UI files reading fixed geometry halves the check.
-        let density = Double(offending.count) / Double(uiFiles.count)
+        let density = Double(offending.count) / Double(lexed.count)
         let score = 1.0 / (1.0 + density / Exclusions.layoutDensityHalfPoint)
         return CheckResult(
             key: "adaptive-layout", title: "Adaptive layout",
             score: score,
-            detail: "\(offending.count) of \(uiFiles.count) UI file(s) use fixed geometry"
+            detail: "\(offending.count) of \(lexed.count) UI file(s) use fixed geometry"
                 + (iconFrames > 0 ? " · \(iconFrames) icon-sized frame(s) not scored" : ""),
             reference: Reference.modernizeUIKit, findings: findings, baseWeight: 0.35,
-            signals: ["offending": Double(offending.count), "ui_files": Double(uiFiles.count),
+            signals: ["offending": Double(offending.count), "ui_files": Double(lexed.count),
                       "icon_frames": Double(iconFrames)])
     }
 
     /// Two halves: how widely the app reads size classes or effective geometry, and how
     /// much of its branching is on device idiom or interface orientation instead.
-    private static func adaptiveGeometry(uiFiles: [FileContent]) -> CheckResult {
+    private static func adaptiveGeometry(lexed: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var aware = 0
         var deviceBranching = 0
         var internalStrings = 0
 
-        for file in uiFiles {
-            let previews = Exclusions.previewLines(in: file.content)
+        for file in lexed {
             var fileIsAware = false
             var fileBranchesOnDevice = false
 
-            let lines = file.content.components(separatedBy: .newlines)
-            for (index, line) in lines.enumerated() {
-                guard !previews.contains(index) else { continue }
-                if line.contains("horizontalSizeClass") || line.contains("verticalSizeClass")
-                    || line.contains("didUpdateEffectiveGeometry") {
+            for line in file.lines {
+                guard !file.isPreview(line: line.number) else { continue }
+                let code = line.code
+                if code.contains("horizontalSizeClass") || code.contains("verticalSizeClass")
+                    || code.contains("didUpdateEffectiveGeometry") {
                     fileIsAware = true
                 }
-                if line.contains("userInterfaceIdiom") || line.contains("interfaceOrientation") {
+                if code.contains("userInterfaceIdiom") || code.contains("interfaceOrientation") {
                     fileBranchesOnDevice = true
                     findings.append(Finding(check: "adaptive-geometry", severity: .minor,
                         message: "Layout branching on device idiom or interface orientation; a resizable scene is described by its size class.",
-                        file: file.path, line: index + 1))
+                        file: file.path, line: line.number))
                 }
-                if line.contains("foldState") || line.contains("angleDegrees")
-                    || line.contains("mechanicalAngleDegrees") {
+                if code.contains("foldState") || code.contains("angleDegrees")
+                    || code.contains("mechanicalAngleDegrees") {
                     internalStrings += 1
                     findings.append(Finding(check: "adaptive-geometry", severity: .info,
                         message: "foldState/angleDegrees are internal framework strings, not public API. Rely on size classes and effective geometry.",
-                        file: file.path, line: index + 1))
+                        file: file.path, line: line.number))
                 }
             }
             if fileIsAware { aware += 1 }
             if fileBranchesOnDevice { deviceBranching += 1 }
         }
 
-        guard !uiFiles.isEmpty else {
+        guard !lexed.isEmpty else {
             return CheckResult(key: "adaptive-geometry", title: "Adaptive geometry",
                 score: nil, detail: "no UI files found", reference: Reference.sizeClasses,
                 findings: [], baseWeight: 0.35, signals: ["aware": 0, "device_branching": 0, "ui_files": 0])
@@ -374,7 +385,7 @@ enum AuditEngine {
         // Coverage anchor, calibrated on the twenty-app corpus (2026-09-06): an app is
         // credited with full coverage once one UI file in fifty reads the scene geometry.
         // Recorded in docs/result-contract.md with its corpus and date, not hidden here.
-        let target = max(1.0, Double(uiFiles.count) * Exclusions.geometryCoverageAnchor)
+        let target = max(1.0, Double(lexed.count) * Exclusions.geometryCoverageAnchor)
         let coverage = min(1.0, Double(aware) / target)
         // An app that branches on nothing has no purity problem. Scoring it zero punished
         // three corpus apps for an absence rather than for a mistake.
@@ -389,38 +400,38 @@ enum AuditEngine {
         return CheckResult(
             key: "adaptive-geometry", title: "Adaptive geometry",
             score: score,
-            detail: "\(aware) of \(uiFiles.count) UI file(s) read size classes or effective geometry, "
+            detail: "\(aware) of \(lexed.count) UI file(s) read size classes or effective geometry, "
                 + "\(deviceBranching) branch on device or orientation"
                 + (internalStrings > 0 ? " · \(internalStrings) internal fold string(s)" : ""),
             reference: Reference.sizeClasses, findings: findings, baseWeight: 0.35,
             signals: ["aware": Double(aware), "device_branching": Double(deviceBranching),
-                      "ui_files": Double(uiFiles.count)])
+                      "ui_files": Double(lexed.count)])
     }
 
     /// Share of stateful views that preserve their state.
     ///
     /// The laddered version returned 70 whenever the app had view models, which was
     /// seventeen of the twenty corpus apps.
-    private static func statePreservation(uiFiles: [FileContent]) -> CheckResult {
+    private static func statePreservation(lexed: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var stateful = 0
         var preserved = 0
 
-        for file in uiFiles {
-            let holdsState = file.content.contains("List(")
-                || file.content.contains("List {")
-                || file.content.contains("ScrollView")
-                || file.content.contains("UITableView")
-                || file.content.contains("UICollectionView")
-                || file.content.contains("Table(")
+        for file in lexed {
+            let holdsState = file.contains("List(")
+                || file.contains("List {")
+                || file.contains("ScrollView")
+                || file.contains("UITableView")
+                || file.contains("UICollectionView")
+                || file.contains("Table(")
             guard holdsState else { continue }
             stateful += 1
 
-            let preserves = file.content.contains("@SceneStorage")
-                || file.content.contains("restorationIdentifier")
-                || file.content.contains("preservesSelectionInNavigationStack")
-                || file.content.contains("scrollPosition(")
-                || file.content.contains("NSUserActivity")
+            let preserves = file.contains("@SceneStorage")
+                || file.contains("restorationIdentifier")
+                || file.contains("preservesSelectionInNavigationStack")
+                || file.contains("scrollPosition(")
+                || file.contains("NSUserActivity")
             if preserves {
                 preserved += 1
             } else {
