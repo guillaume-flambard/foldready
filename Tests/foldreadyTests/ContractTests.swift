@@ -128,10 +128,17 @@ struct ContractTests {
     }
 
     @Test("Weights serialise without binary float noise")
-    func weightSerialisation() {
+    func weightSerialisation() throws {
         let root = writeFixture(in: tempParent())
-        let rendered = JSONReport.render(AuditEngine.run(root: root, appName: "DemoApp"))
-        #expect(!rendered.contains("0.3500000000000000"))
-        #expect(rendered.contains("\"weight\" : 0.35"))
+        let result = AuditEngine.run(root: root, appName: "DemoApp")
+        let rendered = JSONReport.render(result)
+        let layout = try #require(result.outcomes.first { $0.key == "adaptive-layout" })
+        #expect(!rendered.contains(String(describing: layout.weight)),
+                "a raw Double weight would print its full binary expansion")
+        // The report rounds to four decimals; NSDecimalNumber drops trailing zeros.
+        var clean = String(format: "%.4f", layout.weight)
+        while clean.hasSuffix("0") { clean.removeLast() }
+        if clean.hasSuffix(".") { clean.removeLast() }
+        #expect(rendered.contains("\"weight\" : \(clean)"))
     }
 }

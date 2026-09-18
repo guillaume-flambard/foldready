@@ -39,6 +39,14 @@ enum Reference {
     static let sizeClasses =
         "https://developer.apple.com/documentation/uikit/uitraitcollection/horizontalsizeclass"
 
+    /// Interface idiom: Apple directs apps to branch on size class rather than idiom.
+    static let interfaceIdiom =
+        "https://developer.apple.com/documentation/uikit/uidevice/userinterfaceidiom"
+
+    /// Supported interface orientations, the Info.plist key that locks an app to a shape.
+    static let interfaceOrientations =
+        "https://developer.apple.com/documentation/bundleresources/information-property-list/uisupportedinterfaceorientations"
+
     /// `@SceneStorage`: per-scene state that survives a scene being torn down and rebuilt.
     static let sceneStorage = "https://developer.apple.com/documentation/swiftui/scenestorage"
 

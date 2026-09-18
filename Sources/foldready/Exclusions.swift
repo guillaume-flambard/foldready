@@ -70,4 +70,39 @@ enum Exclusions {
         guard let regex else { return false }
         return regex.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)) != nil
     }
+
+    /// The `UIInterfaceOrientation*` values in the first `UISupportedInterfaceOrientations`
+    /// array of a plist, in file order. Empty when the key is absent or its array holds no
+    /// values, which is how a caller tells "not declared" from "declared and not locked".
+    static func declaredOrientations(in plist: String) -> [String] {
+        guard let arrayRegex = orientationArray, let valueRegex = orientationValue else { return [] }
+        let range = NSRange(plist.startIndex..., in: plist)
+        guard let match = arrayRegex.firstMatch(in: plist, range: range),
+              let body = Range(match.range(at: 1), in: plist) else { return [] }
+        let array = String(plist[body])
+        let arrayRange = NSRange(array.startIndex..., in: array)
+        return valueRegex.matches(in: array, range: arrayRange).compactMap { stringMatch in
+            Range(stringMatch.range(at: 1), in: array).map { String(array[$0]) }
+        }
+    }
+
+    /// True when a plist declares supported interface orientations and every one is portrait.
+    /// A portrait-only array is the lock that stops the app adapting to a wider canvas; any
+    /// landscape value makes it false. A plist with no key also returns false, so
+    /// `declaredOrientations(in:)` is how the caller distinguishes the two.
+    static func orientationLock(in plist: String) -> Bool {
+        let declared = declaredOrientations(in: plist)
+        guard !declared.isEmpty else { return false }
+        return declared.allSatisfy { portraitOrientations.contains($0) }
+    }
+
+    private static let orientationArray = try? NSRegularExpression(
+        pattern: #"<key>\s*UISupportedInterfaceOrientations\s*</key>\s*<array>(.*?)</array>"#,
+        options: [.dotMatchesLineSeparators])
+    private static let orientationValue = try? NSRegularExpression(
+        pattern: #"<string>\s*([A-Za-z]+)\s*</string>"#)
+
+    private static let portraitOrientations: Set<String> = [
+        "UIInterfaceOrientationPortrait", "UIInterfaceOrientationPortraitUpsideDown"
+    ]
 }

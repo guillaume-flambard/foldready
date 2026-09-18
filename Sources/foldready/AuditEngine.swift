@@ -164,6 +164,8 @@ enum AuditEngine {
             adaptiveLayout(lexed: scorable),
             adaptiveGeometry(lexed: scorable),
             statePreservation(lexed: scorable),
+            idiom(lexed: scorable),
+            orientation(lexed: scorable, plists: plists),
             buildToolchain(build: build)
         ]
         if !screenshots.isEmpty {
@@ -246,17 +248,25 @@ enum AuditEngine {
 
     // MARK: - Checks
 
+    /// Whole-file token presence over shipping lines only. The navigation and state checks
+    /// ask whether a file holds a container of a kind, not where; a `NavigationView` or a
+    /// `List` that exists only inside a preview block must not answer yes.
+    private static func containsOutsidePreview(_ token: String, in file: LexedFile) -> Bool {
+        file.lines.contains { !file.isPreview(line: $0.number) && $0.code.contains(token) }
+    }
+
     /// Standard navigation adapts without a sidebar opt-in. This is a source signal,
     /// not proof that a particular screen or transition renders correctly.
     private static func navigation(lexed: [LexedFile]) -> CheckResult {
         var adopted = 0
         var legacy: [String] = []
+        let standardContainers = ["NavigationStack", "NavigationSplitView", "TabView",
+                                  "UINavigationController", "UISplitViewController",
+                                  "UITabBarController"]
         for file in lexed {
-            let standard = ["NavigationStack", "NavigationSplitView", "TabView",
-                            "UINavigationController", "UISplitViewController", "UITabBarController"]
-                .contains { file.contains($0) }
+            let standard = standardContainers.contains { containsOutsidePreview($0, in: file) }
             if standard { adopted += 1 }
-            else if file.contains("NavigationView") { legacy.append(file.path) }
+            else if containsOutsidePreview("NavigationView", in: file) { legacy.append(file.path) }
         }
         let total = adopted + legacy.count
         let findings = legacy.sorted().map { path in
@@ -339,30 +349,24 @@ enum AuditEngine {
                       "icon_frames": Double(iconFrames)])
     }
 
-    /// Two halves: how widely the app reads size classes or effective geometry, and how
-    /// much of its branching is on device idiom or interface orientation instead.
+    /// Share of UI files that read size classes or effective geometry.
+    ///
+    /// The device-branching half moved to the `idiom` and `orientation` checks; what is left
+    /// is coverage of the trait environment. An app that reads no geometry has a missing
+    /// signal rather than a defect, so absence is not scored zero.
     private static func adaptiveGeometry(lexed: [LexedFile]) -> CheckResult {
         var findings: [Finding] = []
         var aware = 0
-        var deviceBranching = 0
         var internalStrings = 0
 
         for file in lexed {
             var fileIsAware = false
-            var fileBranchesOnDevice = false
-
             for line in file.lines {
                 guard !file.isPreview(line: line.number) else { continue }
                 let code = line.code
                 if code.contains("horizontalSizeClass") || code.contains("verticalSizeClass")
                     || code.contains("didUpdateEffectiveGeometry") {
                     fileIsAware = true
-                }
-                if code.contains("userInterfaceIdiom") || code.contains("interfaceOrientation") {
-                    fileBranchesOnDevice = true
-                    findings.append(Finding(check: "adaptive-geometry", severity: .minor,
-                        message: "Layout branching on device idiom or interface orientation; a resizable scene is described by its size class.",
-                        file: file.path, line: line.number))
                 }
                 if code.contains("foldState") || code.contains("angleDegrees")
                     || code.contains("mechanicalAngleDegrees") {
@@ -373,13 +377,12 @@ enum AuditEngine {
                 }
             }
             if fileIsAware { aware += 1 }
-            if fileBranchesOnDevice { deviceBranching += 1 }
         }
 
         guard !lexed.isEmpty else {
             return CheckResult(key: "adaptive-geometry", title: "Adaptive geometry",
                 score: nil, detail: "no UI files found", reference: Reference.sizeClasses,
-                findings: [], baseWeight: 0.35, signals: ["aware": 0, "device_branching": 0, "ui_files": 0])
+                findings: [], baseWeight: 0.15, signals: ["aware": 0, "ui_files": 0])
         }
 
         // Coverage anchor, calibrated on the twenty-app corpus (2026-09-06): an app is
@@ -387,25 +390,17 @@ enum AuditEngine {
         // Recorded in docs/result-contract.md with its corpus and date, not hidden here.
         let target = max(1.0, Double(lexed.count) * Exclusions.geometryCoverageAnchor)
         let coverage = min(1.0, Double(aware) / target)
-        // An app that branches on nothing has no purity problem. Scoring it zero punished
-        // three corpus apps for an absence rather than for a mistake.
-        let score: Double
-        if aware + deviceBranching == 0 {
-            score = 1.0
-        } else {
-            let purity = Double(aware) / Double(aware + deviceBranching)
-            score = 0.5 * coverage + 0.5 * purity
-        }
+        // An app that reads no geometry has a missing signal to report, not a mistake: three
+        // corpus apps were punished for the absence before this guard.
+        let score = aware == 0 ? 1.0 : coverage
 
         return CheckResult(
             key: "adaptive-geometry", title: "Adaptive geometry",
             score: score,
-            detail: "\(aware) of \(lexed.count) UI file(s) read size classes or effective geometry, "
-                + "\(deviceBranching) branch on device or orientation"
+            detail: "\(aware) of \(lexed.count) UI file(s) read size classes or effective geometry"
                 + (internalStrings > 0 ? " · \(internalStrings) internal fold string(s)" : ""),
-            reference: Reference.sizeClasses, findings: findings, baseWeight: 0.35,
-            signals: ["aware": Double(aware), "device_branching": Double(deviceBranching),
-                      "ui_files": Double(lexed.count)])
+            reference: Reference.sizeClasses, findings: findings, baseWeight: 0.15,
+            signals: ["aware": Double(aware), "ui_files": Double(lexed.count)])
     }
 
     /// Share of stateful views that preserve their state.
@@ -418,20 +413,16 @@ enum AuditEngine {
         var preserved = 0
 
         for file in lexed {
-            let holdsState = file.contains("List(")
-                || file.contains("List {")
-                || file.contains("ScrollView")
-                || file.contains("UITableView")
-                || file.contains("UICollectionView")
-                || file.contains("Table(")
+            let holdsState = ["List(", "List {", "ScrollView", "UITableView",
+                              "UICollectionView", "Table("]
+                .contains { containsOutsidePreview($0, in: file) }
             guard holdsState else { continue }
             stateful += 1
 
-            let preserves = file.contains("@SceneStorage")
-                || file.contains("restorationIdentifier")
-                || file.contains("preservesSelectionInNavigationStack")
-                || file.contains("scrollPosition(")
-                || file.contains("NSUserActivity")
+            let preserves = ["@SceneStorage", "restorationIdentifier",
+                             "preservesSelectionInNavigationStack", "scrollPosition(",
+                             "NSUserActivity"]
+                .contains { containsOutsidePreview($0, in: file) }
             if preserves {
                 preserved += 1
             } else {
@@ -454,6 +445,100 @@ enum AuditEngine {
             detail: "\(preserved) of \(stateful) stateful view file(s) preserve state",
             reference: Reference.sceneStorage, findings: findings, baseWeight: 0.10,
             signals: ["preserved": Double(preserved), "stateful": Double(stateful)])
+    }
+
+    /// Share of UI files that do not branch on the device idiom.
+    ///
+    /// Apple directs layout decisions at the size class and the scene's effective geometry. A
+    /// `UIDevice.current.userInterfaceIdiom` branch describes a device, not a canvas, and a
+    /// resizable one can change shape under it. The finding is `medium` confidence because a
+    /// deliberate phone-only screen is invisible to a source scan.
+    private static func idiom(lexed: [LexedFile]) -> CheckResult {
+        var findings: [Finding] = []
+        var clean = 0
+
+        for file in lexed {
+            var branches = false
+            for line in file.lines {
+                guard !file.isPreview(line: line.number) else { continue }
+                guard line.code.contains("userInterfaceIdiom") else { continue }
+                branches = true
+                findings.append(Finding(check: "idiom", severity: .minor,
+                    message: "Layout branching on the device idiom; a resizable scene is described by its size class, not by whether it is a phone or a tablet.",
+                    file: file.path, line: line.number, confidence: .medium))
+            }
+            if !branches { clean += 1 }
+        }
+
+        guard !lexed.isEmpty else {
+            return CheckResult(key: "idiom", title: "Interface idiom",
+                score: nil, detail: "no UI files found", reference: Reference.interfaceIdiom,
+                findings: [], baseWeight: 0.10, signals: ["clean": 0, "ui_files": 0])
+        }
+
+        return CheckResult(
+            key: "idiom", title: "Interface idiom",
+            score: Double(clean) / Double(lexed.count),
+            detail: "\(clean) of \(lexed.count) UI file(s) free of device-idiom branching",
+            reference: Reference.interfaceIdiom, findings: findings, baseWeight: 0.10,
+            signals: ["clean": Double(clean), "ui_files": Double(lexed.count)])
+    }
+
+    /// Interface orientation, read from the Info.plist declaration and from source branches.
+    ///
+    /// A plist that lists only portrait orientations locks the app to a shape, so it cannot
+    /// use the full canvas when the scene is wider. A source branch on `interfaceOrientation`
+    /// makes the same device-level decision the size class would settle. The check does not
+    /// apply when no plist declares orientations and no source file branches on one, so its
+    /// weight is spread over the checks that do.
+    private static func orientation(lexed: [LexedFile], plists: [FileContent]) -> CheckResult {
+        var findings: [Finding] = []
+        var sites = 0
+        var clean = 0
+        var lockedPlists = 0
+
+        for plist in plists {
+            let declared = Exclusions.declaredOrientations(in: plist.content)
+            guard !declared.isEmpty else { continue }
+            sites += 1
+            if Exclusions.orientationLock(in: plist.content) {
+                lockedPlists += 1
+                findings.append(Finding(check: "orientation", severity: .major,
+                    message: "Info.plist declares only portrait orientations, locking the app to one shape so it cannot use the full canvas when the scene is wider.",
+                    file: plist.path, line: nil, confidence: .high))
+            } else {
+                clean += 1
+            }
+        }
+
+        for file in lexed {
+            var branches = false
+            for line in file.lines {
+                guard !file.isPreview(line: line.number) else { continue }
+                guard line.code.contains("interfaceOrientation") else { continue }
+                branches = true
+                findings.append(Finding(check: "orientation", severity: .minor,
+                    message: "Layout branching on interface orientation; a resizable scene is described by its size class, not by the device's current rotation.",
+                    file: file.path, line: line.number, confidence: .high))
+            }
+            if branches { sites += 1 }
+        }
+
+        guard sites > 0 else {
+            return CheckResult(key: "orientation", title: "Interface orientation",
+                score: nil,
+                detail: "no supported orientations declared in Info.plist and no orientation branch in source",
+                reference: Reference.interfaceOrientations, findings: [], baseWeight: 0.10,
+                signals: ["sites": 0, "clean": 0, "locked_plists": 0])
+        }
+
+        return CheckResult(
+            key: "orientation", title: "Interface orientation",
+            score: Double(clean) / Double(sites),
+            detail: "\(clean) of \(sites) orientation site(s) adapt to the scene",
+            reference: Reference.interfaceOrientations, findings: findings, baseWeight: 0.10,
+            signals: ["sites": Double(sites), "clean": Double(clean),
+                      "locked_plists": Double(lockedPlists)])
     }
 
     // MARK: - Visual check
