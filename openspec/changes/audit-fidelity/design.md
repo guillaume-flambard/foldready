@@ -91,11 +91,11 @@ version.
 `confidence: Confidence` with `high`, `medium` and `low`. Severity stays "how bad if true";
 confidence is "how sure the audit is". `high` is a lexed occurrence in a shipping file whose
 meaning does not depend on unseen context: `UIScreen.main.bounds`, a literal frame above
-`iconPointLimit`, an idiom or orientation branch, a plist orientation lock. `medium` is a real
+`iconPointLimit`, a plist orientation lock. `medium` is a real
 match whose interpretation depends on context the audit cannot see: a `userInterfaceIdiom`
-branch may be deliberate, a custom bar may be intentional. `low` is reserved for matches that
-survive only through heuristics and are reported without being scored, such as icon-sized
-frames. Keeping severity preserves the report's existing styling and the `maxSeverity` rule.
+branch may be deliberate, a custom bar may be intentional. `low` is the floor a gate falls back
+to when no confidence is configured, and the level reserved for heuristic matches that survive
+without being scored. Keeping severity preserves the report's existing styling and the `maxSeverity` rule.
 
 **Exclusions move into `.foldready.json`, which the audit now reads.** The spec requires the
 exclusions to be configurable in the audited repository and reported. The policy file the gate

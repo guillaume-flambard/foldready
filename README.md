@@ -48,8 +48,8 @@ The remaining automatic proposal removes `UIRequiresFullScreen`; review its rele
 before applying it. Structural changes are work orders for a developer or coding agent.
 Static verification only reports whether source signals changed.
 
-The engine checks adaptive layout, standard navigation, state preservation, interface idiom
-and orientation, and the Xcode build floor. Source is read through a lexer, so a flagged
+The engine checks adaptive layout, geometry, standard navigation, state preservation, interface
+idiom and orientation, and the Xcode build floor. Source is read through a lexer, so a flagged
 symbol in a comment or in the text of a string is not scored. Interface idiom is scored on
 its own: branching on `UIDevice.current.userInterfaceIdiom` describes a device, not the
 canvas the scene receives. Interface orientation reads the `UISupportedInterfaceOrientations`
