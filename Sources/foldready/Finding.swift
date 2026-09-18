@@ -43,7 +43,10 @@ struct Finding: Sendable {
     let line: Int?
     /// How sure the audit is this finding is real. Defaults to `.high`: the strongest
     /// claim, so an unlabelled site behaves exactly as before confidence existed.
-    let confidence: Confidence = .high
+    ///
+    /// `var`, not `let`: a stored `let` with a default is omitted from the synthesised
+    /// memberwise initialiser, which would leave later checks no way to set the level.
+    var confidence: Confidence = .high
 
     /// Total order over findings, so two audits of the same tree emit the same list in
     /// the same order regardless of file system enumeration order. `Array.sorted` is not

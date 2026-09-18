@@ -16,6 +16,13 @@ struct ConfidenceTests {
         #expect(finding.confidence == .high)
     }
 
+    @Test func aFindingAcceptsAnExplicitConfidence() {
+        let finding = Finding(check: "adaptive-layout", severity: .major,
+                              message: "m", file: "A.swift", line: 1,
+                              confidence: .low)
+        #expect(finding.confidence == .low)
+    }
+
     @Test func gateFiltersBelowTheConfiguredConfidence() throws {
         let policy = try JSONDecoder().decode(GatePolicy.self,
             from: Data(#"{"minConfidence":"high"}"#.utf8))
