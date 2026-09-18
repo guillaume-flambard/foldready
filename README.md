@@ -1,219 +1,112 @@
 # FoldReady
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+Free, local source analysis for iOS apps, plus scoped human readiness reviews for iPhone Duo.
+The scanner identifies candidate issues, supports CI policies and prepares work orders.
+It does not certify device compatibility. Scores and effort estimates are heuristics.
 
-Readiness gate for iOS apps on a resizable canvas: score a source tree, fail the build
-when it regresses, and hand the remaining work to the tool that should do it.
-**Open source and independent** — the readiness check should not be a black box, and
-every check cites the Apple source it is derived from.
+## Apple announcements, checked 18 September 2026
 
-`foldready <path>` runs 7 static checks and emits a 0-100 score with an HTML report, a
-machine-readable [result contract](docs/result-contract.md) and an effort estimate.
-`foldready gate <path>` enforces a readiness policy in CI. Xcode 27 ships Apple's own
-app modernization agent skill, which edits the code with the build graph and the type
-checker; FoldReady measures, gates and verifies, and writes that skill a work order.
+- [iPhone Duo](https://www.apple.com/newsroom/2026/09/apple-unveils-iphone-duo/) has 5.4-inch outer and 7.6-inch inner displays with the same aspect ratio, and ships with iOS 27.1. Preorders open Friday 16 October; availability opens Friday 23 October, with 28 more countries on 30 October. Split View puts two apps side by side on iPhone for the first time, including two windows of the same app.
+- [Apple Developer](https://developer.apple.com/iphone-duo/) has the Xcode 27.1 beta available for download. Apple states that an app must be built with Xcode 27.1 or later to use all of the available screen space; in earlier versions it does not extend under the status bar and camera. The iPhone Duo simulator in Device Hub also requires Xcode 27.1, which Apple says is coming later this month.
+- [Prepare your app for iPhone Duo](https://developer.apple.com/documentation/technologyoverviews/preparing-your-app-for-iphone-duo): existing apps run without recompilation; the linked SDK affects screen usage. Standard navigation adapts automatically and sidebar placement is optional. Apple calls out four surfaces for custom layouts: reserved regions for the fold and the cameras, arrangement views, bars that the system stacks vertically on the side of the display, and camera-facing direction when the active display changes. Apple directs apps away from `UIDevice.userInterfaceIdiom` and `UIInterfaceOrientation` for layout decisions.
+- [Designing for iPhone Duo](https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo) is a dedicated HIG page, and Apple Design Resources now publishes [Figma and Sketch design kits](https://developer.apple.com/design/resources/).
+- Six technology talks cover the platform: [design](https://developer.apple.com/videos/play/tech-talks/111466/), [preparation](https://developer.apple.com/videos/play/tech-talks/111461/), [bars](https://developer.apple.com/videos/play/tech-talks/111462/), [adaptive layouts](https://developer.apple.com/videos/play/tech-talks/111463/), [multiple displays and scenes](https://developer.apple.com/videos/play/tech-talks/111464/) and [camera](https://developer.apple.com/videos/play/tech-talks/111465/). Apple runs iPhone Duo workshops worldwide.
 
-## Checks
+## Product and offer
 
-| Weight | Check | What it looks for |
-|---|---|---|
-| 25% | Adaptive navigation / sidebar | `NavigationSplitView`, `.adaptiveSidebar()`, `tabBarController.sidebar` |
-| 22% | Adaptive layout | Hardcoded `.frame(width:height:)`, `UIScreen.main.bounds`, deprecated `UIScreen.main` |
-| 15% | UIScene lifecycle | Required when building against the iOS 27 SDK: without it the app does not launch (TN3187) |
-| 12% | Adaptive geometry | size classes, `didUpdateEffectiveGeometry`, `GeometryReader` |
-| 10% | SwiftUI vs UIKit | SwiftUI adapts to geometry; UIKit needs the sidebar opt-in |
-| 8% | Resizable presentation opt-in | `UIRequiresFullScreen=true` opts the app out of a resizable scene |
-| 8% | State preservation | `@SceneStorage`, restoration, view models that survive a resize |
+- **Free CLI:** source signals, optional screenshot heuristics, JSON/HTML reports, CI policies and work orders.
+- **$349 human readiness review:** one app revision and up to three agreed critical journeys. Reviewed source findings, build/SDK assumptions, available screenshots reviewed in context, prioritized remediation and a Duo test checklist. One follow-up review within the same scope in 30 days.
+- **Corrections and validation:** quoted after review, with explicit environments and acceptance criteria. A later Duo simulator pass is scoped separately, subject to tool availability and a buildable app. Physical-device testing is not included in the review.
 
-Scores are proportional to the codebase (occurrences relative to file count), so a large
-app with a handful of hardcoded frames is not unfairly failed. Each check carries the
-Apple source it is derived from, printed next to the check in the report: a scored check
-with no Apple source fails the repository's own check script.
+Agree access, scope and delivery date before starting. No guaranteed App Store featuring,
+blanket compatibility claim, or automatic launch-day promise. See [delivery scope](docs/readiness-review.md).
 
 ## Usage
 
+An experimental XCTest continuity prototype now lives alongside the scanner. It compares
+three synthetic journeys under real simulator rotation with an explicit test suite:
+
 ```sh
 swift build
-./.build/debug/foldready <path-to-ios-repo> [--name "App"] [--json] [--open]
+./.build/debug/foldready continuity Examples/continuity-demo/continuity-demo.xcodeproj
 ```
 
-Outputs `foldready-report.html` (and `result.json` with `--json`) into the audited
-folder by default, or into `--out <dir>`.
-
-## Visual grading (captured layout)
-
-A 10% "Captured layout" check is added when screenshots are supplied. It detects
-letterboxing: uniform near-black/white margin bands around the app content, the exact
-signature of a portrait app rendered on the wider iPhone Fold canvas.
+See the [experiment guide](docs/continuity-experiment.md), [timed benchmark protocol](docs/continuity-benchmark.md)
+and [unpublished pilot brief](docs/continuity-pilot.md). Duo folding is explicitly unsupported.
+Injected defects return exit code 2; human time savings and customer demand remain unvalidated.
 
 ```sh
-# 1. Capture (needs an .xcodeproj in the repo; simulator build, no signing)
-./Scripts/capture.sh <repo> --name "App" --out shots
-
-# 2. Audit with the visual check
-./.build/debug/foldready <repo> --with-screenshots shots --name "App" --open
-
-# Standalone screenshot analysis
-./.build/debug/foldready visual shots
+swift build
+./.build/debug/foldready <local-source-directory> --name App --json --open
+./.build/debug/foldready gate <local-source-directory> --write-baseline
+./.build/debug/foldready port <local-source-directory>   # review proposals first
+./.build/debug/foldready verify <local-source-directory> --build
 ```
 
-The pixel engine (`Sources/foldready/VisualAnalysis.swift`) is unit-tested against
-synthetic full-screen vs letterboxed images. The iPhone Fold simulator device type
-ships with Xcode 27; `capture.sh` targets the widest available device until then.
+`port --apply` applies proposed edits. It no longer inserts optional sidebar placement.
+The remaining automatic proposal removes `UIRequiresFullScreen`; review its relevance
+before applying it. Structural changes are work orders for a developer or coding agent.
+Static verification only reports whether source signals changed.
 
-## What the score means
+The engine checks adaptive layout, geometry, standard navigation, state preservation and the
+Xcode build floor. The build floor reads `LastUpgradeCheck` from `project.pbxproj`: Apple
+requires Xcode 27.1 or later to use all of the available screen space on iPhone Duo, and below
+it the app does not extend under the status bar and camera. That value records the last Xcode
+upgrade and can be stale, so a gap is a prompt to confirm the toolchain that actually builds
+the app, not proof a shipped binary fails.
 
-Apple told developers to stop targeting fixed sizes and orientations and to handle "a
-dynamic range of sizes and aspect ratios"
-([WWDC26, Modernize your UIKit app](https://developer.apple.com/videos/play/wwdc2026/278/)).
-Two things follow, and only one of them is optional:
+The report also raises advisory questions for the four Duo surfaces Apple names for custom
+layouts: reserved regions (the fold and the cameras), arrangement views, bars the system stacks
+vertically on the side, and camera direction when the active display changes. These are
+questions, not defects: they never change the score or a gate verdict, and each one names the
+runtime check that would settle it.
 
-- **Hard requirement**: the UIScene lifecycle. An app built against the iOS 27 SDK
-  without it does not launch. Apps already shipped, and apps still built against the
-  iOS 26 SDK, keep working — the App Store floor is Xcode 26 / iOS 26 since 28 April
-  2026, and Apple has not published an iOS 27 SDK date yet.
-- **The part the score measures**: how well the app uses the room it is given. The apps
-  that look right on a wide canvas are the ones that adopted split-view sidebars, size
-  classes and adaptive layout.
+Potential lifecycle and full-screen opt-out blockers are reported separately. Source scans
+cannot resolve every build setting, generated declaration or Objective-C implementation;
+confirm potential blockers in the target build. The linked SDK is not inferred from the
+source score. A legacy app's migration requirement is not proof its shipped binary fails.
 
-Grade bands: A >= 75, B >= 60, C >= 45, D >= 30, F < 30. Risk: low / medium / high.
+With `--with-screenshots <directory>`, the report adds uniform-margin heuristics.
+Margins may reflect intentional design or system compatibility presentation. They are
+not proof of a hardcoded layout. `verify --build` captures one simulator launch screenshot,
+prefers a Duo device type if installed, and records the selected device/runtime and linked
+SDK in `capture.json`. It does not exercise poses, transitions or critical journeys.
+Reports always carry a list of runtime checks still needed.
 
-## Readiness gate (CI)
+The older `Scripts/capture.sh` helper also captures a selected simulator, not a Duo test
+matrix. Its device/runtime defaults are generic and may need local overrides.
 
-`foldready gate` audits a tree, evaluates the repository's policy, and communicates the
-verdict through the exit code: `0` pass, `2` policy breach, `1` the run itself failed.
-A failing app and a broken pipeline are different problems, so they get different codes.
+## CI and result contract
 
-```sh
-./.build/debug/foldready gate <repo>                   # report only, exits 0
-./.build/debug/foldready gate <repo> --write-baseline  # accept the current score
-```
+[Contract v4](docs/result-contract.md) adds the scored build floor, so every weight shifted and
+v3 scores are not comparable. Rewrite baselines deliberately after review. The Duo surface
+questions sit in a separate `advisory` array outside the score: they cannot turn a gate red,
+and an empty advisory list does not make a passing run. Existing website rankings and reports
+are labelled historical until the source apps are re-audited.
 
-Policy lives in `.foldready.json` at the audited repository. Every field is optional,
-and an absent file means "no policy": the gate reports the score and does not fail the
-build.
+Policy lives in `.foldready.json`; no policy means report-only:
 
 ```json
 {
   "min_score": 60,
   "max_total_regression": 0,
-  "no_regression_checks": ["scene", "full-screen"],
-  "max_severity": "critical",
+  "no_regression_checks": ["adaptive-layout"],
   "baseline": ".foldready-baseline.json"
 }
 ```
 
-The baseline is a committed file, not a hosted service: accepting a lower score is a
-reviewable diff in the pull request that causes it, and CI never needs an account or
-network access.
+`forbid_blockers` can reject potential blockers pending human confirmation. It is not a
+runtime launch assertion. Exit codes: 0 policy passed, 2 policy breach, 1 execution error.
+The GitHub Action is defined in [action.yml](action.yml).
 
-### GitHub Action
-
-```yaml
-- uses: guillaume-flambard/foldready@v1
-  with:
-    path: .
-```
-
-On a pull request it reports the score, the base score and the delta, uploads the HTML
-report as a job artifact, and fails the job when the policy is breached. It runs on a
-macOS runner and builds the pinned action source with the runner's Swift — nothing is
-fetched at run time. Add `fetch-depth: 0` to `actions/checkout` to get the score delta.
-Full input list in [action.yml](action.yml).
-
-## Porting: what FoldReady writes, and what it hands over
-
-Xcode 27 ships Apple's `uikit-app-modernization` agent skill (exportable with
-`xcrun agent skills export`). It migrates the scene lifecycle, converts main-screen
-reads to trait and scene lookups, and replaces orientation checks with size classes —
-inside the project, with the type checker. A pattern matcher cannot beat that, and
-FoldReady no longer tries.
-
-The split is by provability:
-
-| FoldReady writes | FoldReady hands over |
-|---|---|
-| Remove `UIRequiresFullScreen` from Info.plist | Scene lifecycle migration |
-| UIKit tab bar sidebar opt-in (gated by `#available`) | Fixed screen geometry reads |
-| | Root navigation that cannot become a sidebar |
-| | Size-class-driven layout |
-| | State preservation across a resize |
+## Development
 
 ```sh
-./.build/debug/foldready port <repo> [--apply] [--out <dir>]
-./.build/debug/foldready verify <repo> [--work-order <file>] [--build]
-```
-
-`port` writes the safe patches plus `work-order.md` and `work-order.json`. Each entry
-states where the work is, the required end state, the Apple source the requirement comes
-from, and the condition FoldReady re-evaluates. Hand `work-order.md` to Apple's skill or
-any other coding agent; then `verify` reports each entry as fixed, unchanged or
-regressed, alongside the score delta.
-
-`verify --build` also closes the visual loop: it builds the app for the widest available
-simulator (in-process pipeline mirroring `Scripts/capture.sh`), captures a screenshot,
-and adds the "Captured layout" pixel check to the re-score. Without a buildable
-`.xcodeproj` it degrades to the static re-score.
-
-The checks target the **public** iOS 27 contract. The internal `foldState` and
-`angleDegrees` strings are not public API and are treated as info-only, never as a port
-target.
-
-## Web app (Next.js)
-
-The marketing + product site implements the design system v2 (Space Grotesk /
-Inter / JetBrains Mono, ink + screen blue + ready green, dark/light):
-
-- `/` — landing (hero gauge, proof strip, offering, pricing, objections)
-- `/ranking` — Fold-Ready Index (sort + grade filter, driven by `web/lib/data.ts`)
-- `/report/[slug]` — dynamic Fold-Ready report per audited app (gauge, check
-  breakdown, findings, remediation roadmap)
-- `/components` — the 12-component catalog with dark/light toggle
-
-```sh
+./Scripts/check.sh
 cd web
-npm install
-npm run dev        # http://localhost:3000
-npm run build      # static export to web/out/
+npm run dev
 ```
 
-Static export: `output: "export"`, deployable to GitHub Pages / Vercel / any host.
-App data lives in `web/lib/data.ts`; the CLI audit JSON can seed it via
-`Scripts/aggregate-index.py` (currently writes the legacy `web-legacy/data.js`).
-
-**Live**: https://foldready.memolabs.dev (primary, Coolify/nginx serving `web/out`)
-and https://guillaume-flambard.github.io/foldready/ (GitHub Pages). The repo root
-Dockerfile builds the web static export for Coolify.
-
-Legacy static v1 site (report HTML per app) is preserved in `web-legacy/`, rebuilt
-by `Scripts/build-index.sh`:
-
-```sh
-./Scripts/build-index.sh <repo1> <repo2> ...
-```
-
-## Design system
-
-The authoritative design system lives in `design/ds-package/` — the exported Open
-Design package: `DESIGN.md` (tokens), `DESIGN-HANDOFF.md` (implementation contract),
-`DESIGN-MANIFEST.json` (machine-readable map), `colors_and_type.css` (canonical token
-CSS), the 5 screens, `preview/` cards and `ui_kits/app/` (token-bound component demos).
-
-The web app consumes the same tokens: colors are identical, and the canonical
-radius/spacing/motion names (`--r-container`, `--sp-*`, `--t-fast`…) are declared in
-`web/app/globals.css`. Reconcile any drift against `design/ds-package/` before
-changing a color. The design prompt used to generate the system is in
-`design/DESIGN-SYSTEM-PROMPT.md`.
-
-## Contributing
-
-Open source, PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the rules —
-the short version: new checks, transforms, and edge-case tests are the most useful;
-stay anchored on the **public** iOS 27 contract; never break code silently; keep
-`./Scripts/check.sh` green.
-
-## Product
-
-The CLI is the entry product: pay-per-audit reports that open the door to fixed-price
-porting contracts for enterprise iOS apps. Brand and assets in `brand/`.
+The Next.js site exports to `web/out`. Its design tokens are defined in
+`design/ds-package/`; preserve that system when editing styles. Public website:
+https://foldready.memolabs.dev. This repository change does not itself publish the site.
