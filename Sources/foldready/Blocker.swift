@@ -38,7 +38,7 @@ enum Blockers {
         guard !adopted else { return nil }
         return Blocker(
             id: sceneLifecycleMissing,
-            title: "No UIScene lifecycle",
+            title: "UIScene lifecycle not detected in scanned source",
             consequence: """
                 An app built against the iOS 27 SDK without the scene lifecycle does not \
                 launch. Apps already shipped, and apps still built against the iOS 26 SDK, \

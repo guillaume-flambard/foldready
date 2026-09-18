@@ -198,14 +198,14 @@ enum WorkOrderBuilder {
             let acceptance = Acceptance.findingResolved(check: "navigation", file: file.path)
             entries.append(WorkOrderEntry(
                 id: "adaptive-navigation",
-                title: "Adopt a navigation container that can become a sidebar",
+                title: "Review legacy navigation",
                 checkKey: "navigation",
                 file: file.path, line: file.line,
                 requiredEndState: """
-                    The root navigation is a NavigationSplitView (SwiftUI) or opts into \
-                    the tab bar sidebar placement (UIKit), so the system can show a \
-                    sidebar when the scene is wide enough. Only the root container \
-                    changes; nested navigation stays as it is.
+                    Review legacy navigation and use a standard NavigationStack,
+                    NavigationSplitView, TabView or UIKit navigation container as appropriate.
+                    Sidebar placement is optional. Verify the existing navigation flow
+                    before changing the interface.
                     """,
                 reference: reference("navigation"),
                 acceptance: acceptance,
@@ -229,7 +229,7 @@ enum WorkOrderBuilder {
                 metWhenWritten: acceptance.isMet(by: result)))
         }
 
-        if score("state") < 70 {
+        if result.outcomes.contains(where: { $0.key == "state" }) && score("state") < 70 {
             let acceptance = Acceptance.checkAtLeast(key: "state", score: 70)
             entries.append(WorkOrderEntry(
                 id: "state-preservation",
@@ -276,14 +276,12 @@ extension WorkOrder {
 
         Score at the time of writing: \(Int(score))/100.
 
-        These are the changes FoldReady will not make for you: each one needs judgement \
-        about the app's structure, which the tool that has the build graph and the type \
-        checker should exercise, not a pattern matcher. Apple ships one such tool with \
-        Xcode 27 — the app modernization agent skill, exportable with \
-        `xcrun agent skills export` — and this document is written so that skill, or any \
-        other coding agent, can execute it.
+        Review these source signals before changing code. Static acceptance means the
+        signal disappeared, not that the app was tested on iPhone Duo. Apple's announced
+        App Resizability skill in Xcode 27.1 supports SwiftUI and iPhone Duo; this work
+        order can also be reviewed by another coding agent.
 
-        FoldReady measures and verifies. After the work, re-run:
+        After reviewing and applying appropriate changes, re-run:
 
         ```sh
         foldready verify <path> --work-order <this file's directory>/work-order.json
@@ -295,7 +293,7 @@ extension WorkOrder {
         """
 
         if entries.isEmpty {
-            out += "\nNothing to hand over: no judgement-level work outstanding.\n"
+            out += "\nNothing to hand over from the static checks. Runtime testing remains outstanding.\n"
             return out
         }
 
