@@ -68,7 +68,7 @@ export default function LandingPage() {
           <div className="ocard2"><p className="q">When can Duo testing happen?</p><p className="a">Apple lists Xcode 27.1 beta for later in September. Confirm tool availability and build access when agreeing a simulator pass. Every delivery names the environments actually tested.</p></div>
         </div>
         <p className="spec">Sources, checked 11 September 2026: <a href="https://www.apple.com/newsroom/2026/09/apple-unveils-iphone-duo/">Apple announcement</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111461/">Prepare your app for iPhone Duo</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111463/">Adaptive layouts</a>.</p>
-        <p className="spec"><Link href="/ranking">View historical source audits</Link>. These pre-announcement scores are archived, not current Duo compatibility results.</p>
+        <p className="spec"><Link href="/ranking">Source audits of twenty open-source apps</Link>. Scores come from the current scanner; they are source signals, not Duo runtime verdicts.</p>
       </section>
     </main>
   );

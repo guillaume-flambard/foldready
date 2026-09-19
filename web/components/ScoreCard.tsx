@@ -50,16 +50,17 @@ export function SeverityChip({ severity }: { severity: string }) {
 }
 
 export function WeakChips({ app }: { app: AppScore }) {
+  const val = (k: keyof Checks) => app.checks[k] ?? 100;
   const weak = (Object.keys(app.checks) as (keyof Checks)[])
-    .filter((k) => app.checks[k] < 70)
-    .sort((a, b) => app.checks[a] - app.checks[b])
+    .filter((k) => val(k) < 70)
+    .sort((a, b) => val(a) - val(b))
     .slice(0, 3);
   if (weak.length === 0) return <span className="chip ready">all checks pass</span>;
   return (
     <>
       {weak.map((k) => (
         <span key={k} className="chip weak">
-          {CHECK_LABELS[k]} <b className="mono">{app.checks[k]}</b>
+          {CHECK_LABELS[k]} <b className="mono">{val(k)}</b>
         </span>
       ))}
     </>

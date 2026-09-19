@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!app) return { title: "Report not found — FoldReady" };
   return {
     title: `Fold-Ready Report · ${app.name}`,
-    description: `Fold-Ready audit of ${app.name} (archived contract v2): score ${app.score}, grade ${app.grade}, ${app.hours}h port estimate, ${app.findings} findings.`,
+    description: `Fold-Ready audit of ${app.name} (contract v5): score ${app.score}, grade ${app.grade}, ${app.hours}h port estimate, ${app.findings} findings.`,
   };
 }
 
@@ -46,13 +46,15 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
 
   const majorCount = app.findings.filter((f) => f.severity === "critical" || f.severity === "major").length;
   const minorCount = app.findings.filter((f) => f.severity === "minor").length;
-  const weakest = checkKeys.reduce<{ k: keyof Checks; v: number }>((acc, k) =>
-    app.checks[k] < acc.v ? { k, v: app.checks[k] } : acc, { k: checkKeys[0], v: 100 });
+  const weakest = checkKeys.reduce<{ k: keyof Checks; v: number }>((acc, k) => {
+    const v = app.checks[k] ?? 100;
+    return v < acc.v ? { k, v } : acc;
+  }, { k: checkKeys[0], v: 100 });
 
   return (
     <main className="wrap">
       <PageMotion />
-      <p className="lede" style={{ paddingTop: 32 }}>Archived pre-announcement report. This v2 score and its remediation suggestions are superseded. No Duo runtime compatibility was verified; rerun the current CLI before making decisions.</p>
+      <p className="lede" style={{ paddingTop: 32 }}>Source audit under contract v5. It reports source signals, not runtime verdicts: no Duo build was run and compatibility is unverified. Re-run the current CLI on your own revision before making decisions.</p>
       <nav className="crumbs">
         <Link href="/ranking">Fold-Ready Index</Link>
         <span className="sep">/</span>
@@ -121,11 +123,11 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
       <section className="block" data-reveal>
         <div className="sec-head">
           <h2>Check breakdown</h2>
-          <span className="id">4 checks · weighted</span>
+          <span className="id">6 checks · weighted</span>
         </div>
         <div>
           {checkKeys.map((k) => {
-            const s = app.checks[k];
+            const s = app.checks[k] ?? 100;
             const ok = s >= 70;
             return (
               <div className="chkrow" key={k}>
@@ -193,7 +195,7 @@ export default async function ReportPage({ params }: { params: Promise<{ slug: s
         ))}
       </section>
 
-      <p className="spec">Historical patch proposals are withdrawn. Run the current CLI to prepare a reviewed work order.</p>
+      <p className="spec">Patch proposals are not generated in this report. Run the current CLI to prepare a reviewed work order.</p>
 
       <section className="block" style={{ borderBottom: 0 }}>
         <div className="band">

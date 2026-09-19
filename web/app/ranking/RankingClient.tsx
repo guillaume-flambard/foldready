@@ -26,10 +26,11 @@ export function RankingClient() {
   return (
     <>
       <div className="head">
-        <span className="kicker">Archive · pre-announcement scoring</span>
-        <h1>Historical source audits</h1>
-        <p className="lede">These contract v2 results predate the iPhone Duo announcement. Their navigation and geometry scoring has been superseded in v3. They have not been re-audited and must not be used as current compatibility verdicts or correction quotes.</p>
-        <p className="spec">The old scanner flagged potential lifecycle issues in {BLOCKED_APPS.length} of {APPS.length} source trees. These were source signals, not observed launch failures. SDK and build configuration were not resolved.</p>
+        <span className="kicker">Independent index · contract v5</span>
+        <h1>Source audits of twenty iOS apps</h1>
+        <p className="lede">Each app is audited from its own source tree by the current scanner. These are source signals, not runtime verdicts: no app here was run on iPhone Duo.</p>
+        <p className="spec">Scores rose across the board when the contract moved to v5, and the rise is mostly a change of shape rather than a change in the apps. Adaptive geometry stopped penalising an app that reads no size classes at all, and two new checks added this release (interface idiom and interface orientation) score high for most trees because few branch on the device idiom. Read a score here as a rough summary, never as a compatibility claim.</p>
+        <p className="spec">{BLOCKED_APPS.length} of {APPS.length} source trees still show a lifecycle signal that could stop an app launching once it is built against the iOS 27 SDK. That is a source signal, not an observed launch failure; SDK and build configuration are not resolved from source.</p>
         <div className="legend">
           {GRADES.map((g) => (
             <span key={g}><b className="g" style={{ color: `var(--g${g})` }}>{g}</b> {GRADE_MEANING[g]}</span>
@@ -37,7 +38,7 @@ export function RankingClient() {
         </div>
         <p className="meta">
           <span>{list.length} app{list.length === 1 ? "" : "s"} audited</span>
-          <span>result contract v2 · regenerate with Scripts/generate-index.py</span>
+          <span>result contract v5 · regenerate with Scripts/generate-index.py</span>
         </p>
       </div>
 
@@ -69,8 +70,9 @@ export function RankingClient() {
         <div>
           <h2>Get your app scored</h2>
           <p>
-            A static audit of your iOS source tree: the blocking facts first, then four
-            weighted checks against the iOS 27 adaptivity requirements, with an hours estimate.
+            A static audit of your iOS source tree: the blocking facts first, then the
+            weighted checks of contract v5 against the iOS 27 adaptivity requirements, with
+            an hours estimate.
           </p>
         </div>
         <a className="btn btn-pri" href={href("/get-scored")}>Get your app scored</a>

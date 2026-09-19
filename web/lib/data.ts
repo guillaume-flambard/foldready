@@ -2,12 +2,18 @@ import { INDEX_APPS } from "./index-data";
 
 export type Grade = "A" | "B" | "C" | "D" | "F";
 
-/** The four scored checks of contract v2. Blocking facts are not checks: see `Blocker`. */
+/**
+ * The scored checks of contract v5, minus the build-toolchain floor, which the page
+ * reports separately. A check the audit could not measure is carried as 100 with a
+ * "not applicable" detail: it is not a zero, and the page must never render it as one.
+ */
 export interface Checks {
   layout: number;
   geometry: number;
   nav: number;
   state: number;
+  idiom: number;
+  orientation: number;
 }
 
 /**
@@ -53,13 +59,17 @@ export const CHECK_LABELS: Record<keyof Checks, string> = {
   geometry: "Adaptive geometry",
   nav: "Sidebar navigation",
   state: "State preservation",
+  idiom: "Interface idiom",
+  orientation: "Interface orientation",
 };
 
 export const CHECK_WEIGHTS: Record<keyof Checks, string> = {
   layout: "w 0.35",
-  geometry: "w 0.35",
+  geometry: "w 0.15",
   nav: "w 0.20",
   state: "w 0.10",
+  idiom: "w 0.10",
+  orientation: "w 0.10",
 };
 
 /** What each check means, in one line, for a reader who has not read the contract. */
@@ -67,9 +77,11 @@ export const CHECK_MEANING: Record<keyof Checks, string> = {
   layout:
     "Share of UI files free of fixed screen geometry. Icon-sized frames, previews and tests are not scored.",
   geometry:
-    "How widely the app reads size classes and scene geometry, against how much it branches on device idiom or orientation.",
+    "How widely the app reads size classes and scene geometry. Absence of any read is not scored zero.",
   nav: "Whether any navigation container can become a sidebar when the scene is wide.",
   state: "Share of stateful views that keep scroll and selection across a scene resize.",
+  idiom: "Share of UI files free of layout branching on the device idiom.",
+  orientation: "Whether the app adapts to scene geometry rather than branching on interface orientation.",
 };
 
 /** Absolute meanings, not ranks. Calibrated on the twenty-app corpus. */
@@ -114,7 +126,7 @@ export interface ReportDetail {
  */
 export function reportDetail(app: AppScore): ReportDetail {
   const checkCount = Object.keys(app.checks).length;
-  const weak = (Object.keys(app.checks) as (keyof Checks)[]).filter((k) => app.checks[k] < 70);
+  const weak = (Object.keys(app.checks) as (keyof Checks)[]).filter((k) => (app.checks[k] ?? 100) < 70);
   const blocking = app.blockers.filter((b) => b.stopsLaunch);
 
   const summary = blocking.length
@@ -143,9 +155,17 @@ export function reportDetail(app: AppScore): ReportDetail {
   if (app.checks.geometry < 70) {
     roadmap.push({
       title: "Size classes over device checks",
-      body: "Branch layout on the horizontal size class and the scene's effective geometry rather than on device idiom or interface orientation.",
+      body: "Read the horizontal size class and the scene's effective geometry so layout follows a resize, instead of relying on no read at all.",
       hours: Math.max(8, Math.round(app.hours * 0.25)),
       pct: 0.25,
+    });
+  }
+  if ((app.checks.idiom ?? 100) < 100 || (app.checks.orientation ?? 100) < 100) {
+    roadmap.push({
+      title: "Drop device idiom and orientation branches",
+      body: "Replace layout decisions that branch on the device idiom or on interface orientation with size-class and scene-geometry reads.",
+      hours: Math.max(6, Math.round(app.hours * 0.2)),
+      pct: 0.2,
     });
   }
   if (app.checks.layout < 90) {

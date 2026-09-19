@@ -3,65 +3,100 @@
     {
       "app": "bitwarden",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [],
+        "object_versions": []
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 84,
+          "score": 90,
           "signals": {
             "aware": 7,
-            "device_branching": 2,
             "ui_files": 389
           },
-          "weight": 0.35
+          "weight": 0.15
         },
         "adaptive-layout": {
-          "score": 74,
+          "score": 80,
           "signals": {
             "icon_frames": 22,
-            "offending": 4,
+            "offending": 3,
             "ui_files": 389
           },
           "weight": 0.35
         },
-        "navigation": {
-          "score": 0,
+        "idiom": {
+          "score": 99,
           "signals": {
-            "adopted": 0,
-            "containers": 68
+            "clean": 387,
+            "ui_files": 389
+          },
+          "weight": 0.1
+        },
+        "navigation": {
+          "score": 88,
+          "signals": {
+            "adopted": 23,
+            "containers": 26
           },
           "weight": 0.2
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 3,
+            "locked_plists": 0,
+            "sites": 3
+          },
+          "weight": 0.1
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 54
+            "stateful": 35
           },
           "weight": 0.1
         }
       },
-      "grade_v2": "C",
-      "score_v1": 73,
+      "grade_v5": "B",
       "score_v2": 55,
+      "score_v5": 79,
       "stats": {
-        "excluded_files": 2372,
-        "swift_files": 2761,
+        "excluded_files": 2377,
+        "swift_files": 2766,
         "swiftui_files": 308,
         "ui_files": 389,
-        "uikit_files": 101
+        "uikit_files": 102
       }
     },
     {
       "app": "deltachat",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "DcCore/DcCore.xcodeproj/project.pbxproj",
+            "value": 1140
+          },
+          {
+            "file": "deltachat-ios.xcodeproj/project.pbxproj",
+            "value": 1640
+          }
+        ],
+        "object_versions": [
+          54,
+          77
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 0,
+          "score": 100,
           "signals": {
             "aware": 0,
-            "device_branching": 6,
             "ui_files": 173
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 63,
@@ -70,15 +105,41 @@
             "offending": 3,
             "ui_files": 173
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 2
+            "last_upgrade_check": 1640,
+            "object_version": 77,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 98,
+          "signals": {
+            "clean": 169,
+            "ui_files": 173
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 100,
+          "signals": {
+            "adopted": 8,
+            "containers": 8
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 50,
+          "signals": {
+            "clean": 2,
+            "locked_plists": 0,
+            "sites": 4
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
@@ -86,15 +147,15 @@
             "preserved": 0,
             "stateful": 60
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "F",
-      "score_v1": 62,
+      "grade_v5": "B",
       "score_v2": 22,
+      "score_v5": 65,
       "stats": {
-        "excluded_files": 43,
-        "swift_files": 216,
+        "excluded_files": 42,
+        "swift_files": 215,
         "swiftui_files": 14,
         "ui_files": 173,
         "uikit_files": 161
@@ -103,30 +164,57 @@
     {
       "app": "dime",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "app/dime.xcodeproj/project.pbxproj",
+            "value": 1400
+          }
+        ],
+        "object_versions": [
+          55
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 0,
+          "score": 100,
           "signals": {
             "aware": 0,
-            "device_branching": 0,
             "ui_files": 80
           },
-          "weight": 0.35
+          "weight": 0.15
         },
         "adaptive-layout": {
-          "score": 17,
+          "score": 18,
           "signals": {
-            "icon_frames": 82,
-            "offending": 12,
+            "icon_frames": 73,
+            "offending": 11,
             "ui_files": 80
           },
           "weight": 0.35
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 2
+            "last_upgrade_check": 1400,
+            "object_version": 55,
+            "xcode_27_1_generation": 2710
+          },
+          "weight": 0.1
+        },
+        "idiom": {
+          "score": 100,
+          "signals": {
+            "clean": 80,
+            "ui_files": 80
+          },
+          "weight": 0.1
+        },
+        "navigation": {
+          "score": 60,
+          "signals": {
+            "adopted": 3,
+            "containers": 5
           },
           "weight": 0.2
         },
@@ -134,14 +222,14 @@
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 19
+            "stateful": 18
           },
           "weight": 0.1
         }
       },
-      "grade_v2": "F",
-      "score_v1": 56,
+      "grade_v5": "D",
       "score_v2": 6,
+      "score_v5": 43,
       "stats": {
         "excluded_files": 14,
         "swift_files": 94,
@@ -155,15 +243,25 @@
       "blockers": [
         "scene-lifecycle-missing"
       ],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "DuckDuckGo-iOS.xcodeproj/project.pbxproj",
+            "value": 1500
+          }
+        ],
+        "object_versions": [
+          54
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 75,
+          "score": 100,
           "signals": {
             "aware": 26,
-            "device_branching": 25,
             "ui_files": 465
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 48,
@@ -172,28 +270,54 @@
             "offending": 15,
             "ui_files": 465
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 12
+            "last_upgrade_check": 1500,
+            "object_version": 54,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 95,
+          "signals": {
+            "clean": 442,
+            "ui_files": 465
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 79,
+          "signals": {
+            "adopted": 26,
+            "containers": 33
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 0,
+          "signals": {
+            "clean": 0,
+            "locked_plists": 0,
+            "sites": 2
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 130
+            "stateful": 126
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 53,
+      "grade_v5": "C",
       "score_v2": 43,
+      "score_v5": 52,
       "stats": {
         "excluded_files": 737,
         "swift_files": 1202,
@@ -207,15 +331,25 @@
       "blockers": [
         "scene-lifecycle-missing"
       ],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "ios/Artsy.xcodeproj/project.pbxproj",
+            "value": 1210
+          }
+        ],
+        "object_versions": [
+          54
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 93,
+          "score": 100,
           "signals": {
             "aware": 6,
-            "device_branching": 1,
             "ui_files": 60
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 31,
@@ -224,15 +358,41 @@
             "offending": 4,
             "ui_files": 60
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 4
+            "last_upgrade_check": 1210,
+            "object_version": 54,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 98,
+          "signals": {
+            "clean": 59,
+            "ui_files": 60
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 80,
+          "signals": {
+            "adopted": 4,
+            "containers": 5
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 0,
+          "signals": {
+            "clean": 0,
+            "locked_plists": 1,
+            "sites": 1
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
@@ -240,12 +400,12 @@
             "preserved": 0,
             "stateful": 15
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 56,
+      "grade_v5": "C",
       "score_v2": 43,
+      "score_v5": 47,
       "stats": {
         "excluded_files": 80,
         "swift_files": 140,
@@ -257,65 +417,115 @@
     {
       "app": "element",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [],
+        "object_versions": []
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 38,
+          "score": 25,
           "signals": {
             "aware": 4,
-            "device_branching": 4,
-            "ui_files": 790
+            "ui_files": 794
           },
-          "weight": 0.35
+          "weight": 0.15
         },
         "adaptive-layout": {
-          "score": 72,
+          "score": 73,
           "signals": {
-            "icon_frames": 32,
+            "icon_frames": 34,
             "offending": 9,
-            "ui_files": 790
+            "ui_files": 794
           },
           "weight": 0.35
         },
-        "navigation": {
-          "score": 0,
+        "idiom": {
+          "score": 99,
           "signals": {
-            "adopted": 0,
-            "containers": 16
+            "clean": 790,
+            "ui_files": 794
+          },
+          "weight": 0.1
+        },
+        "navigation": {
+          "score": 50,
+          "signals": {
+            "adopted": 7,
+            "containers": 14
           },
           "weight": 0.2
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 1
+          },
+          "weight": 0.1
         },
         "state": {
           "score": 1,
           "signals": {
             "preserved": 1,
-            "stateful": 139
+            "stateful": 135
           },
           "weight": 0.1
         }
       },
-      "grade_v2": "D",
-      "score_v1": 71,
+      "grade_v5": "C",
       "score_v2": 39,
+      "score_v5": 59,
       "stats": {
-        "excluded_files": 1219,
-        "swift_files": 2009,
-        "swiftui_files": 403,
-        "ui_files": 790,
-        "uikit_files": 404
+        "excluded_files": 1221,
+        "swift_files": 2015,
+        "swiftui_files": 405,
+        "ui_files": 794,
+        "uikit_files": 406
       }
     },
     {
       "app": "firefox",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "SampleBrowser/SampleBrowser.xcodeproj/project.pbxproj",
+            "value": 1500
+          },
+          {
+            "file": "SampleComponentLibraryApp/SampleComponentLibraryApp.xcodeproj/project.pbxproj",
+            "value": 1430
+          },
+          {
+            "file": "firefox-ios/Client.xcodeproj/project.pbxproj",
+            "value": 1020
+          },
+          {
+            "file": "firefox-ios/ThirdParty/Deferred/Deferred.xcodeproj/project.pbxproj",
+            "value": 600
+          },
+          {
+            "file": "focus-ios/Blockzilla.xcodeproj/project.pbxproj",
+            "value": 1300
+          }
+        ],
+        "object_versions": [
+          46,
+          56,
+          56,
+          60,
+          70
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 68,
+          "score": 100,
           "signals": {
             "aware": 26,
-            "device_branching": 45,
             "ui_files": 746
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 49,
@@ -324,31 +534,57 @@
             "offending": 23,
             "ui_files": 746
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 15
+            "last_upgrade_check": 1500,
+            "object_version": 70,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 94,
+          "signals": {
+            "clean": 702,
+            "ui_files": 746
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 87,
+          "signals": {
+            "adopted": 45,
+            "containers": 52
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 67,
+          "signals": {
+            "clean": 2,
+            "locked_plists": 0,
+            "sites": 3
+          },
+          "weight": 0.0909
         },
         "state": {
-          "score": 1,
+          "score": 0,
           "signals": {
-            "preserved": 1,
-            "stateful": 199
+            "preserved": 0,
+            "stateful": 197
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 59,
+      "grade_v5": "C",
       "score_v2": 41,
+      "score_v5": 60,
       "stats": {
-        "excluded_files": 2429,
-        "swift_files": 3175,
+        "excluded_files": 2443,
+        "swift_files": 3189,
         "swiftui_files": 155,
         "ui_files": 746,
         "uikit_files": 620
@@ -357,65 +593,111 @@
     {
       "app": "homeassistant",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "HomeAssistant.xcodeproj/project.pbxproj",
+            "value": 2700
+          }
+        ],
+        "object_versions": [
+          76
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
           "score": 56,
           "signals": {
             "aware": 9,
-            "device_branching": 8,
-            "ui_files": 762
+            "ui_files": 804
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
-          "score": 72,
+          "score": 73,
           "signals": {
-            "icon_frames": 56,
+            "icon_frames": 57,
             "offending": 9,
-            "ui_files": 762
+            "ui_files": 804
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 141
+            "last_upgrade_check": 2700,
+            "object_version": 76,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 99,
+          "signals": {
+            "clean": 795,
+            "ui_files": 804
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 27,
+          "signals": {
+            "adopted": 18,
+            "containers": 66
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 50,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 1,
+            "sites": 2
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 1,
           "signals": {
             "preserved": 1,
-            "stateful": 196
+            "stateful": 167
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "C",
-      "score_v1": 74,
+      "grade_v5": "C",
       "score_v2": 45,
+      "score_v5": 49,
       "stats": {
-        "excluded_files": 1252,
-        "swift_files": 2014,
-        "swiftui_files": 638,
-        "ui_files": 762,
-        "uikit_files": 198
+        "excluded_files": 1578,
+        "swift_files": 2382,
+        "swiftui_files": 668,
+        "ui_files": 804,
+        "uikit_files": 215
       }
     },
     {
       "app": "icecubesapp",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "IceCubesApp.xcodeproj/project.pbxproj",
+            "value": 1600
+          }
+        ],
+        "object_versions": [
+          70
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 55,
+          "score": 73,
           "signals": {
             "aware": 4,
-            "device_branching": 7,
             "ui_files": 274
           },
-          "weight": 0.35
+          "weight": 0.15
         },
         "adaptive-layout": {
           "score": 73,
@@ -426,11 +708,28 @@
           },
           "weight": 0.35
         },
+        "build-toolchain": {
+          "score": 0,
+          "signals": {
+            "last_upgrade_check": 1600,
+            "object_version": 70,
+            "xcode_27_1_generation": 2710
+          },
+          "weight": 0.1
+        },
+        "idiom": {
+          "score": 97,
+          "signals": {
+            "clean": 267,
+            "ui_files": 274
+          },
+          "weight": 0.1
+        },
         "navigation": {
           "score": 100,
           "signals": {
-            "adopted": 1,
-            "containers": 32
+            "adopted": 38,
+            "containers": 38
           },
           "weight": 0.2
         },
@@ -438,14 +737,14 @@
           "score": 5,
           "signals": {
             "preserved": 3,
-            "stateful": 61
+            "stateful": 58
           },
           "weight": 0.1
         }
       },
-      "grade_v2": "B",
-      "score_v1": 72,
+      "grade_v5": "B",
       "score_v2": 65,
+      "score_v5": 67,
       "stats": {
         "excluded_files": 154,
         "swift_files": 428,
@@ -457,15 +756,25 @@
     {
       "app": "isowords",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "App/isowords.xcodeproj/project.pbxproj",
+            "value": 1500
+          }
+        ],
+        "object_versions": [
+          54
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 0,
+          "score": 100,
           "signals": {
             "aware": 0,
-            "device_branching": 1,
             "ui_files": 99
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 37,
@@ -474,28 +783,54 @@
             "offending": 5,
             "ui_files": 99
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 24
+            "last_upgrade_check": 1500,
+            "object_version": 54,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 99,
+          "signals": {
+            "clean": 98,
+            "ui_files": 99
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 50,
+          "signals": {
+            "adopted": 2,
+            "containers": 4
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 82,
+          "signals": {
+            "clean": 9,
+            "locked_plists": 2,
+            "sites": 11
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 15
+            "stateful": 12
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "F",
-      "score_v1": 76,
+      "grade_v5": "C",
       "score_v2": 13,
+      "score_v5": 51,
       "stats": {
         "excluded_files": 289,
         "swift_files": 388,
@@ -509,65 +844,116 @@
       "blockers": [
         "scene-lifecycle-missing"
       ],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "Kickstarter.xcodeproj/project.pbxproj",
+            "value": 1430
+          },
+          {
+            "file": "bin/StringsScript/StringsScript.xcodeproj/project.pbxproj",
+            "value": 9999
+          }
+        ],
+        "object_versions": [
+          46,
+          60
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 34,
+          "score": 50,
           "signals": {
             "aware": 5,
-            "device_branching": 22,
-            "ui_files": 502
+            "ui_files": 503
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 72,
           "signals": {
             "icon_frames": 2,
             "offending": 6,
-            "ui_files": 502
+            "ui_files": 503
           },
-          "weight": 0.35
+          "weight": 0.3182
+        },
+        "build-toolchain": {
+          "score": 100,
+          "signals": {
+            "last_upgrade_check": 9999,
+            "object_version": 60,
+            "xcode_27_1_generation": 2710
+          },
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 96,
+          "signals": {
+            "clean": 481,
+            "ui_files": 503
+          },
+          "weight": 0.0909
         },
         "navigation": {
-          "score": 0,
+          "score": 100,
           "signals": {
-            "adopted": 0,
-            "containers": 3
+            "adopted": 25,
+            "containers": 25
           },
-          "weight": 0.2
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 1
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 1,
-            "stateful": 217
+            "stateful": 213
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 50,
+      "grade_v5": "B",
       "score_v2": 37,
+      "score_v5": 75,
       "stats": {
         "excluded_files": 1577,
-        "swift_files": 2079,
-        "swiftui_files": 93,
-        "ui_files": 502,
+        "swift_files": 2080,
+        "swiftui_files": 94,
+        "ui_files": 503,
         "uikit_files": 430
       }
     },
     {
       "app": "mochidiffusion",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "Mochi Diffusion.xcodeproj/project.pbxproj",
+            "value": 1540
+          }
+        ],
+        "object_versions": [
+          56
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 0,
+          "score": 100,
           "signals": {
             "aware": 0,
-            "device_branching": 0,
             "ui_files": 37
           },
-          "weight": 0.35
+          "weight": 0.15
         },
         "adaptive-layout": {
           "score": 53,
@@ -578,11 +964,28 @@
           },
           "weight": 0.35
         },
+        "build-toolchain": {
+          "score": 0,
+          "signals": {
+            "last_upgrade_check": 1540,
+            "object_version": 56,
+            "xcode_27_1_generation": 2710
+          },
+          "weight": 0.1
+        },
+        "idiom": {
+          "score": 100,
+          "signals": {
+            "clean": 37,
+            "ui_files": 37
+          },
+          "weight": 0.1
+        },
         "navigation": {
           "score": 100,
           "signals": {
-            "adopted": 1,
-            "containers": 1
+            "adopted": 2,
+            "containers": 2
           },
           "weight": 0.2
         },
@@ -595,9 +998,9 @@
           "weight": 0.1
         }
       },
-      "grade_v2": "D",
-      "score_v1": 92,
+      "grade_v5": "C",
       "score_v2": 38,
+      "score_v5": 63,
       "stats": {
         "excluded_files": 21,
         "swift_files": 58,
@@ -609,15 +1012,25 @@
     {
       "app": "movieswiftui",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "MovieSwift/MovieSwift.xcodeproj/project.pbxproj",
+            "value": 1200
+          }
+        ],
+        "object_versions": [
+          52
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 0,
+          "score": 100,
           "signals": {
             "aware": 0,
-            "device_branching": 0,
             "ui_files": 91
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 35,
@@ -626,28 +1039,54 @@
             "offending": 5,
             "ui_files": 91
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 15
+            "last_upgrade_check": 1200,
+            "object_version": 52,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 100,
+          "signals": {
+            "clean": 91,
+            "ui_files": 91
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 27,
+          "signals": {
+            "adopted": 3,
+            "containers": 11
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 1
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 38
+            "stateful": 35
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "F",
-      "score_v1": 63,
+      "grade_v5": "C",
       "score_v2": 12,
+      "score_v5": 48,
       "stats": {
         "excluded_files": 14,
         "swift_files": 105,
@@ -659,15 +1098,25 @@
     {
       "app": "netnewswire",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "NetNewsWire.xcodeproj/project.pbxproj",
+            "value": 2700
+          }
+        ],
+        "object_versions": [
+          76
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 23,
+          "score": 40,
           "signals": {
             "aware": 1,
-            "device_branching": 14,
             "ui_files": 124
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 100,
@@ -676,31 +1125,57 @@
             "offending": 0,
             "ui_files": 124
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 6
+            "last_upgrade_check": 2700,
+            "object_version": 76,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 89,
+          "signals": {
+            "clean": 110,
+            "ui_files": 124
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 100,
+          "signals": {
+            "adopted": 17,
+            "containers": 17
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 1
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 46
+            "stateful": 45
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 60,
+      "grade_v5": "B",
       "score_v2": 43,
+      "score_v5": 73,
       "stats": {
-        "excluded_files": 577,
-        "swift_files": 701,
+        "excluded_files": 587,
+        "swift_files": 711,
         "swiftui_files": 29,
         "ui_files": 124,
         "uikit_files": 101
@@ -709,65 +1184,111 @@
     {
       "app": "nextcloud",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "Nextcloud.xcodeproj/project.pbxproj",
+            "value": 2640
+          }
+        ],
+        "object_versions": [
+          70
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 38,
+          "score": 67,
           "signals": {
-            "aware": 4,
-            "device_branching": 16,
-            "ui_files": 357
+            "aware": 5,
+            "ui_files": 375
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 40,
           "signals": {
-            "icon_frames": 56,
-            "offending": 16,
-            "ui_files": 357
+            "icon_frames": 60,
+            "offending": 17,
+            "ui_files": 375
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 17
+            "last_upgrade_check": 2640,
+            "object_version": 70,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 95,
+          "signals": {
+            "clean": 356,
+            "ui_files": 375
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 89,
+          "signals": {
+            "adopted": 40,
+            "containers": 45
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 1
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 81
+            "stateful": 87
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 49,
+      "grade_v5": "C",
       "score_v2": 27,
+      "score_v5": 56,
       "stats": {
-        "excluded_files": 88,
-        "swift_files": 445,
-        "swiftui_files": 123,
-        "ui_files": 357,
-        "uikit_files": 294
+        "excluded_files": 104,
+        "swift_files": 479,
+        "swiftui_files": 141,
+        "ui_files": 375,
+        "uikit_files": 299
       }
     },
     {
       "app": "openfind",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "OpenFind.xcodeproj/project.pbxproj",
+            "value": 1110
+          }
+        ],
+        "object_versions": [
+          52
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 62,
+          "score": 60,
           "signals": {
             "aware": 9,
-            "device_branching": 5,
             "ui_files": 750
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 46,
@@ -776,15 +1297,41 @@
             "offending": 26,
             "ui_files": 750
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 9
+            "last_upgrade_check": 1110,
+            "object_version": 52,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 100,
+          "signals": {
+            "clean": 749,
+            "ui_files": 750
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 88,
+          "signals": {
+            "adopted": 37,
+            "containers": 42
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 0,
+          "signals": {
+            "clean": 0,
+            "locked_plists": 5,
+            "sites": 9
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
@@ -792,12 +1339,12 @@
             "preserved": 0,
             "stateful": 148
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 68,
+      "grade_v5": "C",
       "score_v2": 38,
+      "score_v5": 48,
       "stats": {
         "excluded_files": 83,
         "swift_files": 833,
@@ -811,15 +1358,18 @@
       "blockers": [
         "scene-lifecycle-missing"
       ],
+      "build": {
+        "last_upgrade_check": [],
+        "object_versions": []
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 0,
+          "score": 100,
           "signals": {
             "aware": 0,
-            "device_branching": 0,
             "ui_files": 102
           },
-          "weight": 0.35
+          "weight": 0.15
         },
         "adaptive-layout": {
           "score": 60,
@@ -830,13 +1380,30 @@
           },
           "weight": 0.35
         },
-        "navigation": {
-          "score": 0,
+        "idiom": {
+          "score": 100,
           "signals": {
-            "adopted": 0,
-            "containers": 3
+            "clean": 102,
+            "ui_files": 102
+          },
+          "weight": 0.1
+        },
+        "navigation": {
+          "score": 100,
+          "signals": {
+            "adopted": 9,
+            "containers": 9
           },
           "weight": 0.2
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 1
+          },
+          "weight": 0.1
         },
         "state": {
           "score": 0,
@@ -847,9 +1414,9 @@
           "weight": 0.1
         }
       },
-      "grade_v2": "F",
-      "score_v1": 50,
+      "grade_v5": "B",
       "score_v2": 21,
+      "score_v5": 76,
       "stats": {
         "excluded_files": 116,
         "swift_files": 218,
@@ -861,115 +1428,197 @@
     {
       "app": "signal",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "Signal.xcodeproj/project.pbxproj",
+            "value": 2600
+          }
+        ],
+        "object_versions": [
+          54
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 72,
+          "score": 91,
           "signals": {
             "aware": 6,
-            "device_branching": 5,
-            "ui_files": 333
+            "ui_files": 331
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 83,
           "signals": {
             "icon_frames": 18,
             "offending": 2,
-            "ui_files": 333
+            "ui_files": 331
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 3
+            "last_upgrade_check": 2600,
+            "object_version": 54,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 99,
+          "signals": {
+            "clean": 327,
+            "ui_files": 331
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 100,
+          "signals": {
+            "adopted": 13,
+            "containers": 13
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 33,
+          "signals": {
+            "clean": 1,
+            "locked_plists": 0,
+            "sites": 3
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 72
+            "stateful": 69
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "C",
-      "score_v1": 62,
+      "grade_v5": "B",
       "score_v2": 54,
+      "score_v5": 69,
       "stats": {
-        "excluded_files": 2306,
-        "swift_files": 2639,
+        "excluded_files": 2314,
+        "swift_files": 2645,
         "swiftui_files": 51,
-        "ui_files": 333,
-        "uikit_files": 286
+        "ui_files": 331,
+        "uikit_files": 284
       }
     },
     {
       "app": "wikipedia",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "Wikipedia.xcodeproj/project.pbxproj",
+            "value": 1640
+          }
+        ],
+        "object_versions": [
+          74
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 81,
+          "score": 100,
           "signals": {
             "aware": 36,
-            "device_branching": 23,
-            "ui_files": 478
+            "ui_files": 486
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
-          "score": 38,
+          "score": 39,
           "signals": {
-            "icon_frames": 46,
+            "icon_frames": 48,
             "offending": 23,
-            "ui_files": 478
+            "ui_files": 486
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 8
+            "last_upgrade_check": 1640,
+            "object_version": 74,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 95,
+          "signals": {
+            "clean": 463,
+            "ui_files": 486
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 94,
+          "signals": {
+            "adopted": 44,
+            "containers": 47
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 100,
+          "signals": {
+            "clean": 4,
+            "locked_plists": 0,
+            "sites": 4
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 5,
           "signals": {
             "preserved": 6,
-            "stateful": 115
+            "stateful": 116
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "D",
-      "score_v1": 53,
+      "grade_v5": "C",
       "score_v2": 42,
+      "score_v5": 61,
       "stats": {
-        "excluded_files": 909,
-        "swift_files": 1387,
-        "swiftui_files": 246,
-        "ui_files": 478,
-        "uikit_files": 288
+        "excluded_files": 923,
+        "swift_files": 1409,
+        "swiftui_files": 252,
+        "ui_files": 486,
+        "uikit_files": 290
       }
     },
     {
       "app": "wordpress",
       "blockers": [],
+      "build": {
+        "last_upgrade_check": [
+          {
+            "file": "WordPress/WordPress.xcodeproj/project.pbxproj",
+            "value": 2600
+          }
+        ],
+        "object_versions": [
+          77
+        ]
+      },
       "checks": {
         "adaptive-geometry": {
-          "score": 83,
+          "score": 100,
           "signals": {
             "aware": 50,
-            "device_branching": 26,
             "ui_files": 1290
           },
-          "weight": 0.35
+          "weight": 0.1364
         },
         "adaptive-layout": {
           "score": 69,
@@ -978,31 +1627,57 @@
             "offending": 17,
             "ui_files": 1290
           },
-          "weight": 0.35
+          "weight": 0.3182
         },
-        "navigation": {
+        "build-toolchain": {
           "score": 0,
           "signals": {
-            "adopted": 0,
-            "containers": 67
+            "last_upgrade_check": 2600,
+            "object_version": 77,
+            "xcode_27_1_generation": 2710
           },
-          "weight": 0.2
+          "weight": 0.0909
+        },
+        "idiom": {
+          "score": 98,
+          "signals": {
+            "clean": 1268,
+            "ui_files": 1290
+          },
+          "weight": 0.0909
+        },
+        "navigation": {
+          "score": 91,
+          "signals": {
+            "adopted": 138,
+            "containers": 152
+          },
+          "weight": 0.1818
+        },
+        "orientation": {
+          "score": 33,
+          "signals": {
+            "clean": 2,
+            "locked_plists": 0,
+            "sites": 6
+          },
+          "weight": 0.0909
         },
         "state": {
           "score": 0,
           "signals": {
             "preserved": 0,
-            "stateful": 395
+            "stateful": 376
           },
-          "weight": 0.1
+          "weight": 0.0909
         }
       },
-      "grade_v2": "C",
-      "score_v1": 56,
+      "grade_v5": "C",
       "score_v2": 53,
+      "score_v5": 64,
       "stats": {
-        "excluded_files": 2000,
-        "swift_files": 3290,
+        "excluded_files": 2002,
+        "swift_files": 3292,
         "swiftui_files": 527,
         "ui_files": 1290,
         "uikit_files": 897
@@ -1010,6 +1685,6 @@
     }
   ],
   "corpus": "twenty well-known open-source iOS apps, shallow clones",
-  "measured": "2026-09-06",
-  "note": "Calibration record for docs/result-contract.md. Signals are the raw counts, so a future rebalance can be simulated from this file without re-cloning the corpus."
+  "measured": "2026-09-19",
+  "note": "Calibration record for docs/result-contract.md and the published index. Signals are the raw counts, so a future rebalance can be simulated from this file without re-cloning the corpus. score_v2 is the superseded contract v2 score; score_v5 is current. The v5 average is higher than v2 mainly because adaptive-geometry stopped penalising zero size-class reads and because idiom and orientation default high for most trees; see the Version 5 section of docs/result-contract.md."
 }

@@ -46,9 +46,18 @@ CHECK_ALIAS = {
     "adaptive-geometry": "geometry",
     "navigation": "nav",
     "state": "state",
+    "idiom": "idiom",
+    "orientation": "orientation",
 }
 
-SUPPORTED_SCHEMA = 2
+# Reasons a check can be absent from the audit. They are carried through to the
+# page so a missing check reads as "not applicable", never as a silent zero.
+NOT_APPLICABLE = {
+    "idiom": "Not applicable: no UI file branches on the device idiom.",
+    "orientation": "Not applicable: no orientation plist and no orientation branch to measure.",
+}
+
+SUPPORTED_SCHEMA = 5
 MAX_FINDINGS = 14
 
 
@@ -78,6 +87,14 @@ def main(paths) -> int:
                 continue
             checks[alias] = round(check["score"])
             details[alias] = check["detail"]
+
+        # A check the audit could not measure (no orientation plist and no
+        # orientation branch, say) is reported as not applicable at 100 rather
+        # than omitted, so the page never renders an unknown number as a zero.
+        for alias in CHECK_ALIAS.values():
+            if alias not in checks:
+                checks[alias] = 100
+                details[alias] = NOT_APPLICABLE[alias]
 
         findings = [
             {

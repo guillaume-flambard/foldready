@@ -134,9 +134,28 @@ NetNewsWire, Firefox, Dime, Eigen, WordPress, DuckDuckGo, Wikipedia, Kickstarter
 Facts, Nextcloud, MochiDiffusion. Anchors are choices, so they are recorded here with their
 corpus and date rather than left as bare constants in the source.
 
-The measurement itself is committed as `docs/calibration-corpus.json`: per app, the v1 and
-v2 score and every check's raw signals. A future rebalance can be simulated from that file
-without re-cloning twenty repositories.
+The measurement itself is committed as `docs/calibration-corpus.json`: per app, the
+superseded v2 score, the current v5 score and every check's raw signals. A future rebalance
+can be simulated from that file without re-cloning twenty repositories.
+
+The corpus was re-audited under **contract v5 on 2026-09-19**. Every app's score rose (the
+range moved from 6 to 65 up to 43 to 79). The rise is mostly a change of contract shape, not
+a change in the apps, and it is worth stating plainly because a reader comparing the two
+measurements would otherwise draw the wrong conclusion:
+
+- **Adaptive geometry stopped penalising zero reads.** Through v4 the check was half
+  coverage and half purity, so an app that read no size class at all scored low. In v5 it is
+  coverage-only and keeps the "absence is not scored zero" guard, so the same app now scores
+  100. isowords scores 100 on "0 of 99 UI file(s) read size classes"; MovieSwiftUI 100 on
+  "0 of 91"; Dime 100 on "0 of 80"; Open Food Facts 100 on "0 of 102". Those were among the
+  lowest-scoring apps before.
+- **The two new checks default high.** Interface idiom scores 95 to 100 for almost every
+  tree, because few apps branch on `userInterfaceIdiom`; orientation scores 100 wherever a
+  plist declares both orientations. Weight moved from adaptive-geometry (0.35 to 0.15) into
+  those two checks (0.10 each), so the weight that used to discriminate now mostly does not.
+
+The activation precedes, and is not, a claim that these apps became more ready for iPhone
+Duo.
 
 ## `findings[]`
 

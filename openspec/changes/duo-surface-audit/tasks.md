@@ -33,8 +33,20 @@
       statement of what an advisory finding is not.
 - [x] 3.4 Regenerate `Tests/Fixtures/contract-golden.json` and update the contract tests,
       including the byte-identical test across working directories.
-- [ ] 3.5 Regenerate the six demo reports and rewrite the published baselines once,
-      deliberately, and record the new scores in the change. BLOCKED (needs the audited app checkouts): the 20 apps behind `web/lib/index-data.ts` live outside this repository and are passed to `Scripts/build-index.sh` as arguments, so the index cannot be regenerated from this tree. The published index still carries v3 checks keys (`nav`, `layout`, `geometry`, `state`, no `build-toolchain`) and is labelled historical until the source apps are re-audited. No `*.foldready-baseline.json` file exists in the repository to rewrite. Re-run `Scripts/build-index.sh <repo1>...` once the corpus is available, then record the new scores here.
+- [x] 3.5 Regenerate the demo reports and rewrite the published index once, deliberately,
+      and record the new scores in the change. DONE 2026-09-19. The twenty apps in
+      `docs/calibration-corpus.json` were shallow-cloned, audited with the current binary
+      (`foldready 0.5.0`, contract v5) and the public index regenerated from those result
+      files. Every app's score rose: bitwarden 55→79, openfoodfacts 21→76, kickstarter
+      37→75, netnewswire 43→73, signal 54→69, icecubesapp 65→67, deltachat 22→65, wordpress
+      53→64, mochidiffusion 38→63, wikipedia 42→61, firefox 41→60, element 39→59, nextcloud
+      27→56, duckduckgo 43→52, isowords 13→51, homeassistant 45→49, movieswiftui 12→48,
+      openfind 38→48, eigen 43→47, dime 6→43. `docs/calibration-corpus.json` was rewritten
+      with the v5 scores and signals and `docs/result-contract.md` records why the movement
+      is mostly a change of contract shape (adaptive geometry no longer penalising zero
+      reads; the two new checks defaulting high) rather than a change in the apps. There is
+      still no committed `*.foldready-baseline.json` in this repository, so no baseline file
+      was rewritten; baselines belong to audited repos, not here.
 
 ## 4. Runtime checklist alignment
 

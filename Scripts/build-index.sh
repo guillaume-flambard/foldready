@@ -1,36 +1,33 @@
 #!/usr/bin/env bash
-# build-index.sh — re-audit the demo apps and rebuild the public Fold-Ready Index.
+# build-index.sh — re-audit the corpus and rebuild the published index.
 #
 #   ./Scripts/build-index.sh <repo1> [<repo2> ...]
 #
-# Each <repo> must be an iOS source tree. The index page lives in web/.
+# Each <repo> must be an iOS source tree whose directory name is the index slug
+# (see CATALOG in generate-index.py). Reports are written OUTSIDE the audited
+# trees, into a scratch directory, and then generate-index.py turns them into
+# web/lib/index-data.ts. The results are kept so a future rebalance can be
+# re-derived without re-cloning the corpus.
 set -euo pipefail
 
-BIN="$(cd "$(dirname "$0")/.." && pwd)/.build/debug/foldready"
-WEB="$(cd "$(dirname "$0")/.." && pwd)/web-legacy"
-REPORTS="$WEB/reports"
-BRAND="$REPORTS/_brand"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+BIN="$ROOT/.build/debug/foldready"
+OUT="${FOLDREADY_INDEX_OUT:-$ROOT/.build/index-out}"
 
 if [[ $# -lt 1 ]]; then
   echo "usage: build-index.sh <repo1> [<repo2> ...]" >&2
   exit 1
 fi
 [[ -x "$BIN" ]] || { echo "build foldready first: swift build" >&2; exit 1; }
-rm -rf "$REPORTS"
-mkdir -p "$BRAND"
-if [[ ! -f "$BRAND/logo-64.png" ]]; then
-  rsvg-convert -w 64 -h 64 -o "$BRAND/logo-64.png" "$(cd "$(dirname "$0")/.." && pwd)/brand/logo.svg" 2>/dev/null \
-    || cp "$(cd "$(dirname "$0")/.." && pwd)/brand/logo.svg" "$BRAND/logo-64.png"
-fi
+
+rm -rf "$OUT"
+mkdir -p "$OUT"
 
 for repo in "$@"; do
   name=$(basename "$repo")
   echo "=== $name ==="
-  "$BIN" "$repo" --name "$name" --json >/dev/null
-  if [[ -d "$repo/foldready-report" ]]; then
-    cp -R "$repo/foldready-report" "$REPORTS/$name"
-  fi
+  "$BIN" "$repo" --name "$name" --json --out "$OUT/$name" >/dev/null
 done
 
-python3 "$(dirname "$0")/aggregate-index.py"
-echo "index rebuilt -> $WEB/index.html"
+python3 "$ROOT/Scripts/generate-index.py" "$OUT"/*/result.json
+echo "index rebuilt from $(ls -d "$OUT"/*/ | wc -l | tr -d ' ') audits -> web/lib/index-data.ts"
