@@ -47,11 +47,24 @@
       reference, and acceptance condition per entry.
 - [x] 4.3 Extend `verify` to report per-entry fixed / unchanged / regressed alongside the
       score delta.
-- [ ] 4.4 BLOCKED (needs Xcode 27): verify the handoff end to end against Apple's exported
-      app-modernization skill on a fixture, and record what it does and does not complete.
-      This machine runs Xcode 26.6, where `xcrun agent skills export` does not exist
-      (`xcrun agent` resolves to the MCP stdio bridge). Re-run once Xcode 27 is installed;
-      the work order and `verify --work-order` are in place and tested against a fixture.
+- [x] 4.4 Verify the handoff against Apple's exported app-modernization skill and record what
+      it does and does not complete. DONE 2026-09-19 on Xcode 27.0 (27A266a), which *does*
+      ship `xcrun agent skills export` (the earlier blocker said 26.6; that machine is gone).
+      Exported 10 skills; `uikit-app-modernization` is the counterpart. Ran `foldready port`
+      on a real corpus app (Open Food Facts, score 76) and compared its one work order and
+      four entries against the skill's four task references. FINDINGS, carried into issue #5:
+      (a) the `state` entry has NO counterpart in the skill, whose tasks are UIScreen,
+      orientation, scene lifecycle and safe area only; (b) the two `adaptive-layout` entries
+      are no more precise than the skill's own decision tree, and the window-frame entry
+      duplicates the scene-lifecycle entry, since `UIWindow(frame: UIScreen.main.bounds)` is
+      resolved BY the scene migration; (c) the skill covers a whole surface FoldReady does not
+      score at all, safe-area insets (hardcoded 20/44/34/49 offsets, `topLayoutGuide`,
+      assumptions of symmetric insets), which on a foldable is a real bug class; (d) the skill
+      edits Swift AND Objective-C, while FoldReady reads `.swift` and `.plist` only. The
+      division of labour is confirmed rather than assumed: FoldReady identifies and verifies,
+      Apple's skill edits. The Duo simulator itself is still absent: Xcode 27.0 ships no
+      iPhone Duo device type and only the iOS 26.5 runtime, so `verify --build` on Duo remains
+      blocked until Apple publishes it.
 - [x] 4.5 Rewrite the README porting section around the measurement-versus-editing split,
       linking the WWDC26 session.
 

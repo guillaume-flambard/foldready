@@ -30,10 +30,12 @@ Built but unvalidated:
 
 Blocked on Apple:
 
-- The Duo simulator in Device Hub requires Xcode 27.1, which is not installed on this
-  machine.
-- Verifying the work-order handoff against Apple's exported `uikit-app-modernization` skill
-  needs `xcrun agent skills export`, which does not exist before Xcode 27.
+- The Duo simulator itself. Xcode 27.0 is installed and ships no iPhone Duo device type and
+  only the iOS 26.5 runtime, so `verify --build` on Duo still has no target. Apple states the
+  Duo simulator in Device Hub requires Xcode 27.1, which it says is coming later this month.
+- Nothing else in this section: the work-order handoff against Apple's exported
+  `uikit-app-modernization` skill was verified on 2026-09-19 (task 4.4), so the skill half of
+  Phase 4 is done and only the simulator half remains.
 
 ## Phase 0. Land the working tree
 
@@ -118,14 +120,31 @@ until attribution is lexed rather than textual.
 
 ## Phase 4. The launch window (16 to 23 October)
 
+**Partly done 19 September, ahead of the window.** The skill half is complete and the
+simulator half is still blocked on Apple, not on this machine, which is the same shape as
+the index problem: the work is understood and the tool is missing.
+
 Entry: Xcode 27.1 and the Duo simulator are available, or the date has passed without them.
 
 Work:
 
-1. Install Xcode 27.1 and complete readiness-gate task 4.4: run the work order through
-   Apple's exported skill on a fixture and record what it does and does not complete.
+1. ~~Install Xcode 27.1 and complete readiness-gate task 4.4.~~ Done 19 September on Xcode
+   27.0, which already ships `xcrun agent skills export`. The work order was run against a
+   real corpus app and compared with Apple's `uikit-app-modernization` skill, entry by entry.
+   Recorded in task 4.4 and issue #5. What the comparison found, and what it means:
+   - Apple does not cover state preservation at all, so that work-order entry has no
+     counterpart and a developer following the skill alone would miss it.
+   - The window-frame entry duplicates the scene-lifecycle entry, because the scene
+     migration is what resolves it. Two entries, one change.
+   - Apple covers a surface FoldReady does not score: safe-area insets, including the
+     assumption that insets are symmetric, which is exactly a foldable bug class. This is
+     the strongest candidate for a future check.
+   - Apple edits Swift and Objective-C; FoldReady reads `.swift` and `.plist` only.
+   The division of labour is now evidenced rather than asserted: FoldReady identifies and
+   verifies, Apple's skill edits.
 2. Run the scanner's own fixture app through `verify --build` on the Duo simulator and
-   record the device, runtime and linked SDK in `capture.json`.
+   record the device, runtime and linked SDK in `capture.json`. STILL BLOCKED: Xcode 27.0
+   has no Duo device type and the only installed runtime is iOS 26.5.
 3. Refresh the site and the README for availability day, with the launch dates and the
    documented Xcode floor.
 4. Re-audit the index under the v5 contract and publish the new scores.
