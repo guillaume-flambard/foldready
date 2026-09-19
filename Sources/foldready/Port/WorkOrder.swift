@@ -94,6 +94,7 @@ struct WorkOrder: Sendable {
     let generatedAt: Date
     let score: Double
     let entries: [WorkOrderEntry]
+    var schemaVersion: Int? = resultSchemaVersion
 
     /// Per-entry outcome of a re-audit.
     enum Status: String, Sendable {
@@ -319,9 +320,11 @@ extension WorkOrder {
     /// The agent-facing document. One file, handed to a coding agent as its task input.
     func markdown() -> String {
         var out = """
-        # FoldReady work order — \(app)
+        # FoldReady work order: \(app)
 
-        Score at the time of writing: \(Int(score))/100.
+        Source score at the time of writing: \(Int(score))/100 (contract v\(schemaVersion.map(String.init) ?? "unknown")).
+        \(ReviewContext.scoreNote)
+        Tool-proposed order only. Human priority is not assessed; validate journey impact first.
 
         Review these source signals before changing code. Static acceptance means the
         signal disappeared, not that the app was tested on iPhone Duo. Apple's announced
@@ -353,7 +356,7 @@ extension WorkOrder {
             - **Audit check**: `\(entry.checkKey)`
             - **Apple source**: \(entry.reference)
             - **Required end state**: \(entry.requiredEndState)
-            - **Done when**: \(entry.acceptance.described)
+            - **Static acceptance only**: \(entry.acceptance.described)
 
             """
         }
@@ -408,6 +411,6 @@ extension WorkOrder {
         }
         let score = (obj["score"] as? Double) ?? (obj["score"] as? Int).map(Double.init) ?? 0
         return WorkOrder(app: (obj["app"] as? String) ?? "app", generatedAt: Date(),
-            score: score, entries: entries)
+            score: score, entries: entries, schemaVersion: obj["schema_version"] as? Int)
     }
 }

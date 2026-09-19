@@ -36,6 +36,7 @@ enum JSONReport {
             "app": result.appName,
             "generated_at": ISO8601DateFormatter().string(from: result.generatedAt),
             "evidence": Evidence.payload(surfaceChecks: result.advisoryRuntimeChecks),
+            "review": ReviewContext.payload(result),
             "score": result.totalScore,
             "grade": result.grade,
             "risk": result.risk,
@@ -116,6 +117,7 @@ enum JSONReport {
                     "check": f.check,
                     "severity": f.severity.rawValue,
                     "confidence": f.confidence.rawValue,
+                    "review": ReviewContext.finding(f, in: result),
                     "message": f.message,
                     "evidence_kind": f.check == "captured-layout" ? "screenshot_signal" : "static_signal",
                     "requires_confirmation": true

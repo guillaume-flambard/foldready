@@ -216,7 +216,7 @@ func runGate(root: String, appName: String, opts: CliOptions, screenshots: [Stri
     print(color("FoldReady gate", "36") + " - \(appName)")
     printBlockers(result)
     print("  \(Evidence.summary)")
-    print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)")
+    print("  source score (contract v\(resultSchemaVersion), engine \(foldreadyVersion)): \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  heuristic risk \(result.risk)")
     if let description = outcome.baselineDescription {
         print("  baseline: \(description)")
     }
@@ -299,13 +299,14 @@ func main() {
         print(color("FoldReady port", "36") + " - \(appName)")
         let mode = options.apply ? "applied" : "dry run"
         print("  mode: \(color(mode, options.apply ? "32" : "33"))")
+        print("  Review target relevance before applying. Runtime behavior is not verified.")
         if options.apply { print("  \(color("\(result.appliedCount) edits written", "32")) to the working tree") }
         for patch in result.plan.patches {
             let n = patch.edits.count + patch.newFiles.count
-            print("  \(color("[SAFE]", "32"))  \(patch.title)  (\(n) file\(n == 1 ? "" : "s"))")
+            print("  \(color("[PROPOSAL]", "33"))  \(patch.title)  (\(n) file\(n == 1 ? "" : "s"))")
             for note in patch.notes.prefix(2) { print("      - \(note)") }
         }
-        if result.plan.patches.isEmpty { print("  no mechanically safe edit to make.") }
+        if result.plan.patches.isEmpty { print("  no mechanical edit proposed.") }
         let entries = result.workOrder.entries
         print("  \(color("work order", "36")): \(entries.count) item(s) needing judgement")
         for entry in entries.prefix(5) { print("      - \(entry.title)  (\(entry.location))") }
@@ -378,7 +379,7 @@ func main() {
         print(color("FoldReady verify", "36") + " - \(appName)")
         printBlockers(result)
         print("  \(Evidence.summary)")
-        print("  score after port: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)")
+        print("  source score (contract v\(resultSchemaVersion)) after port: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)")
         for o in result.outcomes where o.key == "captured-layout" {
             print("  captured layout: \(color(String(format: "%.0f%%", o.score * 100), o.score >= 0.6 ? "32" : "33"))  (\(o.detail))")
         }
@@ -389,15 +390,20 @@ func main() {
         if let workOrder = WorkOrder.load(path: workOrderPath) {
             var counts: [WorkOrder.Status: Int] = [:]
             print("  work order: \(workOrder.entries.count) item(s) from a score of \(Int(workOrder.score))")
-            for entry in workOrder.entries {
-                let status = workOrder.status(of: entry, after: result)
-                counts[status, default: 0] += 1
-                let code = status == .fixed ? "32" : (status == .regressed ? "31" : "33")
-                print("    \(color(status.rawValue.padding(toLength: 9, withPad: " ", startingAt: 0), code)) \(entry.title)  (\(entry.location))")
+            if workOrder.schemaVersion == resultSchemaVersion {
+                print("  Status describes static acceptance only, not runtime fixes.")
+                for entry in workOrder.entries {
+                    let status = workOrder.status(of: entry, after: result)
+                    counts[status, default: 0] += 1
+                    let code = status == .fixed ? "32" : (status == .regressed ? "31" : "33")
+                    print("    \(color(status.rawValue.padding(toLength: 9, withPad: " ", startingAt: 0), code)) \(entry.title)  (\(entry.location))")
+                }
+                let delta = result.totalScore - workOrder.score
+                let sign = delta >= 0 ? "+" : ""
+                print("  \(counts[.fixed] ?? 0) fixed, \(counts[.unchanged] ?? 0) unchanged, \(counts[.regressed] ?? 0) regressed  ·  score \(sign)\(Int(delta))")
+            } else {
+                print("  Static comparison skipped: work order contract differs or is unknown. Regenerate it before comparing scores or acceptance.")
             }
-            let delta = result.totalScore - workOrder.score
-            let sign = delta >= 0 ? "+" : ""
-            print("  \(counts[.fixed] ?? 0) fixed, \(counts[.unchanged] ?? 0) unchanged, \(counts[.regressed] ?? 0) regressed  ·  score \(sign)\(Int(delta))")
         } else if opts.workOrderPath != nil {
             print("  no work order could be read at \(workOrderPath)")
         } else {
@@ -420,6 +426,7 @@ func main() {
         }
         let avg = VisualAnalysis.averageScore(results)
         print(color("FoldReady visual", "36") + " - \(shots.count) screenshot(s)")
+        print("  Screenshot heuristics only: cause and runtime behavior are unverified. Record image provenance before interpretation.")
         for r in results {
             let pct = Int((r.layoutScore * 100).rounded())
             print("  \(color(String(format: "%3d", pct) + "%", pct >= 60 ? "32" : (pct >= 35 ? "33" : "31")))  \(r.file)  \(r.width)x\(r.height)  letterbox \(String(format: "%.0f%%", r.letterbox * 100))")
@@ -446,10 +453,13 @@ func main() {
 
     print(color("FoldReady", "36") + " - \(appName)")
     printBlockers(result)
-    let provisional = result.scoreIsProvisional ? " (provisional: the app opted out of a resizable scene)" : ""
+    let provisional = result.scoreIsProvisional ? " (provisional: confirm source opt-out in the target configuration)" : ""
     print("  \(Evidence.summary)")
-    print("  score: \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  risk \(result.risk)\(provisional)")
-    print("  est. porting effort: \(color("\(result.hoursEstimate) h", "32"))")
+    print("  source score (contract v\(resultSchemaVersion), engine \(foldreadyVersion)): \(color(String(Int(result.totalScore)), "33"))/100  grade \(result.grade)  heuristic risk \(result.risk)\(provisional)")
+    print("  unvalidated effort estimate: \(color("\(result.hoursEstimate) h", "32"))")
+    print("  \(ReviewContext.scoreNote)")
+    print("  \(ReviewContext.effortNote)")
+    print("  Human priority: not assessed. Runtime journeys: not tested.")
     // The four reasons are named rather than folded into one count, and not presented as a
     // total: a non-UI Swift file that no rule excluded is in neither `ui_files` nor any of
     // these counts, so only the reasons the audit actually applied are meaningful here.

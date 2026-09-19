@@ -46,7 +46,7 @@ export function RankingClient() {
         <label htmlFor="sort">Sort</label>
         <select className="sort" id="sort" value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
           <option value="score">Score · high to low</option>
-          <option value="hours">Port hours · low to high</option>
+          <option value="hours">Unvalidated hours · low to high</option>
           <option value="name">Name · A to Z</option>
         </select>
         <div className="fchips" role="group" aria-label="Filter by grade">
@@ -68,14 +68,13 @@ export function RankingClient() {
 
       <section className="cta">
         <div>
-          <h2>Get your app scored</h2>
+          <h2>Request a human review</h2>
           <p>
-            A static audit of your iOS source tree: the blocking facts first, then the
-            weighted checks of contract v5 against the iOS 27 adaptivity requirements, with
-            an hours estimate.
+            Reviewed source signals, agreed journeys and a plan with explicit test coverage.
+            Scanner hours are unvalidated estimates, not a delivery promise.
           </p>
         </div>
-        <a className="btn btn-pri" href={href("/get-scored")}>Get your app scored</a>
+        <a className="btn btn-pri" href={href("/get-scored")}>Request a human review</a>
       </section>
     </>
   );

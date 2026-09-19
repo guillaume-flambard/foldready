@@ -5,9 +5,9 @@ export default function LandingPage() {
     <main className="wrap">
       <header className="hero">
         <div>
-          <span className="kicker">iPhone Duo · launch 23 October 2026</span>
+          <span className="kicker">Human review · source evidence and test coverage</span>
           <h1>Find what needs attention before your app reaches iPhone Duo.</h1>
-          <p className="lede">Review your critical journeys, identify layout risks and agree the fixes. FoldReady combines a free source scanner with a human review of your app and its test coverage.</p>
+          <p className="lede">Review your critical journeys, examine layout signals and agree what to test next. FoldReady combines a free source scanner with a human review of your app and its test coverage.</p>
           <div className="ctas">
             <Link className="btn btn-pri" href="/get-scored">Request a review · $349</Link>
             <a className="btn btn-ghost" href="https://github.com/guillaume-flambard/foldready#usage">Run the free scanner</a>
@@ -16,7 +16,7 @@ export default function LandingPage() {
         <div className="ocard">
           <h2>What is available today</h2>
           <p>Source analysis, a review of up to three agreed critical journeys, and a prioritized test and remediation plan. Existing apps can run on Duo without recompilation.</p>
-          <p>Duo simulator testing depends on Xcode 27.1 beta, announced for later in September. Any later simulator pass is scoped separately. Physical-device testing is not included.</p>
+          <p>Duo simulator testing requires an available target and a buildable app. Any later simulator pass is scoped separately. Physical-device testing is not included.</p>
           <a href="https://developer.apple.com/iphone-duo/">Apple tools and availability</a>
         </div>
       </header>
@@ -40,7 +40,7 @@ export default function LandingPage() {
           <div className="pcard">
             <h3>Source scanner</h3><p className="price">Free</p>
             <p className="what">Repeatable source signals for your team and CI.</p>
-            <ul><li>Layout and navigation checks with Apple sources</li><li>Heuristic score and effort estimate</li><li>Local reports and regression policies</li><li>Work orders for reviewed changes</li></ul>
+            <ul><li>Layout and navigation checks with Apple sources</li><li>Versioned score and unvalidated effort estimate</li><li>Local reports and regression policies</li><li>Work orders for reviewed changes</li></ul>
             <pre className="snippet"><code>{`- uses: guillaume-flambard/foldready@v0`}</code></pre>
             <a className="btn btn-sec" href="https://github.com/guillaume-flambard/foldready#usage">Get the CLI</a>
           </div>
@@ -64,11 +64,11 @@ export default function LandingPage() {
         <div className="obj">
           <div className="ocard2"><p className="q">Does every app need a port?</p><p className="a">No. Apple says existing apps run without recompilation, and standard navigation adapts automatically. The review focuses on your custom layouts and critical journeys. A sidebar is an optional design choice.</p></div>
           <div className="ocard2"><p className="q">Does a high score prove compatibility?</p><p className="a">No. Source analysis cannot prove rendering, state preservation or a successful launch. Screenshot margins can come from compatibility presentation or intentional spacing. Runtime evidence needs a named build, environment and tested journey.</p></div>
-          <div className="ocard2"><p className="q">Why use this alongside Apple tooling?</p><p className="a">Apple announced the App Resizability skill for Xcode 27.1. FoldReady helps prioritize the work and record what was checked; your team can use Apple tooling to implement changes.</p></div>
-          <div className="ocard2"><p className="q">When can Duo testing happen?</p><p className="a">Apple lists Xcode 27.1 beta for later in September. Confirm tool availability and build access when agreeing a simulator pass. Every delivery names the environments actually tested.</p></div>
+          <div className="ocard2"><p className="q">Why use this alongside Apple tooling?</p><p className="a">Apple announced the App Resizability skill for Xcode 27.1. FoldReady proposes a review order; a human validates priorities and records what was checked; your team can use Apple tooling to implement changes.</p></div>
+          <div className="ocard2"><p className="q">When can Duo testing happen?</p><p className="a">Confirm tool availability and build access when agreeing a simulator pass. Every delivery names the environments actually tested.</p></div>
         </div>
         <p className="spec">Sources, checked 11 September 2026: <a href="https://www.apple.com/newsroom/2026/09/apple-unveils-iphone-duo/">Apple announcement</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111461/">Prepare your app for iPhone Duo</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111463/">Adaptive layouts</a>.</p>
-        <p className="spec"><Link href="/ranking">Source audits of twenty open-source apps</Link>. Scores come from the current scanner; they are source signals, not Duo runtime verdicts.</p>
+        <p className="spec"><Link href="/ranking">Source audits of twenty open-source apps</Link>. Scores are labelled by contract; they are source signals, not Duo runtime verdicts.</p>
       </section>
     </main>
   );

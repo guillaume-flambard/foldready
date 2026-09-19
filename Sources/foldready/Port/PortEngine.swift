@@ -155,9 +155,9 @@ enum PortEngine {
             toFile: (dir as NSString).appendingPathComponent("work-order.json"),
             atomically: true, encoding: .utf8)
 
-        var md = "# FoldReady — porting report: \(appName)\n\n"
-        md += applied ? "**Applied \(plan.patches.map(\.edits.count).reduce(0, +)) edits to the working tree.**\n\n" : "**Dry run — review the patches, then re-run with `--apply`.**\n\n"
-        md += "FoldReady only writes edits it can prove are safe. The remaining "
+        var md = "# FoldReady porting report: \(appName)\n\n"
+        md += applied ? "**Applied \(plan.patches.map(\.edits.count).reduce(0, +)) edits to the working tree.**\n\n" : "**Dry run: review the patches, then re-run with `--apply`.**\n\n"
+        md += "Mechanical proposals require review of target relevance and runtime behavior. The remaining "
         md += "\(workOrder.entries.count) item(s) need judgement and are in `work-order.md`, "
         md += "written for Apple's app modernization agent skill or any other coding agent.\n\n"
 

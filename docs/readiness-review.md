@@ -1,6 +1,7 @@
 # Readiness review delivery scope
 
-Offer updated 18 September 2026 against Apple's iPhone Duo announcement and developer sessions.
+Delivery scope updated 19 September 2026. The paid deliverable is a human review; scanner
+output is supporting evidence. Demand and delivery effort have not been validated.
 
 ## Intake and agreement
 
@@ -13,13 +14,23 @@ no payment.
 ## Deliverable
 
 For each item, record its category, location where available, evidence, consequence and
-recommended action. Use three distinct categories:
+recommended action. Retain the scanner confidence and explain why the signal applies or
+does not apply to the reviewed target. Use three distinct categories:
 
 1. Source signal: potential issue requiring confirmation, including SDK-conditioned migration requirements.
 2. Observed defect: reproducible on a recorded app build and named environment, with steps, expected/actual behavior and screenshot or recording.
 3. Optional improvement: a design decision, such as sidebar placement, with its expected benefit.
 
 Include a prioritized plan, clearly labelled effort assumptions and test coverage table.
+The scanner order is only a proposed review sequence. Record the reviewer, review date,
+validated priority and its journey-impact rationale separately; unreviewed items have no
+human priority. Keep dismissed hypotheses with a reason.
+
+Record the source revision, engine version, contract version, exclusion counts and
+unreadable files alongside the score. A score is a versioned summary, not a readiness
+threshold; do not compare different contracts as app improvements. Scanner hours are
+unvalidated heuristics, never a delivery commitment. Record actual review hours separately.
+
 A scanner score alone never establishes a defect. If the app cannot be built, record that
 limitation; do not present source review as runtime testing.
 
@@ -61,3 +72,22 @@ or full compatibility outside recorded test coverage.
 Sources: [Apple tools and availability](https://developer.apple.com/iphone-duo/),
 [preparation guidance](https://developer.apple.com/videos/play/tech-talks/111461/),
 [adaptive layouts](https://developer.apple.com/videos/play/tech-talks/111463/).
+
+## Review worksheet
+
+Use the generated HTML and optional `review` metadata in `result.json` as inputs.
+For each retained signal, include:
+
+| Field | Required content |
+|---|---|
+| Source | Revision, target, file and line when available; otherwise state unavailable |
+| Evidence | Detector message, confidence, check counts/reference; reviewed excerpt or artifact when available |
+| Hypothesis | Suspected consequence and what remains unknown |
+| Human decision | Reviewer/date, confirmed relevance or dismissal, priority and journey-impact rationale |
+| Next action | Specific source inspection, reproduction or correction to agree |
+| Runtime result | Not tested until a named build, environment, steps, expected/actual result and evidence are recorded |
+| Coverage | Exclusions, unreadable files, languages/targets not inspected and journeys not run |
+
+High detector confidence does not establish target membership, runtime failure or business
+priority. Screenshot heuristics do not establish cause. A passing gate only confirms the
+configured source policy. Work-order acceptance checks source signals, not runtime fixes.

@@ -102,7 +102,7 @@ struct PortEngineTests {
         }
         let markdown = result.workOrder.markdown()
         #expect(markdown.contains("App Resizability"))
-        #expect(markdown.contains("Done when"))
+        #expect(markdown.contains("Static acceptance only"))
     }
 
     @Test("apply writes the safe edits and touches nothing else")

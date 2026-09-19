@@ -99,6 +99,7 @@ def main(paths) -> int:
         findings = [
             {
                 "severity": f["severity"],
+                **({"confidence": f["confidence"]} if "confidence" in f else {}),
                 "check": f["check"],
                 "message": f["message"],
                 "file": f.get("file", "app-wide") + (f":{f['line']}" if f.get("line") else ""),

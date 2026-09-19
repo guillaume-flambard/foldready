@@ -130,6 +130,15 @@
       "line": 5,
       "message": "UIScreen.main.bounds is a fixed geometry read; use the view's own bounds or the window scene.",
       "requires_confirmation": true,
+      "review": {
+        "check_evidence": "2 of 2 UI file(s) use fixed geometry",
+        "human_priority": null,
+        "next_step": "Inspect the located layout in its target and resize the affected journey. Record clipping, intentional fixed sizes and expected behavior before proposing a change.",
+        "rationale": "The detector reported this signal; confidence describes the match, not a reproduced defect. Confirm target membership and context.",
+        "reference": "https://developer.apple.com/videos/play/wwdc2026/278/",
+        "runtime_status": "not_tested",
+        "status": "hypothesis_to_review"
+      },
       "severity": "major"
     },
     {
@@ -139,6 +148,15 @@
       "file": "Info.plist",
       "message": "Info.plist declares only portrait orientations, locking the app to one shape so it cannot use the full canvas when the scene is wider.",
       "requires_confirmation": true,
+      "review": {
+        "check_evidence": "0 of 1 orientation site(s) adapt to the scene",
+        "human_priority": null,
+        "next_step": "Confirm the declaration belongs to the reviewed target and inspect branch intent. Test the affected journey across scene sizes and rotation.",
+        "rationale": "The detector reported this signal; confidence describes the match, not a reproduced defect. Confirm target membership and context.",
+        "reference": "https://developer.apple.com/documentation/bundleresources/information-property-list/uisupportedinterfaceorientations",
+        "runtime_status": "not_tested",
+        "status": "hypothesis_to_review"
+      },
       "severity": "major"
     },
     {
@@ -149,6 +167,15 @@
       "line": 9,
       "message": "Hardcoded frame larger than a control: it will not reflow when the scene changes width.",
       "requires_confirmation": true,
+      "review": {
+        "check_evidence": "2 of 2 UI file(s) use fixed geometry",
+        "human_priority": null,
+        "next_step": "Inspect the located layout in its target and resize the affected journey. Record clipping, intentional fixed sizes and expected behavior before proposing a change.",
+        "rationale": "The detector reported this signal; confidence describes the match, not a reproduced defect. Confirm target membership and context.",
+        "reference": "https://developer.apple.com/videos/play/wwdc2026/278/",
+        "runtime_status": "not_tested",
+        "status": "hypothesis_to_review"
+      },
       "severity": "minor"
     },
     {
@@ -159,6 +186,15 @@
       "line": 7,
       "message": "Layout branching on the device idiom; a resizable scene is described by its size class, not by whether it is a phone or a tablet.",
       "requires_confirmation": true,
+      "review": {
+        "check_evidence": "1 of 2 UI file(s) free of device-idiom branching",
+        "human_priority": null,
+        "next_step": "Confirm the declaration belongs to the reviewed target and inspect branch intent. Test the affected journey across scene sizes and rotation.",
+        "rationale": "The detector reported this signal; confidence describes the match, not a reproduced defect. Confirm target membership and context.",
+        "reference": "https://developer.apple.com/documentation/uikit/uidevice/userinterfaceidiom",
+        "runtime_status": "not_tested",
+        "status": "hypothesis_to_review"
+      },
       "severity": "minor"
     },
     {
@@ -168,10 +204,49 @@
       "file": "Feed.swift",
       "message": "Scroll or selection state is not preserved; a scene resize can rebuild the hierarchy and lose it.",
       "requires_confirmation": true,
+      "review": {
+        "check_evidence": "0 of 1 stateful view file(s) preserve state",
+        "human_priority": null,
+        "next_step": "Set selection, scroll and input state, then resize and revisit the journey. Record any loss before proposing restoration changes.",
+        "rationale": "The detector reported this signal; confidence describes the match, not a reproduced defect. Confirm target membership and context.",
+        "reference": "https://developer.apple.com/documentation/swiftui/scenestorage",
+        "runtime_status": "not_tested",
+        "status": "hypothesis_to_review"
+      },
       "severity": "minor"
     }
   ],
   "grade": "D",
+  "review": {
+    "coverage_note": "Swift UI source, plist declarations and project metadata only; no target membership, declaration scope, generated build settings, Objective-C implementation or linked SDK resolution. Exclusions and unreadable files limit coverage. Screenshots cannot establish behavior or cause.",
+    "effort_note": "Unvalidated heuristic hours; not measured delivery time, a quote or a commitment.",
+    "effort_status": "unvalidated_estimate",
+    "order_note": "Tool-proposed review order follows severity, then check and location. Human priority is not assessed; confirm relevance and journey impact first.",
+    "runtime_checks": [
+      {
+        "check": "Record Xcode, linked SDK, simulator or device, build and tested app version.",
+        "status": "not_tested"
+      },
+      {
+        "check": "Test agreed critical journeys on outer and inner displays, including open/close transitions.",
+        "status": "not_tested"
+      },
+      {
+        "check": "Test partial folding, rotation and Split View; check asymmetric safe areas and controls near cameras and hinge.",
+        "status": "not_tested"
+      },
+      {
+        "check": "Verify selection, scroll position, input and navigation state survive resizing.",
+        "status": "not_tested"
+      },
+      {
+        "check": "Separate reproduced defects from optional sidebar or arrangement improvements.",
+        "status": "not_tested"
+      }
+    ],
+    "score_note": "Versioned heuristic summary, not a readiness threshold. Compare only the same contract, engine and coverage.",
+    "status": "awaiting_human_review"
+  },
   "risk": "high",
   "schema_version": 5,
   "score": 41,

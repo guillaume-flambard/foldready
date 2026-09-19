@@ -9,7 +9,7 @@ enum HTMLReport {
         let findings = result.findings.isEmpty
             ? "<p class=\"ok\">No source or screenshot signals detected. Runtime compatibility is unverified.</p>"
             : "<table><thead><tr><th>Severity</th><th>Confidence</th><th>Check</th><th>Finding</th><th>File</th></tr></thead><tbody>"
-                + result.findings.map { findingRow($0) }.joined(separator: "\n")
+                + result.findings.map { findingRow($0, in: result) }.joined(separator: "\n")
                 + "</tbody></table>"
         // The unlexable count is shown only when it is non-zero: such a file is excluded
         // from scoring, so the report must say so rather than read as if the tree were read.
@@ -26,8 +26,8 @@ enum HTMLReport {
             .map { "\($0.1) \($0.0)" }
             .joined(separator: " · ")
         let summaryCards = [
-            "<div class=\"card\"><div class=\"k\">Risk</div><div class=\"v\">\(result.risk)</div></div>",
-            "<div class=\"card\"><div class=\"k\">Est. porting effort</div><div class=\"v\">\(result.hoursEstimate) h</div></div>",
+            "<div class=\"card\"><div class=\"k\">Heuristic risk</div><div class=\"v\">\(result.risk)</div></div>",
+            "<div class=\"card\"><div class=\"k\">Unvalidated effort estimate</div><div class=\"v\">\(result.hoursEstimate) h</div></div>",
             "<div class=\"card\"><div class=\"k\">Swift files</div><div class=\"v\">\(result.stats.swiftFiles)</div></div>",
             result.stats.failedFiles > 0
                 ? "<div class=\"card\"><div class=\"k\">Files the lexer could not read</div><div class=\"v\">\(result.stats.failedFiles)</div></div>"
@@ -54,7 +54,7 @@ enum HTMLReport {
         </div>
         """
         let provisional = result.scoreIsProvisional
-            ? "<p class=\"prov\">This score is provisional: the app opts out of a resizable scene, so the layout it measures never gets the canvas.</p>"
+            ? "<p class=\"prov\">This score is provisional: source declares a resizable-scene opt-out. Confirm the active target configuration.</p>"
             : ""
 
         let f = ISO8601DateFormatter()
@@ -115,7 +115,7 @@ enum HTMLReport {
             <img src="data:image/svg+xml;base64,\(logoBase64())" alt="FoldReady mark">
             <div>
               <h1>\(esc(result.appName))</h1>
-              <div class="sub">Fold-Ready audit · \(f.string(from: result.generatedAt))</div>
+              <div class="sub">Source review input · engine \(foldreadyVersion), contract v\(resultSchemaVersion) · \(f.string(from: result.generatedAt))</div>
             </div>
             <div class="scorebox">
               <div class="score">\(Int(result.totalScore))</div>
@@ -124,7 +124,8 @@ enum HTMLReport {
           </header>
 
           <p class="prov">\(esc(Evidence.summary))</p>
-          <h2>Runtime checks still required</h2>
+          <p>\(esc(ReviewContext.scoreNote))</p>
+          <h2>Runtime validation: not tested</h2>
           <ul>\(Evidence.runtimeChecksRequired(surfaceChecks: result.advisoryRuntimeChecks).map { "<li>\(esc($0))</li>" }.joined())</ul>
           \(blockers)
           \(provisional)
@@ -134,12 +135,17 @@ enum HTMLReport {
             \(summaryCards)
           </div>
 
-          <h2>Score breakdown</h2>
+          <p>\(esc(ReviewContext.effortNote))</p>
+          <h2>Coverage limits</h2>
+          <p>\(esc(ReviewContext.coverageNote))</p>
+          <p>\(result.stats.uiFiles) UI files of \(result.stats.swiftFiles) Swift files; \(result.stats.excludedFiles) excluded; \(result.stats.failedFiles) unreadable.</p>
+          <h2>Versioned score breakdown</h2>
           <div class="bars">
             \(outcomes)
           </div>
 
-          <h2>Findings</h2>
+          <h2>Hypotheses to review</h2>
+          <p>\(esc(ReviewContext.orderNote))</p>
           \(findings)
 
           \(advisorySection(result))
@@ -204,10 +210,14 @@ enum HTMLReport {
         return "Apple · \(tail.split(separator: "/").last.map(String.init) ?? tail)"
     }
 
-    private static func findingRow(_ f: Finding) -> String {
-        let file = f.file.map { esc($0) } ?? "—"
+    private static func findingRow(_ f: Finding, in result: AuditResult) -> String {
+        let file = f.file.map { esc($0) } ?? "project-wide"
         let line = f.line.map { ":\($0)" } ?? ""
-        return "<tr><td class=\"sev \(f.severity.rawValue)\">\(f.severity.rawValue)</td><td class=\"conf\">\(f.confidence.rawValue)</td><td>\(esc(f.check))</td><td>\(esc(f.message))</td><td><code>\(file)\(line)</code></td></tr>"
+        let context = ReviewContext.finding(f, in: result)
+        let evidence = context["check_evidence"] as? String ?? "No check-level evidence available."
+        let rationale = context["rationale"] as? String ?? ""
+        let kind = f.check == "captured-layout" ? "Screenshot signal" : "Static signal"
+        return "<tr><td class=\"sev \(f.severity.rawValue)\">\(f.severity.rawValue)</td><td class=\"conf\">\(f.confidence.rawValue)</td><td>\(esc(f.check))</td><td><b>\(kind):</b> \(esc(f.message))<p><b>Detector evidence:</b> \(esc(evidence))</p><p>\(esc(rationale))</p><p><b>Next verification:</b> \(esc(ReviewContext.nextStep(for: f.check)))</p><p>Runtime: not tested. Human priority: not assessed.</p></td><td><code>\(file)\(line)</code></td></tr>"
     }
 
     private static func logoBase64() -> String {

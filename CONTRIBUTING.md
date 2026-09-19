@@ -1,20 +1,17 @@
 # Contributing to FoldReady
 
-FoldReady audits and ports iOS apps for the iPhone Fold. It is built on the
-**public** iOS 27 contract (UIScene lifecycle mandate, Parallel View opt-in,
-adaptive layout, `NavigationSplitView` + `.adaptiveSidebar`). The internal
-`foldState` / `angleDegrees` strings are NOT public API and are never a port
-target — contributions that rely on them are rejected.
+FoldReady provides source evidence for a scoped human review of iOS apps. The immediate
+focus is the first paid review, as defined in [the roadmap](docs/roadmap.md).
 
 ## What's most useful right now
 
-- **New audit checks**: signals that a real codebase trips, backed by a
-  `Sources/foldready/AuditEngine.swift` check + a unit test fixture.
-- **New or improved port transforms** in `Sources/foldready/Port/Transforms.swift`:
-  safe, review, or manual tier; never break code silently; always produce a
-  reviewable diff.
-- **Edge-case tests** in `Tests/foldreadyTests/` for the lexer and transforms.
-- **Web** (`web/`): the Next.js app, design-system fidelity, accessibility.
+- Fix misleading outputs and retain evidence, confidence and coverage limits.
+- Protect the versioned result contract and existing gate behavior.
+- Test false positives and clearly separate static acceptance from runtime observations.
+- Keep website claims consistent with the review's measured coverage.
+
+New checks, port transforms and platform expansion are deferred until buyer evidence
+justifies them.
 
 ## Getting started
 
@@ -22,7 +19,7 @@ target — contributions that rely on them are rejected.
 git clone https://github.com/guillaume-flambard/foldready.git
 cd foldready
 swift build
-swift test          # 17 tests, all green
+swift test
 ./Scripts/check.sh  # build + tests + web build
 ```
 

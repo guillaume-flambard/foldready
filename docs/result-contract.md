@@ -33,15 +33,15 @@ rather than reporting the rebalance as a regression.
 | `app` | string | App name, from `--name` or the folder name. |
 | `generated_at` | string | ISO 8601 timestamp. The only field that changes between two runs of an unchanged tree. |
 | `score` | number | Total, 0-100, rounded. Equal to the weighted sum of the checks. |
-| `grade` | string | `A` >= 85, `B` >= 65, `C` >= 45, `D` >= 25, `F` below 25. Absolute meanings, not ranks: A adapts on every axis measured; B adapts on most; C reads the scene somewhere; D barely; F not at all. On the calibration corpus this gives A=0, B=1, C=4, D=10, F=5. |
-| `risk` | string | `high` whenever a blocker stops launch, else `low` (>= 70), `medium` (45-69), `high` (< 45). |
-| `estimated_porting_hours` | number | Effort estimate, rounded to the half hour. |
+| `grade` | string | `A` >= 85, `B` >= 65, `C` >= 45, `D` >= 25, `F` below 25. Heuristic source score bands only, not behavior or compatibility grades. |
+| `risk` | string | `high` whenever a conditional launch signal exists, else `low` (>= 70), `medium` (45-69), `high` (< 45). |
+| `estimated_porting_hours` | number | Unvalidated heuristic estimate, rounded to the half hour; not measured effort or a delivery promise. |
 | `blockers` | array | Binary facts with a consequence, outside the score. See below. |
 | `score_is_provisional` | boolean | True when the app opted out of a resizable scene, so the quality score describes code that never gets the canvas. |
 | `stats` | object | `swift_files`, `ui_files`, `excluded_files`, `swiftui_files`, `uikit_files`, `xib_or_storyboard`, `info_plists`, `failed_files`, and one count per exclusion reason: `excluded_tests`, `excluded_vendored`, `excluded_generated`, `excluded_by_config`. |
 | `build` | object | Literal toolchain values read from `project.pbxproj`. See below. |
 | `checks` | array | One entry per check, see below. |
-| `findings` | array | Located problems, see below. |
+| `findings` | array | Located source or screenshot hypotheses, see below. |
 | `advisory` | array | Duo surface questions. Never scored. See below. |
 
 ## `checks[]`
@@ -63,8 +63,8 @@ change in the audited app.
 Current keys and base weights: `adaptive-layout` 0.35, `navigation` 0.20,
 `adaptive-geometry` 0.15, `build-toolchain` 0.10, `state` 0.10, `idiom` 0.10,
 `orientation` 0.10, plus `captured-layout` 0.20 when screenshots are supplied. A check that
-does not apply to an app — no lists to preserve state in, no navigation container to adapt,
-no Xcode project file to read, no orientation declared anywhere — drops out entirely and its
+does not apply to an app (no lists to preserve state in, no navigation container to adapt,
+no Xcode project file to read, no orientation declared anywhere) drops out entirely and its
 weight is spread over the rest, so the reported weights always sum to 1.
 
 ## `build`
@@ -87,39 +87,39 @@ not proof that a shipped binary fails.
 
 ## `blockers[]`
 
-Binary, verifiable facts with a stated consequence. They are reported before the score and
-never contribute a weighted percentage, because averaging "this app does not launch" into a
-number turns a consequence into a school mark.
+Conservative source assessments with conditional consequences. They are reported before
+the score and never contribute a weighted percentage. Confirm the relevant target, build
+configuration and linked SDK before asserting a consequence. These are not observed failures.
 
 | Field | Type | Meaning |
 |---|---|---|
 | `id` | string | `scene-lifecycle-missing` or `full-screen-opt-out`. |
 | `title` | string | Short label. |
-| `consequence` | string | What happens to the app. |
+| `consequence` | string | Conditional consequence to confirm. |
 | `reference` | string | Apple source. |
 | `stops_launch` | boolean | Conditional consequence if the source signal is confirmed and the relevant SDK requirement applies; not an observed launch failure. |
 | `file` | string, optional | Where it was found, when the fact is a declaration. |
 
 ## How each check is computed
 
-- **`adaptive-layout`** — `1 / (1 + d/0.03)` where `d` is the share of UI files reading
+- **`adaptive-layout`**: `1 / (1 + d/0.03)` where `d` is the share of UI files reading
   fixed screen geometry or declaring a frame larger than a control. A soft decay rather
   than a share (which was near-constant on the corpus) or a threshold (which put a cliff at
   the anchor). 3% of UI files affected halves the check.
-- **`adaptive-geometry`** — coverage only. Size-class and effective-geometry reads against a
+- **`adaptive-geometry`**: coverage only. Size-class and effective-geometry reads against a
   target of 2% of UI files. An app that reads no geometry receives full credit: standard
   containers can adapt without explicit geometry code, so the absence of a read is a missing
   signal rather than a defect. Device-idiom and interface-orientation branching are no longer
   folded in here; they are scored by the `idiom` and `orientation` checks.
 - **`navigation`**: standard navigation sites divided by standard plus legacy sites. NavigationStack, NavigationSplitView, TabView and UIKit navigation containers receive credit without a sidebar. Legacy NavigationView is a review signal, not an observed defect.
-- **`state`** — stateful view files that preserve scroll or selection, over stateful view
+- **`state`**: stateful view files that preserve scroll or selection, over stateful view
   files. Near zero across the corpus today: a frontier signal at a low weight, not a
   broken check.
-- **`idiom`** — share of UI files free of `UIDevice.current.userInterfaceIdiom` branching. A
+- **`idiom`**: share of UI files free of `UIDevice.current.userInterfaceIdiom` branching. A
   branch describes a device, not the canvas the scene actually receives, which a resizable
   scene is free to reshape. The finding is `medium` confidence because a deliberate
   phone-only screen is invisible to a source scan.
-- **`orientation`** — supported interface orientations, read from `Info.plist` and from
+- **`orientation`**: supported interface orientations, read from `Info.plist` and from
   source. A plist that declares only portrait orientations is a `major`, `high`-confidence
   finding: it locks the app to one shape, so it cannot use the wider canvas. A source branch
   on `interfaceOrientation` is a `minor`, `high`-confidence finding. The check does not apply
@@ -145,9 +145,9 @@ measurements would otherwise draw the wrong conclusion:
 
 - **Adaptive geometry stopped penalising zero reads.** Through v4 the check was half
   coverage and half purity, so an app that read no size class at all scored low. In v5 it is
-  coverage-only and keeps the "absence is not scored zero" guard, so the same app now scores
+  coverage-only and keeps the absence-is-not-scored-zero guard, so the same app now scores
   100. isowords scores 100 on "0 of 99 UI file(s) read size classes"; MovieSwiftUI 100 on
-  "0 of 91"; Dime 100 on "0 of 80"; Open Food Facts 100 on "0 of 102". Those were among the
+  `0 of 91`; Dime 100 on `0 of 80`; Open Food Facts 100 on `0 of 102`. Those were among the
   lowest-scoring apps before.
 - **The two new checks default high.** Interface idiom scores 95 to 100 for almost every
   tree, because few apps branch on `userInterfaceIdiom`; orientation scores 100 wherever a
@@ -164,7 +164,7 @@ Duo.
 | `check` | string | The `key` of the check that produced it. |
 | `severity` | string | `critical`, `major`, `minor`, `info`. How bad the finding would be if true. |
 | `confidence` | string | `high`, `medium`, `low`. How sure the audit is the finding is real, independent of severity. A match whose meaning depends on context the audit cannot see is `medium` or `low`, never `high`. |
-| `message` | string | What is wrong and what to do instead. |
+| `message` | string | Detector interpretation to review, not an observed defect. |
 | `file` | string, optional | Repository-relative path. Absent for project-wide findings; a screenshot finding carries the image file name. |
 | `line` | integer, optional | 1-based. |
 
@@ -341,3 +341,29 @@ versions rather than comparing an incomparable number. Regenerate the baseline w
 Sources: [Modernize your UIKit app](https://developer.apple.com/videos/play/wwdc2026/278/),
 [UIDevice.userInterfaceIdiom](https://developer.apple.com/documentation/uikit/uidevice/userinterfaceidiom),
 and [UISupportedInterfaceOrientations](https://developer.apple.com/documentation/bundleresources/information-property-list/uisupportedinterfaceorientations).
+
+## Additive review context (19 September 2026, contract v5 unchanged)
+
+No score, weight, grade, risk calculation, confidence value, gate policy or existing key
+changes. The following fields are optional for consumers and absent in older v5 results.
+Absence means review context unavailable, never passed or reviewed.
+
+- Top-level `review`: `status` is `awaiting_human_review`; `score_note`, `effort_note`,
+  `order_note` and `coverage_note` describe interpretation limits. `effort_status` is
+  `unvalidated_estimate`. `runtime_checks` reuses the required checks, each with `check`
+  text and `status: not_tested`. These are scanner assertions about its coverage, not an
+  import of `capture.json` or a human test record. A launch screenshot does not complete them.
+- Each finding's optional `review`: `status: hypothesis_to_review`, `human_priority: null`,
+  `runtime_status: not_tested`, `rationale` and check-specific `next_step`. Where a matching
+  check exists, `check_evidence` reuses its summary and `reference` reuses its source. The
+  existing file/line/message and `checks[].signals` provide the underlying detector evidence;
+  the scanner does not fabricate source excerpts or resolve target membership.
+
+The existing deterministic finding order proposes an inspection sequence only. Human
+priority, applicability, reviewed evidence and observed results belong in the separate
+[review worksheet](readiness-review.md), with reviewer and date. Blockers and advisory
+questions retain their existing locations, references and conditional evidence labels.
+
+Work-order text also labels static acceptance and unvalidated order. `verify` skips
+acceptance and score comparisons when the saved work order has a different or missing
+contract version. Same-contract statuses describe static acceptance, not a reproduced fix.

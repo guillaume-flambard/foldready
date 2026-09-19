@@ -1,8 +1,10 @@
 # FoldReady
 
-Free, local source analysis for iOS apps, plus scoped human readiness reviews for iPhone Duo.
+Human reviews of iOS source signals, critical journeys and test coverage, supported by a free local scanner.
 The scanner identifies candidate issues, supports CI policies and prepares work orders.
-It does not certify device compatibility. Scores and effort estimates are heuristics.
+The paid deliverable is the reviewed evidence and priorities. Device compatibility is not
+certified. Scores are versioned summaries; hour estimates remain unvalidated.
+See the [current plan](docs/roadmap.md) and [delivery scope](docs/readiness-review.md).
 
 ## Apple announcements, checked 18 September 2026
 
@@ -80,7 +82,10 @@ Margins may reflect intentional design or system compatibility presentation. The
 not proof of a hardcoded layout. `verify --build` captures one simulator launch screenshot,
 prefers a Duo device type if installed, and records the selected device/runtime and linked
 SDK in `capture.json`. It does not exercise poses, transitions or critical journeys.
-Reports always carry a list of runtime checks still needed.
+Reports always carry a list of runtime checks still needed, marked not tested. The additive
+`review` context in JSON and the HTML report provide detector evidence, next verification
+and explicit coverage limits. The tool proposes an order; human priorities remain unassessed
+until a reviewer records relevance and journey impact in the delivery worksheet.
 
 The older `Scripts/capture.sh` helper also captures a selected simulator, not a Duo test
 matrix. Its device/runtime defaults are generic and may need local overrides.
@@ -93,8 +98,8 @@ every finding a confidence level the gate can act on, and moves exclusions into
 fails a `baseline-contract` rule naming both versions; rewrite it deliberately after review.
 The Duo surface
 questions sit in a separate `advisory` array outside the score: they cannot turn a gate red,
-and an empty advisory list does not make a passing run. Existing website rankings and reports
-are labelled historical until the source apps are re-audited.
+and an empty advisory list does not make a passing run. The index contains twenty v5 source audits. Cross-contract score increases are not evidence
+of app improvements.
 
 Policy lives in `.foldready.json`; no policy means report-only:
 

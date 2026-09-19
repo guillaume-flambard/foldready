@@ -55,7 +55,7 @@ export function WeakChips({ app }: { app: AppScore }) {
     .filter((k) => val(k) < 70)
     .sort((a, b) => val(a) - val(b))
     .slice(0, 3);
-  if (weak.length === 0) return <span className="chip ready">all checks pass</span>;
+  if (weak.length === 0) return <span className="chip ready">no displayed check below 70; untested</span>;
   return (
     <>
       {weak.map((k) => (
@@ -81,12 +81,12 @@ export function ScoreCard({ app, rank }: { app: AppScore; rank: number }) {
         </div>
       </div>
       <div className="stats">
-        <span>Risk<b>{app.risk}</b></span>
-        <span>Port<b>{app.hours}h</b></span>
+        <span>Heuristic risk<b>{app.risk}</b></span>
+        <span>Unvalidated estimate<b>{app.hours}h</b></span>
         <span style={{ marginLeft: "auto" }}><GradeChip grade={app.grade} /></span>
       </div>
       {blocking.length > 0 && (
-        <p className="blockline">Does not launch on the iOS 27 SDK: {blocking.map((b) => b.title.toLowerCase()).join(", ")}</p>
+        <p className="blockline">Potential lifecycle signal; confirm target and SDK: {blocking.map((b) => b.title.toLowerCase()).join(", ")}</p>
       )}
       <div className="checks"><WeakChips app={app} /></div>
       <a className="go" href={`/report/${app.slug}`}>Full Fold-Ready report</a>
