@@ -14,10 +14,7 @@ private func writeTree(_ files: [String: String], in parent: URL) -> String {
 }
 
 private func tempTree() -> URL {
-    let url = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-duo-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-    return url
+    TestTemporaryDirectory.make("duo")
 }
 
 private func project(generation: Int) -> String {

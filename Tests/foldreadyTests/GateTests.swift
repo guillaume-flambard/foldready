@@ -3,10 +3,7 @@ import Foundation
 @testable import foldready
 
 private func tempDir() -> URL {
-    let url = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-gate-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-    return url
+    TestTemporaryDirectory.make("gate")
 }
 
 /// Writes a tree of files, creating intermediate directories, and returns its root path.
@@ -22,10 +19,7 @@ private func writeTree(_ files: [String: String], in parent: URL) -> String {
 }
 
 private func tempTree() -> URL {
-    let url = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-gate-tree-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-    return url
+    TestTemporaryDirectory.make("gate-tree")
 }
 
 /// A result with the given total and per-check scores, built without touching the disk.

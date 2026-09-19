@@ -3,9 +3,7 @@ import Foundation
 @testable import foldready
 
 private func tree(_ files: [String: String]) -> String {
-    let dir = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-wo-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let dir = TestTemporaryDirectory.make("wo")
     for (name, content) in files {
         let url = dir.appendingPathComponent(name)
         try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
@@ -160,8 +158,8 @@ struct WorkOrderTests {
         let result = AuditEngine.run(root: tree(unreadyApp), appName: "Unready")
         let order = WorkOrderBuilder.build(from: result)
 
-        let path = FileManager.default.temporaryDirectory
-            .appendingPathComponent("work-order-\(UUID().uuidString).json").path
+        let path = TestTemporaryDirectory.make("work-order")
+            .appendingPathComponent("order.json").path
         try order.json().write(toFile: path, atomically: true, encoding: .utf8)
 
         let reloaded = try #require(WorkOrder.load(path: path))

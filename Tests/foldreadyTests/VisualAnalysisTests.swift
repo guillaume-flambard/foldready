@@ -20,9 +20,7 @@ private func write(_ img: CGImage, to url: URL) {
 }
 
 private func tempPNG(_ name: String, draw: (CGContext) -> Void) -> String {
-    let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fr-tests", isDirectory: true)
-    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-    let url = dir.appendingPathComponent(name)
+    let url = TestTemporaryDirectory.make("visual").appendingPathComponent(name)
     let ctx = makeContext(w: 400, h: 800)
     draw(ctx)
     write(ctx.makeImage()!, to: url)

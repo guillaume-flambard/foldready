@@ -3,9 +3,7 @@ import Foundation
 @testable import foldready
 
 private func fixture(_ files: [String: String]) -> String {
-    let dir = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-edge-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let dir = TestTemporaryDirectory.make("edge")
     for (name, content) in files {
         let target = dir.appendingPathComponent(name)
         try? FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)

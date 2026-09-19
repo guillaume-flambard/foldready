@@ -3,9 +3,7 @@ import Foundation
 @testable import foldready
 
 private func tree(_ files: [String: String]) -> String {
-    let dir = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-score-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let dir = TestTemporaryDirectory.make("score")
     for (name, content) in files {
         let url = dir.appendingPathComponent(name)
         try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
@@ -212,9 +210,7 @@ struct ScoringTests {
 
     @Test("A policy can forbid blockers without setting a score floor")
     func policyForbidsBlockers() throws {
-        let dir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("fr-policy-\(UUID().uuidString)", isDirectory: true)
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let dir = TestTemporaryDirectory.make("policy")
         let path = dir.appendingPathComponent(GatePolicy.defaultFileName).path
         try #"{ "forbid_blockers": true }"#.write(toFile: path, atomically: true, encoding: .utf8)
         let policy = try #require(try GatePolicy.load(path: path))

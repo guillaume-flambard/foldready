@@ -16,10 +16,7 @@ private func writeTree(_ files: [String: String], in parent: String) -> String {
 }
 
 private func tempTree() -> String {
-    let url = FileManager.default.temporaryDirectory
-        .appendingPathComponent("fr-exclusions-\(UUID().uuidString)", isDirectory: true)
-    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-    return url.path
+    TestTemporaryDirectory.make("exclusions").path
 }
 
 @Suite("Exclusions")
