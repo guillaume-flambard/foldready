@@ -18,7 +18,7 @@ This design-system workspace was created from an existing Open Design project. T
   "kind": "other",
   "nameSource": "prompt",
   "linkedDirs": [
-    "/Users/memo/projects/foldready"
+    "/Users/memo/projects/tools/foldready"
   ]
 }
 ```

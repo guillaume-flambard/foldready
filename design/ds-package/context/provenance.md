@@ -11,7 +11,7 @@ file records what was extracted, where, and what was deliberately preserved.
 - New design-system project id: `f49dbfb9-cba7-41e0-995f-eb5523605ac4`
 - New design-system id: `user:master-prompt-foldready-design-system-paste`
 - Source skill / design system: (none)
-- Linked source dir: `/Users/memo/projects/foldready`
+- Linked source dir: `/Users/memo/projects/tools/foldready`
 
 ## Copied source files (preserved, unmodified)
 
