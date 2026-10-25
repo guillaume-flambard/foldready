@@ -32,13 +32,16 @@ The first demo must be a **pinned, buildable fixture** (e.g. an app built specif
 
 Test only configurations the environment really supports; `not_tested` and `not_applicable` (with reason) are valid outcomes, not failures.
 
-## C. Pose matrix — initial state, all Not tested
+## C. Verified coverage matrix — 25 October 2026
 
 | Journey | Closed outer | Open inner | Open→close transition | Partially folded | Rotation | Split View | Keyboard | Vertical bar/overflow |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Form and draft | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested |
-| List selection | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested |
-| Navigation/actions | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested |
+| **Synthetic button-driven form value** (`Ada`) | **Passed** (0°) | **Passed** (180°) | **Passed** (0→180→0°) | Not tested | **Failed/not demonstrated** (XCTest command did not rotate geometry) | Not tested | Not tested | Not tested |
+| **Typed draft / keyboard focus** | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested |
+| **List selection and scroll** | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested |
+| **Multi-column navigation/actions** | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested | Not tested |
+
+Only the first row's closed/open/transition result is supported by [the completed synthetic Appium run](duo-hinge-proof-2026-10-25.md). Form state was set by a **button**, not by typing; keyboard continuity must **not** inherit this result. The separate [XCTest rotation run](https://github.com/guillaume-flambard/foldready/actions/runs/40220878657) did not observe a landscape window; this is **not demonstrated**, not proof that the app loses state during real rotation.
 
 Camera direction, scene accessories, hinge interaction and additional windows are **conditional** tests for apps actually using those features. Do not call them universal blockers. System navigation is expected to adapt automatically in many well-structured apps; test the risky custom surface rather than manufacture feature demands. [Apple HIG](https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo), [bars](https://developer.apple.com/videos/play/tech-talks/111462/), [multiple scenes](https://developer.apple.com/videos/play/tech-talks/111464/).
 
@@ -114,4 +117,4 @@ Use Xcode 27.1+, XCUITest driver 12.17.0+ and WebDriverAgent 16.14.2+, pinned by
 
 Appium's extension has only been tested by its maintainers on a **simulator**, not proven here on a physical Duo. Further poses, Split View, keyboard, camera and physical-device observations stay `not_tested` until independently executed. No private customer source or screenshots belong in public workflow artifacts.
 
-**Exit gate:** one recorded working fixture with at least the form or list pose transition, evidence artifacts, machine/app provenance, and clear “not tested” remaining rows. Until then, the runtime-validation offer is **not** a verified shipped capability.
+**First technical exit gate: passed.** A synthetic form transition has a real observed angle cycle, accessible state checks, device/build provenance and three visual captures. **Remaining before claiming a general runtime-validation service:** repeat this level of evidence for a list/selection journey and adaptive multi-column navigation, investigate the outstanding rotation limitation, and measure human setup time and client-specific scope. Neither simulator success nor this matrix constitutes physical-device certification or demonstrated demand.
