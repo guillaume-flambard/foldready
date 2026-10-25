@@ -36,6 +36,14 @@ export default function LandingPage() {
         <p className="spec" style={{ marginTop: 18 }}>Historical source review only; exact app revision not pinned; no Duo runtime verdict.{" "}
           <a href="https://github.com/guillaume-flambard/foldready/blob/main/docs/sample-review.md">See the full annotated example</a>.
         </p>
+        <p className="spec" style={{ marginTop: 8 }}>
+          Executed synthetic-app evidence: an iOS 27 UIKit launch crash fixed with UIScene,
+          followed by a real passing foreground interaction test.{" "}
+          <a href="https://github.com/guillaume-flambard/foldready/blob/main/docs/ios27-scene-runtime-case-study.md">
+            Read the verified before/after case study
+          </a>.
+          This is not a Duo folding test or a client success story.
+        </p>
       </section>
       <section className="block" id="how">
         <div className="sec-head-land">
