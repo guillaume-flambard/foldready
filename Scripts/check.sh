@@ -15,6 +15,9 @@ python3 -m unittest discover -s Tests/continuity -v
 # Every scored check must cite an Apple source (openspec/specs/evidence/sourcing).
 # The runtime test asserts the emitted references; this catches a new check at the source,
 # before anyone runs it.
+echo "==> public site smoke parser (offline)"
+python3 -m unittest discover -s Tests/site -v
+
 echo "==> sourcing (every check cites Apple)"
 python3 Scripts/sourcing-check.py
 

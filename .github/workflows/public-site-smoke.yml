@@ -1,0 +1,21 @@
+name: public-site-smoke
+
+# GitHub Pages deployment != VPS publication. Run independently against the
+# actual production host so a green Pages job is never misreported as VPS proof.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Verify foldready.memolabs.dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check public FoldReady export
+        run: python3 Scripts/check-public-site.py
