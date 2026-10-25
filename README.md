@@ -16,6 +16,8 @@ See the [current plan](docs/roadmap.md), [delivery scope](docs/readiness-review.
 
 The earlier **18 September 2026** announcement/inventory notes are superseded by this dated status. Neither historical source audits nor the continuity prototype have been validated through real Duo folding.
 
+**Local simulator update (25 October, 17:22 UTC):** Apple's iOS 27.1 simulator runtime is now installed on the owner's Mac, and a Duo CoreSimulator instance has **booted** successfully. The earlier absence of a runtime is historical. FoldReady itself has **not** been tested on Duo; see [the dated preflight evidence](docs/duo-preflight-2026-10-25.md) and [the still-unexecuted test matrix](docs/duo-runtime-evidence-protocol.md).
+
 ## Product and offer
 
 - **Free CLI:** source signals, optional screenshot heuristics, JSON/HTML reports, CI policies and work orders.
