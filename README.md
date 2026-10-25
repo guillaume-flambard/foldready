@@ -4,7 +4,7 @@ Human reviews of iOS source signals, critical journeys and test coverage, suppor
 The scanner identifies candidate issues, supports CI policies and prepares work orders.
 The paid deliverable is the reviewed evidence and priorities. Device compatibility is not
 certified. Scores are versioned summaries; hour estimates remain unvalidated.
-See the [current plan](docs/roadmap.md) and [delivery scope](docs/readiness-review.md).
+See the [current plan](docs/roadmap.md), [delivery scope](docs/readiness-review.md), [research-led offer decision (25 October 2026)](docs/market-and-offer-2026-10-25.md), and [sample human review](docs/sales-one-pager.md).
 
 ## iPhone Duo — platform status (checked 25 October 2026)
 
