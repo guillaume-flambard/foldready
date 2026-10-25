@@ -172,7 +172,7 @@ jobs:
           evidence["runtime_test_evidence"] = ["ui-test.log", "duo-ui-smoke.xcresult"]
           evidence["fold_unfold_transition"] = "not_tested"
           evidence["physical_device"] = "not_tested"
-          manifest_path.write_text(json.dumps(evidence, indent=2) + "\\n")
+          manifest_path.write_text(json.dumps(evidence, indent=2))
           print(json.dumps(evidence, indent=2))
           PY
 
