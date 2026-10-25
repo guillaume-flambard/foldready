@@ -7,19 +7,20 @@ export function GetScoredForm() {
   const [repo, setRepo] = useState("");
   const [email, setEmail] = useState("");
   const [journeys, setJourneys] = useState("");
-  const [sent, setSent] = useState(false);
+  const [draftPrepared, setDraftPrepared] = useState(false);
+  const [reviewType, setReviewType] = useState<"source" | "validation">("source");
   const [copied, setCopied] = useState(false);
 
   const cliCmd = "foldready <local-source-directory> --json --open";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const subject = encodeURIComponent(`FoldReady readiness review: ${appName.trim() || "my app"}`);
+    const subject = encodeURIComponent(`FoldReady ${reviewType === "source" ? "source review" : "validation enquiry"}: ${appName.trim() || "my app"}`);
     const body = encodeURIComponent(
-      `App: ${appName.trim()}\nRepo / source: ${repo.trim()}\nEmail: ${email.trim()}\nCritical journeys: ${journeys.trim()}\n\nI would like to discuss the $349 readiness review. Please confirm the scope, test environments and delivery date before work starts.`
+      `Request type: ${reviewType === "source" ? "$349 human source review, no simulator test" : "Separate quote: runtime validation or corrections"}\nApp: ${appName.trim()}\nRepo / source: ${repo.trim()}\nEmail: ${email.trim()}\nCritical journeys: ${journeys.trim()}\n\nPlease agree scope, access, linked SDK, delivery date, testing capability and price before any paid work.`
     );
     window.location.href = `mailto:hello@memolabs.dev?subject=${subject}&body=${body}`;
-    setSent(true);
+    setDraftPrepared(true);
   }
 
   async function copyCmd() {
@@ -34,6 +35,13 @@ export function GetScoredForm() {
     <div className="gs-grid">
       <form className="gs-form" onSubmit={submit}>
         <label className="field">
+          <span>What do you need?</span>
+          <select value={reviewType} onChange={(e) => setReviewType(e.target.value as "source" | "validation")}>
+            <option value="source">Human source review — $349</option>
+            <option value="validation">Discuss Duo runtime testing or fixes — quote</option>
+          </select>
+        </label>
+        <label className="field">
           <span>App name</span>
           <input value={appName} onChange={(e) => setAppName(e.target.value)} placeholder="MyApp" required />
         </label>
@@ -46,9 +54,9 @@ export function GetScoredForm() {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" required />
         </label>
         <label className="field"><span>Up to three critical journeys</span><textarea value={journeys} onChange={(e) => setJourneys(e.target.value)} placeholder="For example: sign in, checkout, account settings" required /></label>
-        <button className="btn btn-pri" type="submit" style={{ width: "100%" }}>Prepare review request</button>
+        <button className="btn btn-pri" type="submit" style={{ width: "100%" }}>Open email draft</button>
         <p className="spec" style={{ marginTop: 10 }}>
-          Opens an email draft. Sending it requests a scope discussion; no payment is taken. You do not need to share private source code in this form.
+          Opens a draft in your mail app, not a submitted website form. No message is transmitted until you press Send, no payment is taken, and private source code is not required.
         </p>
       </form>
 
@@ -65,9 +73,9 @@ export function GetScoredForm() {
           Then: <code>foldready &lt;repo&gt; --open</code> opens the HTML report, and{" "}
           <code>foldready port &lt;repo&gt;</code> prepares a patch proposal and work order for review.
         </p>
-        {sent && (
+        {draftPrepared && (
           <p className="chip ready" style={{ marginTop: 14 }}>
-            <span className="dot" /> Email draft requested. If your mail client did not open, email hello@memolabs.dev. Nothing has been sent automatically.
+            <span className="dot" /> Draft requested, not sent. If your mail client did not open, email hello@memolabs.dev. Nothing has been sent automatically.
           </p>
         )}
       </div>
