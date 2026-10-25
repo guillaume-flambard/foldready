@@ -111,7 +111,20 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$DUO_PROOF_DIR"
-          xcrun simctl list devices > "$DUO_PROOF_DIR/simulator-devices.txt" 2>&1 || true
+          # CoreSimulator can itself hang after a WDA startup failure.
+          # Bound diagnostics so artifact upload cannot be blocked.
+          python3 - <<'PY'
+          import os, pathlib, subprocess
+          target = pathlib.Path(os.environ["DUO_PROOF_DIR"]) / "simulator-devices.txt"
+          try:
+              result = subprocess.run(
+                  ["xcrun", "simctl", "list", "devices"],
+                  capture_output=True, text=True, timeout=20
+              )
+              target.write_text(result.stdout + result.stderr)
+          except subprocess.TimeoutExpired:
+              target.write_text("simctl list devices timed out after 20 seconds\n")
+          PY
           if [ -f "$DUO_PROOF_DIR/appium-server.log" ]; then
             echo "Appium session startup diagnostics retained in the artifact."
           fi
