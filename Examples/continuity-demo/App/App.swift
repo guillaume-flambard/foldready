@@ -90,6 +90,11 @@ final class JourneyController: UIViewController {
         reset.accessibilityIdentifier = "reset"
         reset.addTarget(self, action: #selector(resetFixture), for: .touchUpInside)
         stack.addArrangedSubview(reset)
+        let listDemo = UIButton(type: .system)
+        listDemo.setTitle("Open synthetic list journey", for: .normal)
+        listDemo.accessibilityIdentifier = "openListDemo"
+        listDemo.addTarget(self, action: #selector(openListDemo), for: .touchUpInside)
+        stack.addArrangedSubview(listDemo)
         geometry.accessibilityIdentifier = "geometry"
         geometry.isAccessibilityElement = true
         stack.addArrangedSubview(geometry)
@@ -109,6 +114,12 @@ final class JourneyController: UIViewController {
             values[step == 1 ? "name" : "details"] = step == 1 ? "Ada" : "12 Test Street"
         }
         refresh()
+    }
+
+    @objc private func openListDemo() {
+        let list = ListContinuityController()
+        list.modalPresentationStyle = .fullScreen
+        present(list, animated: false)
     }
 
     @objc private func resetFixture() {
@@ -141,5 +152,106 @@ final class JourneyController: UIViewController {
             label.text = "\(key): \(values[key]!)"
             label.accessibilityValue = values[key]!
         }
+    }
+}
+
+
+/// An actual, scrollable UIKit table. The selected row and content offset
+/// are measured across the Duo's cover/inner/cover geometry transitions.
+/// This is synthetic test content, not an existing customer app.
+final class ListContinuityController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    private let count = 80
+    private let table = UITableView(frame: .zero, style: .plain)
+    private let selectedLabel = UILabel()
+    private let offsetLabel = UILabel()
+    private let geometry = UILabel()
+    private var selection: Int?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+
+        let title = UILabel()
+        title.text = "Continuity demo: list / fixed"
+        title.font = .preferredFont(forTextStyle: .headline)
+        title.accessibilityIdentifier = "listHeading"
+
+        selectedLabel.accessibilityIdentifier = "listSelected"
+        selectedLabel.isAccessibilityElement = true
+        offsetLabel.accessibilityIdentifier = "listOffset"
+        offsetLabel.isAccessibilityElement = true
+        geometry.accessibilityIdentifier = "geometry"
+        geometry.isAccessibilityElement = true
+
+        let jump = UIButton(type: .system)
+        jump.setTitle("Scroll to item 70", for: .normal)
+        jump.accessibilityIdentifier = "listJumpTo70"
+        jump.addTarget(self, action: #selector(jumpTo70), for: .touchUpInside)
+
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "item")
+        table.dataSource = self
+        table.delegate = self
+        table.rowHeight = 44
+        table.accessibilityIdentifier = "listTable"
+
+        let heading = UIStackView(arrangedSubviews: [title, selectedLabel, offsetLabel, jump, geometry])
+        heading.axis = .vertical
+        heading.spacing = 8
+        heading.translatesAutoresizingMaskIntoConstraints = false
+        table.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(heading)
+        view.addSubview(table)
+        NSLayoutConstraint.activate([
+            heading.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            heading.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            heading.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+            table.topAnchor.constraint(equalTo: heading.bottomAnchor, constant: 8),
+            table.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            table.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            table.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12)
+        ])
+        updateObservedState()
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { count }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "item", for: indexPath)
+        cell.textLabel?.text = "Item \(indexPath.row)"
+        cell.accessibilityIdentifier = "listItem-\(indexPath.row)"
+        cell.isAccessibilityElement = true
+        cell.accessoryType = indexPath.row == selection ? .checkmark : .none
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selection = indexPath.row
+        tableView.reloadData()
+        updateObservedState()
+    }
+
+    @objc private func jumpTo70() {
+        table.layoutIfNeeded()
+        table.scrollToRow(at: IndexPath(row: 70, section: 0), at: .middle, animated: false)
+        updateObservedState()
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateObservedState()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        geometry.text = "Window: \(Int(view.bounds.width)) x \(Int(view.bounds.height))"
+        updateObservedState()
+    }
+
+    private func updateObservedState() {
+        let value = selection.map { "Item \($0)" } ?? "none"
+        selectedLabel.text = "Selected: \(value)"
+        selectedLabel.accessibilityValue = value
+        let offset = String(Int(table.contentOffset.y.rounded()))
+        offsetLabel.text = "Scroll offset: \(offset)"
+        offsetLabel.accessibilityValue = offset
     }
 }
