@@ -85,6 +85,9 @@ jobs:
           APP="$RUNNER_TEMP/duo-derived/Build/Products/Debug-iphonesimulator/ContinuityDemo.app"
           test -d "$APP"
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
+          SCENE=$(/usr/libexec/PlistBuddy -c 'Print :UIApplicationSceneManifest:UISceneConfigurations:UIWindowSceneSessionRoleApplication:0:UISceneDelegateClassName' "$APP/Info.plist")
+          echo "Verified embedded scene delegate: $SCENE"
+          [[ "$SCENE" == *"SceneDelegate" ]] || { echo "Missing iOS 27 scene lifecycle" >&2; exit 1; }
           xcrun simctl install "$DUO_UDID" "$APP"
           SIMCTL_CHILD_FR_JOURNEY=form SIMCTL_CHILD_FR_VARIANT=fixed \
             xcrun simctl launch "$DUO_UDID" "$BUNDLE" \
