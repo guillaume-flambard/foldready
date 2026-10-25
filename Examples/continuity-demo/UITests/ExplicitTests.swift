@@ -34,6 +34,54 @@ final class ExplicitTests: CaseRecorder {
         }
     }
 
+    /// A real simulator rotation with observable state, NOT a hinge/fold transition.
+    /// The fixed fixture must retain entered form values after a size change.
+    func testDuoRotationPreservesFormState() {
+        let app = XCUIApplication()
+        XCUIDevice.shared.orientation = .portrait
+        app.launchEnvironment = ["FR_JOURNEY": "form", "FR_VARIANT": "fixed"]
+        app.launch()
+        defer {
+            app.terminate()
+            XCUIDevice.shared.orientation = .portrait
+        }
+
+        let firstStep = app.buttons["step1"]
+        guard firstStep.waitForExistence(timeout: 25), firstStep.isHittable else {
+            XCTFail("The fixture must be actionable before rotation")
+            return
+        }
+        firstStep.tap()
+        let nameValue = app.staticTexts["name"]
+        let geometry = app.staticTexts["geometry"]
+        guard nameValue.waitForExistence(timeout: 10), geometry.exists else {
+            XCTFail("Fixture values and window geometry must be accessible")
+            return
+        }
+        XCTAssertEqual(nameValue.value as? String, "Ada", "Pre-rotation form state")
+        let originalGeometry = geometry.label
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+        let landscape = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value == %@", "landscape"),
+            object: geometry
+        )
+        guard XCTWaiter.wait(for: [landscape], timeout: 20) == .completed else {
+            XCTFail("Requested rotation did not produce a landscape window")
+            return
+        }
+        XCTAssertNotEqual(geometry.label, originalGeometry, "Window must actually resize")
+        XCTAssertEqual(nameValue.value as? String, "Ada", "Form state must survive rotation")
+        XCTAssertTrue(firstStep.isHittable, "Primary form action must remain available")
+
+        XCTContext.runActivity(named: "iPhone Duo synthetic rotation - form state preserved") { activity in
+            let screenshot = XCTAttachment(screenshot: app.screenshot())
+            screenshot.name = "duo-landscape-form-with-preserved-state"
+            screenshot.lifetime = .keepAlways
+            activity.add(screenshot)
+        }
+    }
+
     func testMatrix() {
         for variant in variants {
             for repetition in 1...repetitions {
