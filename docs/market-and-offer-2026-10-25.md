@@ -88,7 +88,7 @@ iPhone Duo is a timely door-opener; the defensible product category, if validate
 **Stop/reconsider triggers:**
 - 5 qualified interviews show **zero willingness to pay** for source-only diagnosis, and all want execution/fixes → switch to a **fix-and-verify consulting package** if the skills/environment are proven; don't build recurring SaaS.
 - Human source review requires more hours than the $349 offer can sustainably cover → quote narrower scope or change pricing after measurement.
-- Simulator pose controls lack a documented automatable interface → stay manual/test-plan-first; never fake hinge automation via rotation.
+- Automated hinge controls now exist in [Appium XCUITest](https://appium.github.io/appium-xcuitest-driver/12.19/guides/duo/) (12.17.0+); **they are not yet exercised in FoldReady CI**. Require angle read-back, active-display switching and actual app state continuity before claiming automation. If they fail in our pinned environment, fall back to manual Device Hub instead of faking a fold through rotation.
 - New Apple tooling already produces equivalent third-party audit artifacts → focus on the real client workflow or stop, not a duplicative feature.
 
 ## Research sources (primary and differentiated)
@@ -110,5 +110,9 @@ iPhone Duo is a timely door-opener; the defensible product category, if validate
 15. [Applitools](https://applitools.com/platform-pricing/) / [Percy](https://percy.io/blog/app-visual-testing).
 16. [WIRED iPhone Duo review](https://www.wired.com/review/apple-iphone-duo) and [Tom's Guide review synthesis](https://www.tomsguide.com/phones/iphones/polished-but-rough-the-common-flaws-in-the-iphone-duo-found-by-nine-different-reviewers).
 17. [r/iOSProgramming developers' early discussion](https://www.reddit.com/r/iOSProgramming/comments/1wbxxj3/iphone_duo_is_official_how_much_work_is_this/) (low-confidence demand signal, not market sampling).
+
+18. [Appium XCUITest driver 12.19 — Duo automation](https://appium.github.io/appium-xcuitest-driver/12.19/guides/duo/) (hinge angle get/set, display routing; documentation updated 19 October 2026, simulator-only validated by provider).
+
+**Evidence update, 25 October:** FoldReady [PR #18](https://github.com/guillaume-flambard/foldready/pull/18) fixed the synthetic UIKit fixture's missing iOS 27 `UIScene` lifecycle and verified a real foreground form interaction on a Duo simulator with XCUITest (1 test, 0 failures). This is **not** the same as an open/close continuity test, a client app review, or paid demand. A follow-on [rotation test PR #20](https://github.com/guillaume-flambard/foldready/pull/20) is under evaluation; do not count it as executed until its CI passes.
 
 **Result of research:** no verified source proves an unoccupied SaaS niche, an appropriate $349 margin, recurring buyers, or an independently reproducible fold bug. The strongest actionable hypothesis is **client-specific evidence + priority + optional remediation**, validated through actual paid work.
