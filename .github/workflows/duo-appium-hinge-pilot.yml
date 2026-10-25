@@ -48,13 +48,12 @@ jobs:
               handle.write(f"DUO_UDID={udid}\n")
           print("Duo simulator:", udid)
           PY
-          xcrun simctl boot "$DUO_UDID"
-          xcrun simctl bootstatus "$DUO_UDID" -b
-
       - name: Build source-pinned synthetic fixture
         shell: bash
         run: |
           set -euo pipefail
+          xcrun simctl boot "$DUO_UDID"
+          xcrun simctl bootstatus "$DUO_UDID" -b
           xcodebuild -project "$PROJ" -scheme ContinuityDemo \
             -configuration Debug \
             -destination "platform=iOS Simulator,id=$DUO_UDID" \
