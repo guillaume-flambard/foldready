@@ -1,6 +1,8 @@
-# iPhone Duo — reproducible continuity evidence protocol (v0, manual-first)
+# iPhone Duo — reproducible continuity evidence protocol (v1, evidence-gated)
 
-**Status: protocol only; ZERO iPhone Duo journeys executed.** The [25 October Mac preflight](duo-preflight-2026-10-25.md) confirms Xcode 27.1 and Duo device type but **not** a runnable iOS 27.1 simulator instance. This protocol does not claim that XCUITest, `simctl`, or Maestro can operate the hinge programmatically. Apple's **Device Hub GUI** is the reference pose controller; test automation is a separate feasibility question.
+**Status (25 October 2026):** The iOS 27.1 simulator is installed on the owner's Mac. [FoldReady CI run #40219952552](https://github.com/guillaume-flambard/foldready/actions/runs/40219952552) compiled and launched the synthetic UIKit form on iPhone Duo; it passed **one real XCUITest** which tapped the form and verified the resulting state (zero failures). The app was observed on the outer screen; the inactive inner screen was black in the **closed pose**. **No fold/unfold or cross-pose continuity test has yet passed.** See [issue #9](https://github.com/guillaume-flambard/foldready/issues/9).
+
+**Automatable hinge controls exist via a provider:** [Appium XCUITest's official Duo guide](https://appium.github.io/appium-xcuitest-driver/12.19/guides/duo/) documents hinge-angle extensions for XCUITest driver **12.17.0+**, WebDriverAgent **16.14.2+**, Xcode **27.1+**. This is documentation, **not** a FoldReady verified hinge run; the angle-setting API explicitly warns that command success does not prove the angle changed.
 
 **Environment update (25 October, 17:22 UTC):** iOS 27.1 runtime `24A94425` was installed, and an actual iPhone Duo simulator instance `FD909981-4733-435D-939C-1B4B2F7D1E70` completed CoreSimulator boot successfully. A GUI pose transition and any app launch **have not been observed**. The first-run preflight was the only completed step. Read the dated [preflight addendum](duo-preflight-2026-10-25.md) before attempting the protocol.
 
@@ -68,7 +70,7 @@ Each row can be saved as private JSON (or translated to the [review worksheet](r
   "actual": null,
   "result": "not_tested",
   "evidence": [],
-  "reason": "No runnable iPhone Duo simulator device configured on the Mac",
+  "reason": "No open/close transition was executed on this app revision",
   "operator": null,
   "executed_at": null
 }
@@ -87,7 +89,7 @@ Each row can be saved as private JSON (or translated to the [review worksheet](r
 ## E. Minimal technical validation sequence
 
 1. **Preflight:** confirm disk space and target architecture; list installed simulator runtimes/devices; install an appropriate **supported** runtime only after safe resource check. A device type without a runtime is not launchable evidence.
-2. **Boot and provenance:** create/select an iPhone Duo *device instance*, boot, log UUID, runtime and Xcode build. Verify Device Hub GUI pose controls and capture at least one independent pose change, not just rotation.
+2. **Boot and provenance:** create/select an iPhone Duo instance, boot, log UUID, runtime and Xcode. For pose control use either manual Device Hub or version-pinned Appium/WDA hinge calls, with **hinge read-back plus app-geometry confirmation**; rotation alone is not a fold.
 3. **Fixture:** pin a small repo revision and build with Xcode 27.1. Check the **linked SDK on the actual app build**. Avoid upgrading a customer project without consent.
 4. **Manual test:** follow journey steps; capture before and after at named poses. Log system bar, reserved regions and scroll/selection changes. Repeat unexpectedly failing flows before diagnosing.
 5. **Reconcile static scan:** for each candidate, identify reproduction or dismissal and impact on user journey. Store detector confidence separately from outcome.
@@ -96,9 +98,20 @@ Each row can be saved as private JSON (or translated to the [review worksheet](r
 ## F. Scope boundaries and resources
 
 - Apple's [three-step guide](https://developer.apple.com/iphone-duo/prepare/) explicitly recommends the simulator and resized-window testing **after** its source skill.
-- The [Device Hub Tech Talk](https://developer.apple.com/videos/play/tech-talks/111461/) demonstrates open/close/rotate/fold in the simulator GUI; that is not equivalent to a supported public scripting contract.
-- [XCTest UI testing](https://developer.apple.com/documentation/xcode/testing) may automate UI interactions once a device boots. Inspect supported pose APIs before claiming fully automated fold transitions.
+- Apple demonstrates manual pose controls in [Device Hub](https://developer.apple.com/videos/play/tech-talks/111461/). Independently, Appium now provides [supported-in-driver hinge commands](https://appium.github.io/appium-xcuitest-driver/12.19/guides/duo/), not a built-in `simctl` hinge flag.
+- [XCTest UI testing](https://developer.apple.com/documentation/xcode/testing) already validated a synthetic foreground interaction in FoldReady CI. [Appium's set-angle reference](https://appium.github.io/appium-xcuitest-driver/12.19/reference/execute-methods/#mobile-setsimulatedhingeangle) warns that asynchronous hinge commands must be followed by angle read-back, display selection and actual layout verification.
 - [Maestro](https://maestro.dev/) and [BrowserStack](https://www.browserstack.com/app-automate) are candidates for reusable user journeys, but Duo pose and device availability must be empirically verified per provider.
 - [App Store screenshot specs](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications) list Duo resolutions and a future requirement. App Store assets are a **separate optional deliverable** from functional validation; actual app screenshots must comply with [2.3.3](https://developer.apple.com/help/app-review/guideline-reference/2-3-3-screenshots).
+
+## G. First real fold/unfold pilot — acceptance protocol (NOT EXECUTED)
+
+Use Xcode 27.1+, XCUITest driver 12.17.0+ and WebDriverAgent 16.14.2+, pinned by exact versions; capture app revision, SDK, simulator UUID and initial hinge reading.
+
+1. **Closed (0°):** select the outer display via `mobile: listDisplays` / `currentDisplayId`, set `name = Ada` in the *synthetic fixture*, verify its UI and capture evidence.
+2. **Open (180°):** call `mobile: setSimulatedHingeAngle` with `angle: 180`; poll `mobile: getSimulatedHingeAngle` and wait for a **real window/layout change**. Select the inner display, assert the same `name = Ada` and capture the screen.
+3. **Close again (0°):** request 0°, read back the actual angle, select the outer display and confirm state and controls remain accessible.
+4. Record before/after geometry, angle and active display separately from API return codes. Fail closed if any are missing; do not relabel rotation as a hinge operation.
+
+Appium's extension has only been tested by its maintainers on a **simulator**, not proven here on a physical Duo. Further poses, Split View, keyboard, camera and physical-device observations stay `not_tested` until independently executed. No private customer source or screenshots belong in public workflow artifacts.
 
 **Exit gate:** one recorded working fixture with at least the form or list pose transition, evidence artifacts, machine/app provenance, and clear “not tested” remaining rows. Until then, the runtime-validation offer is **not** a verified shipped capability.
