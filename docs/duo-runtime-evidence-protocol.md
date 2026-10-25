@@ -2,6 +2,8 @@
 
 **Status: protocol only; ZERO iPhone Duo journeys executed.** The [25 October Mac preflight](duo-preflight-2026-10-25.md) confirms Xcode 27.1 and Duo device type but **not** a runnable iOS 27.1 simulator instance. This protocol does not claim that XCUITest, `simctl`, or Maestro can operate the hinge programmatically. Apple's **Device Hub GUI** is the reference pose controller; test automation is a separate feasibility question.
 
+**Environment update (25 October, 17:22 UTC):** iOS 27.1 runtime `24A94425` was installed, and an actual iPhone Duo simulator instance `FD909981-4733-435D-939C-1B4B2F7D1E70` completed CoreSimulator boot successfully. A GUI pose transition and any app launch **have not been observed**. The first-run preflight was the only completed step. Read the dated [preflight addendum](duo-preflight-2026-10-25.md) before attempting the protocol.
+
 Companion: [review delivery scope](readiness-review.md), [research decision](market-and-offer-2026-10-25.md).
 
 ## A. First-run prerequisites (all must be explicitly recorded)
