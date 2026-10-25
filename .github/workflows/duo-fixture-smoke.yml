@@ -9,6 +9,11 @@ on:
       - "Examples/continuity-demo/**"
   workflow_dispatch:
 
+# Avoid spending several hosted macOS simulator runs on superseded PR revisions.
+concurrency:
+  group: duo-fixture-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
