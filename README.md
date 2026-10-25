@@ -4,7 +4,7 @@ Human reviews of iOS source signals, critical journeys and test coverage, suppor
 The scanner identifies candidate issues, supports CI policies and prepares work orders.
 The paid deliverable is the reviewed evidence and priorities. Device compatibility is not
 certified. Scores are versioned summaries; hour estimates remain unvalidated.
-See the [current plan](docs/roadmap.md), [delivery scope](docs/readiness-review.md), [research-led offer decision (25 October 2026)](docs/market-and-offer-2026-10-25.md), and [sample human review](docs/sales-one-pager.md), [verified iOS 27 fixture case study](docs/ios27-scene-runtime-case-study.md).
+See the [current plan](docs/roadmap.md), [delivery scope](docs/readiness-review.md), [research-led offer decision (25 October 2026)](docs/market-and-offer-2026-10-25.md), and [sample human review](docs/sales-one-pager.md), [verified iOS 27 fixture case study](docs/ios27-scene-runtime-case-study.md), [first executed fold/unfold evidence](docs/duo-hinge-proof-2026-10-25.md).
 
 ## iPhone Duo — platform status (checked 25 October 2026)
 
@@ -16,7 +16,7 @@ See the [current plan](docs/roadmap.md), [delivery scope](docs/readiness-review.
 
 The earlier **18 September 2026** announcement/inventory notes are superseded by this dated status. Neither historical source audits nor the continuity prototype have been validated through real Duo folding.
 
-**iPhone Duo simulator evidence (25 October 2026):** Xcode 27.1 and an iPhone Duo simulator are available on the owner's Mac, and a separate GitHub-hosted Duo runner [built, launched and interacted with a synthetic UIKit fixture](https://github.com/guillaume-flambard/foldready/actions/runs/40219952552) using XCUITest (**1 test, 0 failures**) after migrating to the required iOS 27 scene lifecycle. This is **not** customer-app or fold/unfold proof. [Actual test matrix and Appium hinge protocol](docs/duo-runtime-evidence-protocol.md); [dated Mac preflight](docs/duo-preflight-2026-10-25.md).
+**First verified Duo hinge continuity (25 October 2026):** [Appium CI run #40228317331](https://github.com/guillaume-flambard/foldready/actions/runs/40228317331) tested a **synthetic UIKit form** through simulated **closed 0° → open 180° → reclosed 0°**. The real window resized from **466×678** to **951×669** points and back, while the live form value `Ada` survived. Hinge angles were independently read back and three screenshots captured and inspected. This proves **one synthetic simulator journey**, not any client app or physical-device compatibility. [Verified provenance and hashes](docs/duo-hinge-proof-2026-10-25.md); [full matrix](docs/duo-runtime-evidence-protocol.md).
 
 ## Product and offer
 
