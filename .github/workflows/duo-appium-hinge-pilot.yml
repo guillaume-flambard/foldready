@@ -9,6 +9,10 @@ on:
       - ".github/workflows/duo-appium-hinge-pilot.yml"
       - "Scripts/probe_duo_hinge.py"
       - "Scripts/validate_duo_hinge_evidence.py"
+      - "Scripts/probe_duo_list.py"
+      - "Scripts/validate_duo_list_evidence.py"
+      - "Examples/continuity-demo/App/App.swift"
+      - "Tests/site/test_duo_list_evidence_gate.py"
       - "Tests/site/test_duo_hinge_evidence_gate.py"
   workflow_dispatch:
 
@@ -102,11 +106,12 @@ jobs:
               raise SystemExit("Appium server never became ready")
           PY
 
-      - name: Execute hinge closed-open-closed proof
+      - name: Exercise both independent synthetic hinge journeys
         shell: bash
         run: |
           set -euo pipefail
           python3 -u Scripts/probe_duo_hinge.py 2>&1 | tee "$DUO_PROOF_DIR/hinge-client.log"
+          python3 -u Scripts/probe_duo_list.py 2>&1 | tee "$DUO_PROOF_DIR/list-client.log"
 
       - name: Capture Appium and simulator diagnostics after any outcome
         if: always()
@@ -138,6 +143,8 @@ jobs:
           set -euo pipefail
           python3 Scripts/validate_duo_hinge_evidence.py "$DUO_PROOF_DIR" \
             | tee "$DUO_PROOF_DIR/evidence-validation.log"
+          python3 Scripts/validate_duo_list_evidence.py "$DUO_PROOF_DIR" \
+            | tee "$DUO_PROOF_DIR/list-evidence-validation.log"
 
       - name: Upload exact evidence even on failures
         if: always()
