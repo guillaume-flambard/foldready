@@ -6,7 +6,7 @@ export default function LandingPage() {
       <header className="hero">
         <div>
           <span className="kicker">Human review · source evidence and test coverage</span>
-          <h1>Find what needs attention before your app reaches iPhone Duo.</h1>
+          <h1>Find resize risks before your users do.</h1>
           <p className="lede">Review your critical journeys, examine layout signals and agree what to test next. FoldReady combines a free source scanner with a human review of your app and its test coverage.</p>
           <div className="ctas">
             <Link className="btn btn-pri" href="/get-scored">Request a review · $349</Link>
@@ -16,7 +16,7 @@ export default function LandingPage() {
         <div className="ocard">
           <h2>What is available today</h2>
           <p>Source analysis, a review of up to three agreed critical journeys, and a prioritized test and remediation plan. Existing apps can run on Duo without recompilation.</p>
-          <p>Duo simulator testing requires an available target and a buildable app. Any later simulator pass is scoped separately. Physical-device testing is not included.</p>
+          <p>Apple's Xcode 27.1 and Device Hub support iPhone Duo simulation. A simulator pass still requires a locally available runtime, a buildable app and a separate agreement. Physical-device testing is not included.</p>
           <a href="https://developer.apple.com/iphone-duo/">Apple tools and availability</a>
         </div>
       </header>
@@ -64,10 +64,10 @@ export default function LandingPage() {
         <div className="obj">
           <div className="ocard2"><p className="q">Does every app need a port?</p><p className="a">No. Apple says existing apps run without recompilation, and standard navigation adapts automatically. The review focuses on your custom layouts and critical journeys. A sidebar is an optional design choice.</p></div>
           <div className="ocard2"><p className="q">Does a high score prove compatibility?</p><p className="a">No. Source analysis cannot prove rendering, state preservation or a successful launch. Screenshot margins can come from compatibility presentation or intentional spacing. Runtime evidence needs a named build, environment and tested journey.</p></div>
-          <div className="ocard2"><p className="q">Why use this alongside Apple tooling?</p><p className="a">Apple announced the App Resizability skill for Xcode 27.1. FoldReady proposes a review order; a human validates priorities and records what was checked; your team can use Apple tooling to implement changes.</p></div>
-          <div className="ocard2"><p className="q">When can Duo testing happen?</p><p className="a">Confirm tool availability and build access when agreeing a simulator pass. Every delivery names the environments actually tested.</p></div>
+          <div className="ocard2"><p className="q">Why use this alongside Apple tooling?</p><p className="a">Apple's App Resizability skill in Xcode 27.1 supports SwiftUI and UIKit code changes. FoldReady provides source evidence, an optional CI gate and a human-reviewed priority order. Neither a scanner score nor an automated fix is a compatibility certificate.</p></div>
+          <div className="ocard2"><p className="q">When can Duo testing happen?</p><p className="a">Xcode 27.1 and Device Hub are available from Apple. A paid simulator pass is scoped separately after confirming a buildable app and a working local device/runtime. Every delivery identifies the journeys and configurations actually tested.</p></div>
         </div>
-        <p className="spec">Sources, checked 11 September 2026: <a href="https://www.apple.com/newsroom/2026/09/apple-unveils-iphone-duo/">Apple announcement</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111461/">Prepare your app for iPhone Duo</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111463/">Adaptive layouts</a>.</p>
+        <p className="spec">Sources, checked 25 October 2026: <a href="https://developer.apple.com/news/?id=kkphp5qo">Apple Xcode 27.1 and Device Hub</a> · <a href="https://developer.apple.com/videos/play/tech-talks/111461/">Prepare your app for iPhone Duo</a> · <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications">iPhone Duo screenshot specifications (April 2027 SDK-specific requirement)</a>.</p>
         <p className="spec"><Link href="/ranking">Source audits of twenty open-source apps</Link>. Scores are labelled by contract; they are source signals, not Duo runtime verdicts.</p>
       </section>
     </main>
