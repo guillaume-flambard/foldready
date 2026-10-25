@@ -42,7 +42,16 @@ export default function LandingPage() {
           <a href="https://github.com/guillaume-flambard/foldready/blob/main/docs/ios27-scene-runtime-case-study.md">
             Read the verified before/after case study
           </a>.
-          This is not a Duo folding test or a client success story.
+          This was a launch and interaction test, not a fold test or client success story.
+        </p>
+        <p className="spec" style={{ marginTop: 8 }}>
+          Verified simulated fold/unfold: a synthetic UIKit form preserved the value "Ada"
+          across a measured 0° → 180° → 0° hinge cycle on iPhone Duo, with window-size
+          changes and three screenshots.{" "}
+          <a href="https://github.com/guillaume-flambard/foldready/blob/main/docs/duo-hinge-proof-2026-10-25.md">
+            Inspect the measured hinge evidence and limits
+          </a>.
+          This is not a test of a customer app, physical hardware or every critical journey.
         </p>
       </section>
       <section className="block" id="how">

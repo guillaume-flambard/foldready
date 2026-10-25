@@ -1,8 +1,8 @@
 # iPhone Duo — reproducible continuity evidence protocol (v1, evidence-gated)
 
-**Status (25 October 2026):** The iOS 27.1 simulator is installed on the owner's Mac. [FoldReady CI run #40219952552](https://github.com/guillaume-flambard/foldready/actions/runs/40219952552) compiled and launched the synthetic UIKit form on iPhone Duo; it passed **one real XCUITest** which tapped the form and verified the resulting state (zero failures). The app was observed on the outer screen; the inactive inner screen was black in the **closed pose**. **No fold/unfold or cross-pose continuity test has yet passed.** See [issue #9](https://github.com/guillaume-flambard/foldready/issues/9).
+**Status (25 October 2026):** A [completed Appium Duo simulator run #40228317331](https://github.com/guillaume-flambard/foldready/actions/runs/40228317331) **verified a synthetic UIKit form during actual hinge closed (0°) → open (180°) → reclosed (0°)**. The app showed `name = Ada` across both displays and measured different window geometries; three real screenshots and sensor readings are archived. See the [verified evidence record](duo-hinge-proof-2026-10-25.md), [merged PR #22](https://github.com/guillaume-flambard/foldready/pull/22) and [issue #9](https://github.com/guillaume-flambard/foldready/issues/9). **Not tested:** actual client apps, partial folding, navigation/scroll, Split View or physical hardware.
 
-**Automatable hinge controls exist via a provider:** [Appium XCUITest's official Duo guide](https://appium.github.io/appium-xcuitest-driver/12.19/guides/duo/) documents hinge-angle extensions for XCUITest driver **12.17.0+**, WebDriverAgent **16.14.2+**, Xcode **27.1+**. This is documentation, **not** a FoldReady verified hinge run; the angle-setting API explicitly warns that command success does not prove the angle changed.
+**Hinge controls are now exercised in FoldReady:** [Appium XCUITest's official Duo guide](https://appium.github.io/appium-xcuitest-driver/12.19/guides/duo/) documents hinge-angle extensions; our pinned XCUITest driver **12.20.0** ran them successfully with **independent angle readback, window changes, state assertions and screenshots**. A set-angle command by itself is insufficient; all those checks remain mandatory. The result is confined to this synthetic form on an iOS 27.1 simulator.
 
 **Environment update (25 October, 17:22 UTC):** iOS 27.1 runtime `24A94425` was installed, and an actual iPhone Duo simulator instance `FD909981-4733-435D-939C-1B4B2F7D1E70` completed CoreSimulator boot successfully. A GUI pose transition and any app launch **have not been observed**. The first-run preflight was the only completed step. Read the dated [preflight addendum](duo-preflight-2026-10-25.md) before attempting the protocol.
 
@@ -103,7 +103,7 @@ Each row can be saved as private JSON (or translated to the [review worksheet](r
 - [Maestro](https://maestro.dev/) and [BrowserStack](https://www.browserstack.com/app-automate) are candidates for reusable user journeys, but Duo pose and device availability must be empirically verified per provider.
 - [App Store screenshot specs](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications) list Duo resolutions and a future requirement. App Store assets are a **separate optional deliverable** from functional validation; actual app screenshots must comply with [2.3.3](https://developer.apple.com/help/app-review/guideline-reference/2-3-3-screenshots).
 
-## G. First real fold/unfold pilot — acceptance protocol (NOT EXECUTED)
+## G. First real fold/unfold pilot — validated on synthetic form; extend only with new evidence
 
 Use Xcode 27.1+, XCUITest driver 12.17.0+ and WebDriverAgent 16.14.2+, pinned by exact versions; capture app revision, SDK, simulator UUID and initial hinge reading.
 
