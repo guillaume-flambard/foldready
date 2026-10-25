@@ -104,14 +104,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 Scripts/probe_duo_hinge.py 2>&1 | tee "$DUO_PROOF_DIR/hinge-client.log"
+          python3 -u Scripts/probe_duo_hinge.py 2>&1 | tee "$DUO_PROOF_DIR/hinge-client.log"
+
+      - name: Capture Appium and simulator diagnostics after any outcome
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$DUO_PROOF_DIR"
+          xcrun simctl list devices > "$DUO_PROOF_DIR/simulator-devices.txt" 2>&1 || true
+          if [ -f "$DUO_PROOF_DIR/appium-server.log" ]; then
+            echo "Appium session startup diagnostics retained in the artifact."
+          fi
+          test -f "$DUO_PROOF_DIR/hinge-evidence.json" || printf '{"status":"execution_error","fold_unfold_transition":"not_tested","reason":"probe did not produce a complete evidence record"}\n' > "$DUO_PROOF_DIR/hinge-evidence.json"
 
       - name: Upload exact evidence even on failures
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: duo-hinge-experiment-${{ github.run_id }}
-          path: ${{ runner.temp }}/duo-hinge-proof/
+          path: /tmp/foldready-duo-hinge-proof/
           if-no-files-found: warn
           retention-days: 14
 
