@@ -56,8 +56,8 @@ def request(method: str, path: str, body: object | None = None, timeout: int = 1
     except HTTPError as err:
         detail = err.read(3000).decode("utf-8", "replace")
         raise RuntimeError(f"Appium {method} {path}: HTTP {err.code}: {detail}") from err
-    except URLError as err:
-        raise RuntimeError(f"Appium {method} {path}: {err}") from err
+    except (URLError, TimeoutError) as err:
+        raise RuntimeError(f"Appium {method} {path}: timed out or unreachable: {err}") from err
     if not isinstance(payload, dict) or "value" not in payload:
         raise RuntimeError(f"Unexpected Appium W3C response for {path}: {str(payload)[:400]}")
     if isinstance(payload["value"], dict) and payload["value"].get("error"):
@@ -181,11 +181,15 @@ def main() -> None:
             "appium:udid": UDID,
             "appium:app": APP,
             "appium:noReset": True,
-            "appium:wdaLaunchTimeout": 180000,
+            "appium:wdaLaunchTimeout": 300000,
+            "appium:showXcodeLog": True,
+            "appium:wdaStartupRetries": 1,
+            "appium:wdaStartupRetryInterval": 5000,
             "appium:wdaConnectionTimeout": 180000,
             "appium:newCommandTimeout": 240,
         }
-        value = request("POST", "/session", {"capabilities": {"alwaysMatch": capabilities, "firstMatch": [{}]}}, timeout=240)
+        print("Establishing WebDriverAgent session (cold start may compile WDA)...", flush=True)
+        value = request("POST", "/session", {"capabilities": {"alwaysMatch": capabilities, "firstMatch": [{}]}}, timeout=480)
         if not isinstance(value, dict) or not value.get("sessionId"):
             raise RuntimeError(f"Appium session not established: {str(value)[:400]}")
         session = str(value["sessionId"])
