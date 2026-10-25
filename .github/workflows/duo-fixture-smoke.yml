@@ -50,15 +50,11 @@ jobs:
           print("Resolved iPhone Duo instance:", duos[0]["udid"])
           PY
 
-      - name: Boot one simulator and build synthetic demo
+      - name: Build synthetic demo with iOS 27.1 SDK (no simulator boot required)
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/duo-proof"
-          if ! xcrun simctl list devices | grep -F "$DUO_UDID" | grep -q "(Booted)"; then
-            xcrun simctl boot "$DUO_UDID"
-          fi
-          xcrun simctl bootstatus "$DUO_UDID" -b
           xcodebuild \
             -project "$PROJ" \
             -scheme "$SCHEME" \
@@ -67,6 +63,20 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/duo-derived" \
             CODE_SIGNING_ALLOWED=NO build \
             2>&1 | tee "$RUNNER_TEMP/duo-proof/xcodebuild.log"
+
+      - name: Boot the iPhone Duo with an explicit timeout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, subprocess
+          udid = os.environ["DUO_UDID"]
+          print("Booting iPhone Duo:", udid, flush=True)
+          subprocess.run(["xcrun", "simctl", "boot", udid], check=True, timeout=90)
+          print("Waiting for iPhone Duo first boot...", flush=True)
+          subprocess.run(["xcrun", "simctl", "bootstatus", udid, "-b"], check=True, timeout=180)
+          print("iPhone Duo booted successfully", flush=True)
+          PY
 
       - name: Install, actually launch, and capture one frame
         shell: bash
