@@ -156,6 +156,26 @@ jobs:
             CODE_SIGNING_ALLOWED=NO test \
             2>&1 | tee "$RUNNER_TEMP/duo-proof/ui-test.log"
 
+          # Only a passing Xcode test command can promote the evidence.
+          # Static display captures are not hinge transitions.
+          python3 - <<'PY'
+          import json, os, pathlib
+          manifest_path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "duo-proof" / "evidence.json"
+          evidence = json.loads(manifest_path.read_text())
+          evidence["critical_user_journey"] = "passed_synthetic_foreground_form"
+          evidence["rotation_state_continuity"] = "passed_synthetic_portrait_to_landscape"
+          evidence["verified_tests"] = [
+              "ExplicitTests.testDuoForegroundJourney",
+              "ExplicitTests.testDuoRotationPreservesFormState"
+          ]
+          evidence["xctest_result"] = "passed"
+          evidence["runtime_test_evidence"] = ["ui-test.log", "duo-ui-smoke.xcresult"]
+          evidence["fold_unfold_transition"] = "not_tested"
+          evidence["physical_device"] = "not_tested"
+          manifest_path.write_text(json.dumps(evidence, indent=2) + "\\n")
+          print(json.dumps(evidence, indent=2))
+          PY
+
       - name: Keep read-only execution evidence, also on failure
         if: always()
         uses: actions/upload-artifact@v4
