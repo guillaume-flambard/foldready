@@ -28,7 +28,8 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      - run: npm run build
+      - name: Build Pages with bounded external font retries
+        run: bash ../Scripts/build-web-pages.sh
         env:
           NEXT_PUBLIC_BASE_PATH: /foldready
       - name: Upload Pages artifact
