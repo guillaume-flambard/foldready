@@ -2,6 +2,22 @@
 
 **Evidence status:** environment inventory performed via Memo Bridge on the owner's Mac on 25 October 2026. **No app has been launched or tested on iPhone Duo**, and no screenshots/videos of a journey were captured. This is the evidence-gated starting point for [the readiness review](readiness-review.md), not a compatibility result.
 
+## Follow-up — 25 October 2026, 17:20–17:22 UTC (actual Mac evidence)
+
+**The blocker documented below has been partly resolved.** The inventory tables further down describe the earlier state and are preserved for auditability, **not** the current installed runtime.
+
+- `xcodebuild -downloadPlatform iOS -buildVersion 27.1` completed **exit 0** after downloading/installing the official arm64 iOS 27.1 simulator, build `24A94425` (~7.85 GB download).
+- `xcrun simctl list runtimes` now returns both iOS 27.0 and **iOS 27.1 (27.1 - 24A94425)**.
+- `xcrun simctl list devices available` now lists **iPhone Duo**, simulator UUID `FD909981-4733-435D-939C-1B4B2F7D1E70`, iOS 27.1, initially **Shutdown**. The device instance was created by the simulator runtime setup; it is not a manufactured “test fixture”.
+- `xcrun simctl boot FD909981-4733-435D-939C-1B4B2F7D1E70` exited **0**. `xcrun simctl bootstatus FD909981-4733-435D-939C-1B4B2F7D1E70 -b` completed **exit 0**, `Status=4294967295, isTerminal=YES`, message `Finished` after first-boot migrations.
+- Approximately **50 GiB** free were available immediately after installation on the Mac. Only **one** simulator was started on the 16 GB RAM system.
+- A subsequent `simctl io ... screenshot` request was **not executed**: Memo Bridge reported `locked_by_other_session` for a different active Mac session. No image, app binary, pose transition, or user journey artifact was obtained.
+- FoldReady remains **`project_not_allowed`** in the Memo Bridge remote project allowlist. This restricts access to its project worktrees/build and test workflow; do not bypass through unrelated operator commands.
+
+**Verified scope:** SDK + installed runtime + created, bootable iPhone Duo CoreSimulator instance. **Not verified:** whether Device Hub's hinge controls are available in a GUI session, any installed user test app, linked SDK on a built app, screenshot dimensions, continuity preservation, actual physical-device compatibility.
+
+**Issue #9 remains open.** Once project access and the Mac operator lock permit, select the pinned `Examples/continuity-demo` fixture, compile under SDK 27.1, capture first image and one *real* Duo pose transition with the [evidence worksheet](duo-runtime-evidence-protocol.md). Until then, every application runtime row below remains **Not tested**.
+
 ## Apple capabilities (public, not local test claims)
 
 - [Apple Developer, 5 October 2026](https://developer.apple.com/news/?id=kkphp5qo): Xcode 27.1 development support and Device Hub for Duo pose and orientation simulation.
