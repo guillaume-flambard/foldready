@@ -1,0 +1,128 @@
+name: iPhone Duo Appium hinge pilot
+
+# A new *experimental* synthetic-app closed/open/closed test.
+# Hinge sensor readback + app state/geometry observations are required.
+# A successful set-angle call alone is NEVER a passing result.
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/duo-appium-hinge-pilot.yml"
+      - "Scripts/probe_duo_hinge.py"
+  workflow_dispatch:
+
+concurrency:
+  group: duo-appium-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-hinge:
+    runs-on: xcode-27
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.1.app/Contents/Developer
+      APPIUM_HOME: ${{ runner.temp }}/foldready-appium-home
+      DUO_PROOF_DIR: ${{ runner.temp }}/duo-hinge-proof
+      PROJ: Examples/continuity-demo/continuity-demo.xcodeproj
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pin Xcode and boot the Duo simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$DUO_PROOF_DIR"
+          xcodebuild -version | tee "$DUO_PROOF_DIR/xcode-version.txt"
+          [[ "$(xcodebuild -version)" == *"Xcode 27.1"* ]] || exit 1
+          python3 - <<'PY'
+          import json, os, subprocess
+          obj = json.loads(subprocess.check_output(["xcrun","simctl","list","devices","available","-j"]))
+          duos = [d for runtime, devices in obj["devices"].items() if "iOS-27-1" in runtime
+                  for d in devices if d["name"] == "iPhone Duo" and d.get("isAvailable", True)]
+          if len(duos) != 1:
+              raise SystemExit(f"Expected one supported iOS 27.1 Duo simulator, found {len(duos)}")
+          udid = duos[0]["udid"]
+          with open(os.environ["GITHUB_ENV"], "a") as handle:
+              handle.write(f"DUO_UDID={udid}\n")
+          print("Duo simulator:", udid)
+          PY
+          xcrun simctl boot "$DUO_UDID"
+          xcrun simctl bootstatus "$DUO_UDID" -b
+
+      - name: Build source-pinned synthetic fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -project "$PROJ" -scheme ContinuityDemo \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$DUO_UDID" \
+            -derivedDataPath "$RUNNER_TEMP/duo-hinge-derived" \
+            CODE_SIGNING_ALLOWED=NO build \
+            2>&1 | tee "$DUO_PROOF_DIR/build.log"
+          APP="$RUNNER_TEMP/duo-hinge-derived/Build/Products/Debug-iphonesimulator/ContinuityDemo.app"
+          test -d "$APP"
+          /usr/libexec/PlistBuddy -c 'Print :UIApplicationSceneManifest:UISceneConfigurations:UIWindowSceneSessionRoleApplication:0:UISceneDelegateClassName' "$APP/Info.plist" | grep -q SceneDelegate
+          echo "DUO_APP_PATH=$APP" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install pinned Appium 3 and XCUITest Duo driver
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install -g appium@3.7.0
+          appium driver install xcuitest@12.20.0
+          appium --version
+          appium driver list --installed
+
+      - name: Start local Appium server
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup appium --address 127.0.0.1 --port 4723 --log "$DUO_PROOF_DIR/appium-server.log" > "$DUO_PROOF_DIR/appium-stdout.log" 2>&1 &
+          echo "$!" > "$DUO_PROOF_DIR/appium.pid"
+          python3 - <<'PY'
+          import json, time, urllib.request
+          for attempt in range(50):
+              try:
+                  with urllib.request.urlopen("http://127.0.0.1:4723/status", timeout=4) as resp:
+                      result = json.load(resp)
+                  if result.get("value", {}).get("ready"):
+                      print("Appium /status ready")
+                      break
+              except Exception:
+                  pass
+              time.sleep(1)
+          else:
+              raise SystemExit("Appium server never became ready")
+          PY
+
+      - name: Execute hinge closed-open-closed proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 Scripts/probe_duo_hinge.py 2>&1 | tee "$DUO_PROOF_DIR/hinge-client.log"
+
+      - name: Upload exact evidence even on failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: duo-hinge-experiment-${{ github.run_id }}
+          path: ${{ runner.temp }}/duo-hinge-proof/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Clean up ephemeral simulator and server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$DUO_PROOF_DIR/appium.pid" ]; then
+            kill "$(cat "$DUO_PROOF_DIR/appium.pid")" || true
+          fi
+          if [ -n "${DUO_UDID:-}" ]; then
+            xcrun simctl shutdown "$DUO_UDID" || true
+          fi
