@@ -1,6 +1,6 @@
 # FoldReady roadmap
 
-Plan of record, updated 19 September 2026. The immediate objective is one paid manual
+Plan of record originally written 19 September 2026. **Post-launch note (25 October 2026):** iPhone Duo has shipped and Xcode 27.1/Device Hub have been released; the earlier simulator unavailability was a *dated local obstacle*, not a present Apple limitation. Our [Mac preflight](duo-preflight-2026-10-25.md) confirms the SDK and device type but no usable simulator instance yet. The first paid review remains unvalidated; see [the commercial prep](sales-one-pager.md) and [prospect research](prospects-2026-10-25.md). Preserve all earlier measurement caveats below. The immediate objective is one paid manual
 review, delivered with evidence and explicit coverage. The scanner is the instrument used
 in that review. Customer demand and delivery effort remain unproven.
 
