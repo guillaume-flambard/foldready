@@ -8,6 +8,8 @@ on:
     paths:
       - ".github/workflows/duo-appium-hinge-pilot.yml"
       - "Scripts/probe_duo_hinge.py"
+      - "Scripts/validate_duo_hinge_evidence.py"
+      - "Tests/site/test_duo_hinge_evidence_gate.py"
   workflow_dispatch:
 
 concurrency:
@@ -129,6 +131,13 @@ jobs:
             echo "Appium session startup diagnostics retained in the artifact."
           fi
           test -f "$DUO_PROOF_DIR/hinge-evidence.json" || printf '{"status":"execution_error","fold_unfold_transition":"not_tested","reason":"probe did not produce a complete evidence record"}\n' > "$DUO_PROOF_DIR/hinge-evidence.json"
+
+      - name: Enforce proof bundle internal consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 Scripts/validate_duo_hinge_evidence.py "$DUO_PROOF_DIR" \
+            | tee "$DUO_PROOF_DIR/evidence-validation.log"
 
       - name: Upload exact evidence even on failures
         if: always()
