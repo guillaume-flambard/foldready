@@ -76,8 +76,6 @@ def validate(proof_directory: Path) -> dict:
     candidates.sort()
     cover_id, inner_id = candidates[0][1], candidates[-1][1]
     require(cover_id != inner_id, "Both stages resolve to the same display")
-    area_by_id = {display["id"]: area for area, (_, display_id) in zip(candidates, candidates)
-                  for display in displays if display["id"] == display_id}
     # Preserve the source provider's display IDs; never hardcode id 1 or 3.
 
     rows = document.get("before_after")
