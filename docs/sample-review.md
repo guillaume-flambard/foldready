@@ -1,5 +1,7 @@
 # Sample review: IceCubesApp
 
+**Historical source example, prepared 19 September 2026.** Statements below about the Duo simulator not yet existing refer to that date and are obsolete as of 25 October: Apple now ships Xcode 27.1 and Device Hub. The app was **not** retested; every Duo runtime row remains **not tested**. See [actual local preflight](duo-preflight-2026-10-25.md).
+
 This is a worked example of the $349 readiness review, produced from a scanner run that
 already existed. No code was written to make it. It exists so a developer can see the shape
 of the deliverable before deciding whether to buy it. It is a sample, not a delivered
