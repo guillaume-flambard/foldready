@@ -1,6 +1,6 @@
 name: iPhone Duo fixture smoke
 
-# A true app build, simulator launch, static screenshots, and an XCUITest foreground form interaction.
+# A real app launch, static screenshots, foreground form interaction and an explicitly verified rotation.
 # This is NOT fold/unfold or application-compatibility certification.
 on:
   pull_request:
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   duo-fixture:
-    name: Verify foreground synthetic UIKit fixture on iPhone Duo
+    name: Verify form interaction and rotation on synthetic iPhone Duo fixture
     runs-on: xcode-27
     timeout-minutes: 25
     env:
@@ -151,6 +151,7 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/duo-derived" \
             -resultBundlePath "$RUNNER_TEMP/duo-proof/duo-ui-smoke.xcresult" \
             -only-testing:ContinuityUITests/ExplicitTests/testDuoForegroundJourney \
+            -only-testing:ContinuityUITests/ExplicitTests/testDuoRotationPreservesFormState \
             -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO test \
             2>&1 | tee "$RUNNER_TEMP/duo-proof/ui-test.log"
