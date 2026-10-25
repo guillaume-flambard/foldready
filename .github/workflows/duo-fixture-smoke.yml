@@ -1,6 +1,6 @@
 name: iPhone Duo fixture smoke
 
-# A true app build, simulator launch and screenshot.
+# A true app build, simulator launch, static screenshots, and an XCUITest foreground form interaction.
 # This is NOT fold/unfold or application-compatibility certification.
 on:
   pull_request:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   duo-fixture:
-    name: Build and launch synthetic UIKit fixture on iPhone Duo
+    name: Verify foreground synthetic UIKit fixture on iPhone Duo
     runs-on: xcode-27
     timeout-minutes: 25
     env:
@@ -121,13 +121,31 @@ jobs:
               "source_review": "not_performed",
               "fold_unfold_transition": "not_tested",
               "pose_coverage": "not_tested",
-              "critical_user_journey": "not_tested",
+              "critical_user_journey": "pending_xcuitest_validation",
               "physical_device": "not_tested",
               "screenshots": ["duo-outer-display.png", "duo-inner-display.png"]
           }
           (root / "evidence.json").write_text(json.dumps(manifest, indent=2) + "\n")
           print(json.dumps(manifest, indent=2))
           PY
+
+      - name: Assert fixture UI is foreground, tappable and changes state
+        shell: bash
+        run: |
+          set -euo pipefail
+          # XCUITest checks a visible heading and executes a real synthetic form tap.
+          # A simctl PID and screenshots of SpringBoard do not qualify as a pass.
+          xcodebuild \
+            -project "$PROJ" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$DUO_UDID" \
+            -derivedDataPath "$RUNNER_TEMP/duo-derived" \
+            -resultBundlePath "$RUNNER_TEMP/duo-proof/duo-ui-smoke.xcresult" \
+            -only-testing:ContinuityUITests/ExplicitTests/testDuoForegroundJourney \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO test \
+            2>&1 | tee "$RUNNER_TEMP/duo-proof/ui-test.log"
 
       - name: Keep read-only execution evidence, also on failure
         if: always()
