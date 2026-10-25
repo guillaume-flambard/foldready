@@ -23,8 +23,8 @@ jobs:
     timeout-minutes: 35
     env:
       DEVELOPER_DIR: /Applications/Xcode_27.1.app/Contents/Developer
-      APPIUM_HOME: ${{ runner.temp }}/foldready-appium-home
-      DUO_PROOF_DIR: ${{ runner.temp }}/duo-hinge-proof
+      APPIUM_HOME: /tmp/foldready-appium-home
+      DUO_PROOF_DIR: /tmp/foldready-duo-hinge-proof
       PROJ: Examples/continuity-demo/continuity-demo.xcodeproj
     steps:
       - uses: actions/checkout@v4
