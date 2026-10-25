@@ -1,0 +1,173 @@
+name: iPhone Duo fixture smoke
+
+# A true app build, simulator launch, static screenshots, and an XCUITest foreground form interaction.
+# This is NOT fold/unfold or application-compatibility certification.
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/duo-fixture-smoke.yml"
+      - "Examples/continuity-demo/**"
+  workflow_dispatch:
+
+# Avoid spending several hosted macOS simulator runs on superseded PR revisions.
+concurrency:
+  group: duo-fixture-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  duo-fixture:
+    name: Verify foreground synthetic UIKit fixture on iPhone Duo
+    runs-on: xcode-27
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.1.app/Contents/Developer
+      PROJ: Examples/continuity-demo/continuity-demo.xcodeproj
+      SCHEME: ContinuityDemo
+      BUNDLE: dev.memolabs.ContinuityDemo
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Xcode 27.1, iOS runtime and Duo instance
+        id: device
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcrun simctl list runtimes
+          xcrun simctl list devices available
+          [[ "$(xcodebuild -version)" == *"Xcode 27.1"* ]] || { echo "Unexpected Xcode release" >&2; exit 1; }
+          python3 - <<'PY'
+          import json, os, subprocess
+          data = json.loads(subprocess.check_output(["xcrun","simctl","list","devices","available","-j"]))
+          duos = [
+              device for runtime, devices in data["devices"].items()
+              if "iOS-27-1" in runtime
+              for device in devices
+              if device["name"] == "iPhone Duo" and device.get("isAvailable", True)
+          ]
+          if len(duos) != 1:
+              raise SystemExit(f"Expected exactly one available iPhone Duo on iOS 27.1; found {len(duos)}")
+          with open(os.environ["GITHUB_ENV"], "a") as env:
+              env.write(f"DUO_UDID={duos[0]['udid']}\n")
+          print("Resolved iPhone Duo instance:", duos[0]["udid"])
+          PY
+
+      - name: Build synthetic demo with iOS 27.1 SDK (no simulator boot required)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/duo-proof"
+          xcodebuild \
+            -project "$PROJ" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$DUO_UDID" \
+            -derivedDataPath "$RUNNER_TEMP/duo-derived" \
+            CODE_SIGNING_ALLOWED=NO build \
+            2>&1 | tee "$RUNNER_TEMP/duo-proof/xcodebuild.log"
+
+      - name: Boot the iPhone Duo with an explicit timeout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, subprocess
+          udid = os.environ["DUO_UDID"]
+          print("Booting iPhone Duo:", udid, flush=True)
+          subprocess.run(["xcrun", "simctl", "boot", udid], check=True, timeout=90)
+          print("Waiting for iPhone Duo first boot...", flush=True)
+          subprocess.run(["xcrun", "simctl", "bootstatus", udid, "-b"], check=True, timeout=180)
+          print("iPhone Duo booted successfully", flush=True)
+          PY
+
+      - name: Install, actually launch, and capture one frame
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/duo-derived/Build/Products/Debug-iphonesimulator/ContinuityDemo.app"
+          test -d "$APP"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
+          SCENE=$(/usr/libexec/PlistBuddy -c 'Print :UIApplicationSceneManifest:UISceneConfigurations:UIWindowSceneSessionRoleApplication:0:UISceneDelegateClassName' "$APP/Info.plist")
+          echo "Verified embedded scene delegate: $SCENE"
+          [[ "$SCENE" == *"SceneDelegate" ]] || { echo "Missing iOS 27 scene lifecycle" >&2; exit 1; }
+          xcrun simctl install "$DUO_UDID" "$APP"
+          SIMCTL_CHILD_FR_JOURNEY=form SIMCTL_CHILD_FR_VARIANT=fixed \
+            xcrun simctl launch "$DUO_UDID" "$BUNDLE" \
+            | tee "$RUNNER_TEMP/duo-proof/launch.log"
+          sleep 5
+          # iPhone Duo has two displays. simctl refuses an ambiguous default.
+          # Capturing each static surface DOES NOT actuate or verify folding.
+          xcrun simctl io "$DUO_UDID" screenshot --display=1 "$RUNNER_TEMP/duo-proof/duo-outer-display.png"
+          xcrun simctl io "$DUO_UDID" screenshot --display=3 "$RUNNER_TEMP/duo-proof/duo-inner-display.png"
+          sips -g pixelWidth -g pixelHeight \
+            "$RUNNER_TEMP/duo-proof/duo-outer-display.png" \
+            "$RUNNER_TEMP/duo-proof/duo-inner-display.png" \
+            | tee "$RUNNER_TEMP/duo-proof/image-dimensions.txt"
+          SDK=$(/usr/libexec/PlistBuddy -c 'Print :DTSDKName' "$APP/Info.plist" 2>/dev/null || true)
+          export ACTUAL_LINKED_SDK="$SDK"
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess
+          root = pathlib.Path(os.environ["RUNNER_TEMP"]) / "duo-proof"
+          images = [root / "duo-outer-display.png", root / "duo-inner-display.png"]
+          if any(not image.is_file() or image.stat().st_size == 0 for image in images):
+              raise SystemExit("Both Duo display screenshots are required")
+          manifest = {
+              "schema_version": 1,
+              "project_revision": os.environ["GITHUB_SHA"],
+              "sample_type": "synthetic UIKit continuity-demo",
+              "simulator_runtime": "iOS 27.1",
+              "simulator_device": "iPhone Duo",
+              "simulator_udid": os.environ["DUO_UDID"],
+              "xcode_version": subprocess.check_output(["xcodebuild","-version"], text=True).strip(),
+              "app_bundle_id": os.environ["BUNDLE"],
+              "linked_sdk_from_app_info_plist": os.environ.get("ACTUAL_LINKED_SDK") or None,
+              "observation": "simctl install and launch returned success; both static display screenshots captured",
+              "visual_review": "not_performed",
+              "source_review": "not_performed",
+              "fold_unfold_transition": "not_tested",
+              "pose_coverage": "not_tested",
+              "critical_user_journey": "pending_xcuitest_validation",
+              "physical_device": "not_tested",
+              "screenshots": ["duo-outer-display.png", "duo-inner-display.png"]
+          }
+          (root / "evidence.json").write_text(json.dumps(manifest, indent=2) + "\n")
+          print(json.dumps(manifest, indent=2))
+          PY
+
+      - name: Assert fixture UI is foreground, tappable and changes state
+        shell: bash
+        run: |
+          set -euo pipefail
+          # XCUITest checks a visible heading and executes a real synthetic form tap.
+          # A simctl PID and screenshots of SpringBoard do not qualify as a pass.
+          xcodebuild \
+            -project "$PROJ" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$DUO_UDID" \
+            -derivedDataPath "$RUNNER_TEMP/duo-derived" \
+            -resultBundlePath "$RUNNER_TEMP/duo-proof/duo-ui-smoke.xcresult" \
+            -only-testing:ContinuityUITests/ExplicitTests/testDuoForegroundJourney \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO test \
+            2>&1 | tee "$RUNNER_TEMP/duo-proof/ui-test.log"
+
+      - name: Keep read-only execution evidence, also on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: duo-fixture-smoke-${{ github.run_id }}
+          path: ${{ runner.temp }}/duo-proof/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Release CI simulator resources
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "${DUO_UDID:-}" ]; then
+            xcrun simctl shutdown "$DUO_UDID" || true
+          fi

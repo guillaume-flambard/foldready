@@ -3,6 +3,37 @@ import XCTest
 /// Hand-written reference. No decoding of journeys.json and no generated checkpoints/expectations.
 @MainActor
 final class ExplicitTests: CaseRecorder {
+    /// Real foreground validation on the selected simulator. No fold gesture is simulated.
+    /// A successful simctl launch alone is insufficient: a home screen screenshot
+    /// can still be produced after the app has disappeared.
+    func testDuoForegroundJourney() {
+        let app = XCUIApplication()
+        app.launchEnvironment = ["FR_JOURNEY": "form", "FR_VARIANT": "fixed"]
+        app.launch()
+        defer { app.terminate() }
+
+        let title = app.staticTexts["Continuity demo: form / fixed"]
+        XCTAssertTrue(title.waitForExistence(timeout: 25), "Synthetic fixture heading must exist")
+        XCTAssertTrue(title.isHittable, "Synthetic fixture must be visible, not only installed")
+
+        let firstStep = app.buttons["step1"]
+        XCTAssertTrue(firstStep.waitForExistence(timeout: 10), "First journey action must exist")
+        XCTAssertTrue(firstStep.isHittable, "First journey action must be tappable")
+        firstStep.tap()
+        let nameValue = app.staticTexts["name"]
+        XCTAssertTrue(nameValue.waitForExistence(timeout: 10), "Fixture state must be exposed")
+        XCTAssertEqual(nameValue.value as? String, "Ada", "One critical fixture state must update")
+
+        let geometry = app.staticTexts["geometry"]
+        XCTAssertTrue(geometry.exists, "Window geometry must be reported")
+        XCTContext.runActivity(named: "Synthetic form journey - visible UI evidence") { activity in
+            let screenshot = XCTAttachment(screenshot: app.screenshot())
+            screenshot.name = "duo-foreground-form-step1"
+            screenshot.lifetime = .keepAlways
+            activity.add(screenshot)
+        }
+    }
+
     func testMatrix() {
         for variant in variants {
             for repetition in 1...repetitions {
