@@ -1,6 +1,6 @@
 # FoldReady, where the product stands
 
-Written 19 September 2026. This is an analysis, not a plan of record. The plan is
+**Historical position as of 19 September 2026 (not a current Apple availability statement).** iPhone Duo launched 23 October; Xcode 27.1, Device Hub and Apple's newly named **App Resizability** skill (SwiftUI and UIKit) are now available. See [current README](../README.md), [Mac preflight](duo-preflight-2026-10-25.md) and [updated customer-discovery work](pilot-outreach.md). The historical hypotheses, including the “blocked on Apple” section below, are superseded in that respect. This is an analysis, not a plan of record. The plan is
 [roadmap.md](roadmap.md); this document exists to state what the product is worth today, what
 competes with it, and what has to change before the offer means anything.
 
