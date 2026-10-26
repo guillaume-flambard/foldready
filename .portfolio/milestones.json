@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "milestones": [
+    {
+      "kind": "prototype",
+      "date": "2026-09-06",
+      "title": {
+        "fr": "Contrat de diagnostic et garde-fou CI documentés",
+        "en": "Documented diagnostic contract and CI quality gate"
+      },
+      "detail": {
+        "fr": "Un contrat de résultats versionné et un contrôle CI aident à comparer les signaux de code source. Aucun score ne certifie la compatibilité réelle d'une application.",
+        "en": "A versioned results contract and CI gate help compare source-code signals. No score certifies an app's real device compatibility."
+      },
+      "evidenceUrl": "https://github.com/guillaume-flambard/foldready/pull/2"
+    },
+    {
+      "kind": "prototype",
+      "date": "2026-10-25",
+      "title": {
+        "fr": "Continuité de saisie testée dans un simulateur Duo synthétique",
+        "en": "Input continuity tested in a synthetic Duo simulator"
+      },
+      "detail": {
+        "fr": "Une forme UIKit synthétique conserve sa valeur sur un parcours simulé fermé → ouvert → refermé. Ce test ne couvre ni appareil physique ni application cliente.",
+        "en": "A synthetic UIKit form retained its value through a simulated closed → open → closed journey. This does not validate a physical device or any client application."
+      },
+      "evidenceUrl": "https://github.com/guillaume-flambard/foldready/actions/runs/40228317331"
+    }
+  ]
+}
